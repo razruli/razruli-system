@@ -1,0 +1,60 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# JUNCTIONS QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  getShipmentFreight(id: ID!): ShipmentFreight
+  listShipmentFreights(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): ShipmentFreightConnection!
+
+  getShipmentStop(id: ID!): ShipmentStop
+  listShipmentStops(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): ShipmentStopConnection!
+
+  getShipmentLog(id: ID!): ShipmentLog
+  listShipmentLogs(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): ShipmentLogConnection!
+
+  getShipmentEvent(id: ID!): ShipmentEvent
+  listShipmentEvents(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): ShipmentEventConnection!
+
+  getShipmentDocument(id: ID!): ShipmentDocument
+  listShipmentDocuments(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): ShipmentDocumentConnection!
+}
+
+type ShipmentFreightConnection {
+  items: [ShipmentFreight!]!
+  pageInfo: PageInfo!
+}
+
+type ShipmentStopConnection {
+  items: [ShipmentStop!]!
+  pageInfo: PageInfo!
+}
+
+type ShipmentLogConnection {
+  items: [ShipmentLog!]!
+  pageInfo: PageInfo!
+}
+
+type ShipmentEventConnection {
+  items: [ShipmentEvent!]!
+  pageInfo: PageInfo!
+}
+
+type ShipmentDocumentConnection {
+  items: [ShipmentDocument!]!
+  pageInfo: PageInfo!
+}

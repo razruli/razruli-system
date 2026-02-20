@@ -1,0 +1,91 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BIDDING TYPES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+enum BidStatus {
+  PENDING
+  RULE_COMPLIANT
+  RULE_NON_COMPLIANT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum RuleType {
+  INSURANCE_AMOUNT
+  HOS_CLEAN
+  VEHICLE_AGE
+  HAZMAT_CERTIFIED
+  TEMPERATURE_CONTROL
+  EARLY_CONFIRM
+  CAPACITY_MATCH
+  ACCESS_HOURS
+  LOCATION_PROXIMITY
+}
+
+"""
+Shipment bid from carrier
+Rule #4: Bid Rules Auto-Validation - auto-checked against requirements
+"""
+type ShipmentBid implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  shipmentId: ID!
+  shipment: Shipment!
+
+  carrier: Carrier!
+  carrierId: String!
+
+  rate: BigInt!
+  status: BidStatus!
+
+  # Rule #4: Compliance status
+  ruleComplianceStatus: BidStatus!
+  remarks: String
+
+  # Additional info
+  estimatedDeliveryDate: DateTime
+  insuranceAmount: BigInt
+  notes: String
+}
+
+"""
+Rule #4: Bid rule for shipment
+AUTO-VALIDATED before bid visibility
+"""
+type BidRule implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  shipmentId: ID!
+  ruleType: RuleType!
+  requirementValue: String!
+  enforced: Boolean!
+}
+
+"""
+Result of bid rule validation
+"""
+type BidRequirement implements Node {
+  id: ID!
+  bidId: ID!
+  ruleId: ID!
+  passed: Boolean!
+  reason: String
+}
+
+input BidInput {
+  rate: BigInt!
+  estimatedDeliveryDate: DateTime
+  insuranceAmount: BigInt
+  notes: String
+}
+
+input BidRuleInput {
+  ruleType: RuleType!
+  requirementValue: String!
+  enforced: Boolean
+}

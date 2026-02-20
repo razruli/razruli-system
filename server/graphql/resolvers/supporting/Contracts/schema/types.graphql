@@ -1,0 +1,185 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONTRACTS TYPE DEFINITIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+type BrokerCarrierContract implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  contractNumber: String!
+  broker: Broker!
+  carrier: Carrier!
+
+  status: String!
+  startDate: DateTime!
+  endDate: DateTime
+
+  defaultRate: BigInt!
+  minRate: BigInt!
+  maxRate: BigInt!
+
+  volumeDiscount: Float!
+  volumeThreshold: Int
+
+  termsDays: Int!
+  paymentTerms: String!
+
+  baselineFuel: Float!
+  fuelSurchargeFormula: String!
+
+  notes: String
+
+  rates: [BrokerRate!]!
+}
+
+type BrokerRate implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  contract: BrokerCarrierContract!
+  brokerRateId: String!
+
+  originState: String
+  destState: String
+  originCity: String
+  destCity: String
+
+  laneDescription: String
+
+  rate: BigInt!
+  minimumCharge: BigInt!
+
+  effectiveDate: DateTime!
+  expiryDate: DateTime
+
+  freightClassMin: Int
+  freightClassMax: Int
+  weightMin: Float
+  weightMax: Float
+}
+
+type CarrierRate implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  carrier: Carrier!
+  carrierRateId: String!
+
+  originState: String
+  destState: String
+  originCity: String
+  destCity: String
+
+  laneDescription: String
+
+  baseRate: BigInt!
+  minRate: BigInt!
+  maxRate: BigInt!
+
+  costPerMile: Float
+  deadheadCost: BigInt
+
+  effectiveDate: DateTime!
+  expiryDate: DateTime
+
+  freightClassMin: Int
+  freightClassMax: Int
+  weightMin: Float
+  weightMax: Float
+}
+
+type CarrierAccessorial implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  carrier: Carrier!
+  serviceCode: String!
+  serviceName: String!
+  serviceDescription: String
+
+  unitType: String!
+  unitRate: BigInt!
+
+  availableRegions: [String!]!
+  minRate: BigInt!
+  maxRate: BigInt!
+
+  isApproved: Boolean!
+}
+
+input CreateBrokerCarrierContractInput {
+  brokerId: ID!
+  carrierId: ID!
+  contractNumber: String!
+  startDate: DateTime!
+  endDate: DateTime
+  defaultRate: BigInt!
+  minRate: BigInt!
+  maxRate: BigInt!
+  volumeDiscount: Float
+  termsDays: Int
+}
+
+input UpdateBrokerCarrierContractInput {
+  status: String
+  defaultRate: BigInt
+  minRate: BigInt
+  maxRate: BigInt
+  volumeDiscount: Float
+  notes: String
+}
+
+input CreateBrokerRateInput {
+  contractId: ID!
+  originState: String
+  destState: String
+  laneDescription: String!
+  rate: BigInt!
+  minimumCharge: BigInt!
+  effectiveDate: DateTime!
+  expiryDate: DateTime
+}
+
+input UpdateBrokerRateInput {
+  rate: BigInt
+  minimumCharge: BigInt
+  expiryDate: DateTime
+}
+
+input CreateCarrierRateInput {
+  carrierId: ID!
+  originState: String
+  destState: String
+  laneDescription: String!
+  baseRate: BigInt!
+  minRate: BigInt!
+  maxRate: BigInt!
+  effectiveDate: DateTime!
+}
+
+input UpdateCarrierRateInput {
+  baseRate: BigInt
+  minRate: BigInt
+  maxRate: BigInt
+  expiryDate: DateTime
+}
+
+input CreateCarrierAccessorialInput {
+  carrierId: ID!
+  serviceCode: String!
+  serviceName: String!
+  unitType: String!
+  unitRate: BigInt!
+  availableRegions: [String!]!
+}
+
+input UpdateCarrierAccessorialInput {
+  serviceName: String
+  unitRate: BigInt
+  availableRegions: [String!]
+  isApproved: Boolean
+}

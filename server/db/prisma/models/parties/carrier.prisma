@@ -1,0 +1,71 @@
+// server/db/prisma/models/parties/carrier.prisma
+// ============================================================================
+// CARRIER MODEL - Transportation company that owns fleet and manages drivers
+// Phase 4-6: Submits bids on shipments + confirms paperwork
+// ============================================================================
+
+model Carrier {
+  id                 String @id @default(cuid())
+  companyName        String @unique
+  registrationNumber String @unique
+  email              String @unique
+  phone              String
+  address            String
+  city               String
+  state              String
+  zipCode            String
+  country            String @default("US")
+
+  contactPersonName String
+  contactPhone      String
+
+  mcNumber           String               @unique
+  dotNumber          String               @unique
+  operatingAuthority CarrierAuthorityType
+
+  licenseNumber     String
+  licenseExpiryDate DateTime
+
+  insuranceProvider   String
+  insurancePolicyId   String
+  insuranceExpiryDate DateTime
+  liabilityLimit      BigInt
+  cargoInsurance      Boolean  @default(true)
+
+  totalTrucks  Int @default(0)
+  totalDrivers Int @default(0)
+
+  fleetTypes      String[]
+  specializations String[]
+  averageFleetAge Int?
+
+  // Reputation (Rule #10: Visible Assignment)
+  rating         Float @default(5.0)
+  reviewCount    Int   @default(0)
+  totalShipments Int   @default(0)
+  onTimeDelivery Float @default(100)
+  damageRate     Float @default(0)
+  safetyScore    Float @default(100)
+
+  // Status
+  isActive           Boolean            @default(true)
+  verificationStatus VerificationStatus @default(pending)
+
+  // Audit trail
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  trucks              Truck[]
+  drivers             Driver[]
+  shipments           Shipment[]
+  brokerContracts     BrokerCarrierContract[]
+  rates               CarrierRate[]
+  reviews             Review[]
+  bids                ShipmentBid[] // Phase 4-5: Carrier bids
+  carrierAccessorials CarrierAccessorial[]
+
+  // Indexes for query performance
+  @@index([isActive, rating])
+  @@index([createdAt])
+}

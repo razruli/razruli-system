@@ -1,0 +1,27 @@
+// shared/ui/shadcn/index.ts
+// Public API for shadcn ui components
+export * from "./alert-dialog";
+export * from "./alert";
+export * from "./avatar";
+export * from "./badge";
+export * from "./breadcrumb";
+export * from "./button";
+export * from "./calendar";
+export * from "./checkbox";
+export * from "./collapsible";
+export * from "./drawer";
+export * from "./dropdown-menu";
+export * from "./form";
+export * from "./input";
+export * from "./label";
+export * from "./pagination";
+export * from "./popover";
+export * from "./select";
+export * from "./separator";
+export * from "./sheet";
+export * from "./sidebar";
+export * from "./skeleton";
+export * from "./switch";
+export * from "./table";
+export * from "./tooltip";
+export * from "./components";

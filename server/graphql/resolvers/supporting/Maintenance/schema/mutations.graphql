@@ -1,0 +1,13 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAINTENANCE MUTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Mutation {
+  """
+  Create maintenance record, update vehicle status if needed
+  """
+  createMaintenanceRecord(
+    vehicleId: ID!
+    input: MaintenanceInput!
+  ): MaintenanceRecord!
+}

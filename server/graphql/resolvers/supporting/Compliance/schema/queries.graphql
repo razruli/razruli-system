@@ -1,0 +1,20 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMPLIANCE QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get compliance status for carrier
+  """
+  getComplianceStatus(carrierId: ID!): ComplianceStatus
+
+  """
+  List all compliance issues
+  """
+  listComplianceIssues(input: PaginationInput!): ComplianceIssueConnection!
+}
+
+type ComplianceIssueConnection {
+  items: [ComplianceIssue!]!
+  pageInfo: PageInfo!
+}

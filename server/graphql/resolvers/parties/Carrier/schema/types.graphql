@@ -1,0 +1,97 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CARRIER TYPE DEFINITIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+enum CarrierAuthorityType {
+  COMMON_CARRIER
+  CONTRACT_CARRIER
+  PRIVATE_CARRIER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+"""
+Transportation company that owns fleet and manages drivers
+Phase 4-6: Submits bids on shipments + confirms paperwork
+Rule #10: Visible Assignment - rating visible to all
+"""
+type Carrier implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  # Basic info
+  companyName: String!
+  email: String!
+  phone: String!
+  address: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
+
+  # Authorization
+  mcNumber: String!
+  dotNumber: String!
+  operatingAuthority: CarrierAuthorityType!
+  licenseNumber: String!
+  licenseExpiryDate: DateTime!
+
+  # Insurance
+  insuranceProvider: String!
+  insurancePolicyId: String!
+  insuranceExpiryDate: DateTime!
+  liabilityLimit: BigInt!
+  cargoInsurance: Boolean!
+
+  # Fleet & Reputation
+  totalTrucks: Int!
+  totalDrivers: Int!
+  fleetTypes: [String!]!
+  specializations: [String!]!
+  averageFleetAge: Int
+
+  # Reputation (Rule #10: Visible Assignment)
+  rating: Float!
+  reviewCount: Int!
+  totalShipments: Int!
+  onTimeDelivery: Float!
+  damageRate: Float!
+  safetyScore: Float!
+
+  # Status
+  isActive: Boolean!
+  verificationStatus: VerificationStatus!
+
+  # Relations
+  trucks: [Vehicle!]!
+  drivers: [Driver!]!
+  shipments: [Shipment!]!
+}
+
+input CreateCarrierInput {
+  companyName: String!
+  email: String!
+  phone: String!
+  address: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String
+  mcNumber: String!
+  dotNumber: String!
+  operatingAuthority: CarrierAuthorityType!
+  licenseNumber: String!
+  licenseExpiryDate: DateTime!
+  insuranceProvider: String!
+  insurancePolicyId: String!
+  insuranceExpiryDate: DateTime!
+  liabilityLimit: BigInt!
+  fleetTypes: [String!]
+  specializations: [String!]
+}

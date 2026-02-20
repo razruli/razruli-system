@@ -1,0 +1,88 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SUPPORTING FRAGMENTS
+# ═══════════════════════════════════════════════════════════════════════════════
+# Reusable field groupings for supporting types (Contracts, Rates, Errors, etc.)
+# Organization: Atomic → Composite → Complete hierarchy
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONTRACTS & RATES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+fragment ContractBasic on BrokerCarrierContract {
+  id
+  contractNumber
+  status
+  startDate
+  endDate
+}
+
+fragment RateBasic on BrokerRate {
+  id
+  rate
+  minimumCharge
+  effectiveDate
+  expiryDate
+}
+
+fragment AccessorialBasic on CarrierAccessorial {
+  id
+  serviceCode
+  serviceName
+  unitType
+  unitRate
+  isApproved
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ERROR HANDLING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+fragment ErrorDetails on Error {
+  code
+  message
+  extensions
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WAREHOUSE BIDDING
+# ═══════════════════════════════════════════════════════════════════════════════
+
+fragment WarehouseBidBasic on WarehouseBid {
+  id
+  warehouseNeedId
+  warehouseId
+  ratePerDay
+  availableCapacityKg
+  status
+}
+
+fragment WarehouseNeedBasic on WarehouseNeed {
+  id
+  freightId
+  brokerId
+  status
+  requiredCapacityKg
+  estimatedStorageDays
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CANCELLATION & PENALTIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+fragment CancellationFeeBasic on CancellationFee {
+  id
+  shipmentId
+  totalFeeAmount
+  feePercentage
+  calculatedAt
+  distributedAt
+}
+
+fragment PenaltyBasic on Penalty {
+  id
+  penaltyType
+  amount
+  reason
+  appliedAt
+}

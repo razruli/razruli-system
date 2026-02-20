@@ -1,0 +1,21 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# REVIEWS TYPES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+type Review implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  carrierId: String!
+  carrier: Carrier!
+
+  rating: Float!
+  comment: String!
+  shippmentId: String
+}
+
+input ReviewInput {
+  rating: Float!
+  comment: String!
+}

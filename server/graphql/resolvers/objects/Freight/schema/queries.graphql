@@ -1,0 +1,31 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# FREIGHT QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get freight by ID
+  """
+  getFreight(id: ID!): Freight
+
+  """
+  List all freights with pagination
+  """
+  listFreights(input: PaginationInput!): FreightConnection!
+
+  """
+  List available freights (status = AVAILABLE)
+  Rule #1: Used by brokers to find cargo to claim
+  """
+  listAvailableFreights(input: PaginationInput!): FreightConnection!
+
+  """
+  Get freight by freight number
+  """
+  getFreightByNumber(number: String!): Freight
+}
+
+type FreightConnection {
+  items: [Freight!]!
+  pageInfo: PageInfo!
+}

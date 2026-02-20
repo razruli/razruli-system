@@ -1,0 +1,31 @@
+# General GraphQL Types (Shared Across All Features)
+
+# Pagination
+type PageInfo {
+  total: Int!
+  hasMore: Boolean!
+  offset: Int!
+  limit: Int!
+}
+
+input PaginationInput {
+  offset: Int
+  limit: Int
+}
+
+# Error Handling
+type Error {
+  code: String!
+  message: String!
+  extensions: JSON
+}
+
+interface Node {
+  id: ID!
+}
+
+#S tatus Types
+enum SortOrder {
+  ASC
+  DESC
+}

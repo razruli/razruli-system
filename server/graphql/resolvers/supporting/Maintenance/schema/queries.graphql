@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAINTENANCE QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get maintenance record by ID
+  """
+  getMaintenanceRecord(id: ID!): MaintenanceRecord
+
+  """
+  List maintenance history for vehicle
+  """
+  listMaintenanceHistory(
+    vehicleId: ID!
+    input: PaginationInput!
+  ): MaintenanceConnection!
+}
+
+type MaintenanceConnection {
+  items: [MaintenanceRecord!]!
+  pageInfo: PageInfo!
+}

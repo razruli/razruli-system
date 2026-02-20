@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONTRACTS MUTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Mutation {
+  createBrokerCarrierContract(
+    input: CreateBrokerCarrierContractInput!
+  ): BrokerCarrierContract!
+  updateBrokerCarrierContract(
+    id: ID!
+    input: UpdateBrokerCarrierContractInput!
+  ): BrokerCarrierContract!
+
+  createBrokerRate(input: CreateBrokerRateInput!): BrokerRate!
+  updateBrokerRate(id: ID!, input: UpdateBrokerRateInput!): BrokerRate!
+
+  createCarrierRate(input: CreateCarrierRateInput!): CarrierRate!
+  updateCarrierRate(id: ID!, input: UpdateCarrierRateInput!): CarrierRate!
+
+  createCarrierAccessorial(
+    input: CreateCarrierAccessorialInput!
+  ): CarrierAccessorial!
+  updateCarrierAccessorial(
+    id: ID!
+    input: UpdateCarrierAccessorialInput!
+  ): CarrierAccessorial!
+}

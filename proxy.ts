@@ -1,7 +1,10 @@
-import createMiddleware from "next-intl/middleware";
-import { routing } from "@/shared/i18n/routing";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-// import { auth } from "./app/lib/auth/auth";
+import createMiddleware from "next-intl/middleware";
+
+import { routing } from "@/shared/i18n/routing";
+
+import { auth } from "./server/auth/auth";
 
 // next-intl middleware
 const intlMiddleware = createMiddleware(routing);
@@ -16,18 +19,16 @@ export async function proxy(request: NextRequest) {
     return intlResponse;
   }
 
-  /**
-   * 2. Auth check
-   */
-  // if (request.nextUrl.pathname.startsWith("/dashboard")) {
-  //   const session = await auth.api.getSession({
-  //     headers: request.headers,
-  //   });
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  //   if (!session) {
-  //     return NextResponse.redirect(new URL("/sign-in", request.url));
-  //   }
-  // }
+  // THIS IS NOT SECURE!
+  // This is the recommended approach to optimistically redirect users
+  // We recommend handling auth checks in each page/route
+  if (!session) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
 
   return NextResponse.next();
 }

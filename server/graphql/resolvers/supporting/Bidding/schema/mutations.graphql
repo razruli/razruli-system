@@ -1,0 +1,45 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BIDDING MUTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Mutation {
+  """
+  Phase 4-5: Carrier submits bid
+  Rule #4: Bid Rules Auto-Validation - checked immediately
+  """
+  createBid(shipmentId: ID!, input: BidInput!): ShipmentBid!
+
+  """
+  Update bid (only if status = PENDING)
+  """
+  updateBid(id: ID!, input: BidInput!): ShipmentBid!
+
+  """
+  Reject bid with reason
+  """
+  rejectBid(id: ID!, reason: String): ShipmentBid!
+
+  """
+  Rule #4: Set bid rule for shipment (before bidding opens)
+  enforced=true: must pass (bid rejected if fails)
+  enforced=false: warning only (bid visible with flag)
+  """
+  createBidRule(shipmentId: ID!, input: BidRuleInput!): BidRule!
+
+  """
+  Update bid rule (only before bidding opens)
+  """
+  updateBidRule(id: ID!, input: BidRuleInput!): BidRule!
+
+  """
+  Delete bid rule (only before bidding opens)
+  """
+  deleteBidRule(id: ID!): Boolean!
+
+  """
+  Rule #4: Override non-compliant bid
+  Broker accepts RULE_NON_COMPLIANT bid
+  Logged in audit trail
+  """
+  overrideBidRuleCompliance(bidId: ID!, reason: String!): ShipmentBid!
+}

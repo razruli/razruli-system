@@ -1,0 +1,57 @@
+// server/db/prisma/models/parties/broker.prisma
+// ============================================================================
+// BROKER MODEL - Logistics intermediary that coordinates shipments
+// Phase 2: Claims freight (single broker lock)
+// Phase 3: Sets bid rules + opens bidding
+// Phase 6-8: Posts warehouse needs + selects winners
+// ============================================================================
+
+model Broker {
+  id                 String @id @default(cuid())
+  companyName        String @unique
+  registrationNumber String @unique
+  email              String @unique
+  phone              String
+  address            String
+  city               String
+  state              String
+  zipCode            String
+  country            String @default("US")
+
+  contactPersonName String
+  contactPhone      String
+
+  licenseNumber       String   @unique
+  licenseExpiryDate   DateTime
+  insuranceProvider   String
+  insurancePolicyId   String
+  insuranceExpiryDate DateTime
+
+  operatingRegions String[]
+  specializations  String[]
+
+  // Reputation (Rule #10: Visible Assignment)
+  rating         Float @default(5.0)
+  reviewCount    Int   @default(0)
+  totalShipments Int   @default(0)
+  onTimeDelivery Float @default(100)
+
+  // Status
+  isActive           Boolean            @default(true)
+  verificationStatus VerificationStatus @default(pending)
+
+  // Audit trail
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  shipments       Shipment[]
+  claimedFreights Freight[] // Phase 2: Single broker lock
+  contracts       BrokerCarrierContract[]
+  reviews         Review[]
+  warehouseNeeds  WarehouseNeed[] // Phase 6-8: Warehouse bidding
+
+  // Indexes for query performance
+  @@index([isActive, rating])
+  @@index([createdAt])
+}

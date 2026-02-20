@@ -1,0 +1,41 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SHIPMENT QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get shipment by ID
+  """
+  getShipment(id: ID!): Shipment
+
+  """
+  List all shipments with pagination
+  """
+  listShipments(input: PaginationInput!): ShipmentConnection!
+
+  """
+  Get shipment by shipment number
+  """
+  getShipmentByNumber(number: String!): Shipment
+
+  """
+  List shipments by broker (owner's perspective)
+  """
+  listShipmentsByBroker(
+    brokerId: String!
+    input: PaginationInput!
+  ): ShipmentConnection!
+
+  """
+  List shipments by carrier (bidding/assigned)
+  """
+  listShipmentsByCarrier(
+    carrierId: String!
+    input: PaginationInput!
+  ): ShipmentConnection!
+}
+
+type ShipmentConnection {
+  items: [Shipment!]!
+  pageInfo: PageInfo!
+}

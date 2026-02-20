@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUDIT LOG TYPES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+enum EventType {
+  BID_SUBMITTED
+  BID_ACCEPTED
+  MARGIN_LOCKED
+  BIDDING_OPENED
+  STATUS_CHANGED
+  CANCELLED_WITH_FEE
+  FREIGHT_CLAIMED
+  SHIPMENT_CREATED
+  PENALTY_DISTRIBUTED
+}
+
+input AuditFilterInput {
+  shipmentId: ID
+  freightId: ID
+  eventType: EventType
+  startDate: DateTime
+  endDate: DateTime
+}

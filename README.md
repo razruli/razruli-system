@@ -1,8 +1,12 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gruzin Platform - Logistics Coordination System
+
+## Overview
+
+Gruzin orchestrates freight transportation across 11 phases, connecting freight owners, brokers, carriers, and drivers in real-time.
+
+**Documentation:** Read [AGENTS.md](docs/development/AGENTS.md) first for development rules.
 
 ## Getting Started
-
-First, run the development server:
 
 ```bash
 npm run dev

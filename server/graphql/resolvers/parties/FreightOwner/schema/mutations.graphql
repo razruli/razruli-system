@@ -1,0 +1,8 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# FREIGHT OWNER MUTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Mutation {
+  createFreightOwner(input: CreateFreightOwnerInput!): FreightOwner!
+  updateFreightOwner(id: ID!, input: CreateFreightOwnerInput!): FreightOwner!
+}

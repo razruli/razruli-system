@@ -1,0 +1,36 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# DRIVER TYPE DEFINITIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+type Driver implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  licenseNumber: String!
+  licenseExpiryDate: DateTime!
+  status: DriverStatus!
+
+  carrier: Carrier!
+  carrierId: String!
+}
+
+input CreateDriverInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  phone: String!
+  licenseNumber: String!
+  licenseExpiryDate: DateTime!
+}

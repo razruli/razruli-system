@@ -1,0 +1,41 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUDIT QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get single audit log entry
+  """
+  getAuditLog(id: ID!): ShipmentLog
+
+  """
+  List all audit logs with pagination
+  """
+  listAuditLogs(input: PaginationInput!): AuditLogConnection!
+
+  """
+  Rule #9: Get complete audit trail for shipment (immutable, append-only)
+  """
+  getShipmentAuditTrail(
+    shipmentId: ID!
+    input: PaginationInput!
+  ): AuditTrailConnection!
+
+  """
+  Get freight audit trail
+  """
+  getFreightAuditTrail(
+    freightId: ID!
+    input: PaginationInput!
+  ): AuditTrailConnection!
+}
+
+type AuditLogConnection {
+  items: [ShipmentLog!]!
+  pageInfo: PageInfo!
+}
+
+type AuditTrailConnection {
+  items: [ShipmentEvent!]!
+  pageInfo: PageInfo!
+}

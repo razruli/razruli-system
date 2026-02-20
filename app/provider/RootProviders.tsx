@@ -1,5 +1,6 @@
-import LocaleLayout from "@/shared/i18n/layout/LocaleLayout";
-import { ThemeProvider } from "@/shared/theme/ThemeProvider";
+import { LocaleLayout } from "@/shared/i18n";
+import { ApolloClientProvider } from "@/shared/lib";
+import { ThemeProvider } from "@/shared/theme";
 
 export function RootProviders({
   children,
@@ -9,8 +10,10 @@ export function RootProviders({
   params: Promise<{ locale: string }>;
 }) {
   return (
-    <LocaleLayout params={params}>
-      <ThemeProvider>{children}</ThemeProvider>
-    </LocaleLayout>
+    <ApolloClientProvider>
+      <LocaleLayout params={params}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </LocaleLayout>
+    </ApolloClientProvider>
   );
 }

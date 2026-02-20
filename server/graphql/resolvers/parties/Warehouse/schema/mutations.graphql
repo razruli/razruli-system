@@ -1,0 +1,9 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# WAREHOUSE MUTATIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Mutation {
+  createWarehouse(input: CreateWarehouseInput!): Warehouse!
+  updateWarehouse(id: ID!, input: UpdateWarehouseInput!): Warehouse!
+  updateCapacity(id: ID!, capacityKg: Float!): Warehouse!
+}

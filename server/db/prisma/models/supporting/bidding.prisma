@@ -1,0 +1,183 @@
+// server/db/prisma/models/supporting/bidding.prisma
+// ============================================================================
+// BIDDING MODELS - Carrier & Warehouse competitive bidding
+// Phase 4-5: Carrier bidding + Rule auto-validation
+// Phase 7-8: Warehouse bidding
+// ============================================================================
+
+model BidRule {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  // Rule definition
+  ruleType         RuleType
+  requirementValue String // E.g., "500000" for insurance, "10" for vehicle age
+  enforced         Boolean  @default(true) // true = must pass, false = warning only
+  description      String?
+
+  // Phase 3: Set before bidding opens, immutable
+  createdAt DateTime @default(now())
+
+  // Relations
+  requirements BidRequirement[]
+
+  @@unique([shipmentId, ruleType])
+  @@index([shipmentId])
+}
+
+model BidRequirement {
+  id        String  @id @default(cuid())
+  bidRuleId String
+  bidRule   BidRule @relation(fields: [bidRuleId], references: [id], onDelete: Cascade)
+
+  bidId String
+  bid   ShipmentBid @relation(fields: [bidId], references: [id], onDelete: Cascade)
+
+  // Validation result
+  carrierResponse String? // What the carrier actually provided
+  meetsRule       Boolean // Did they pass?
+  validationNotes String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([bidRuleId, bidId])
+  @@index([bidId])
+}
+
+model ShipmentBid {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  // Phase 4-5: Carrier submits bid
+  carrierId String
+  carrier   Carrier @relation(fields: [carrierId], references: [id], onDelete: Cascade)
+
+  // Bid terms
+  rate       BigInt // Quoted rate
+  surcharges BigInt @default(0)
+  totalRate  BigInt // rate + surcharges
+
+  // Auto-validation result
+  status BidStatus @default(pending)
+
+  // Phase 5: Broker decision
+  acceptedAt      DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+
+  // Phase 6: Confirmation
+  confirmedPaperworkAt DateTime?
+
+  // Audit trail
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  requirements BidRequirement[]
+
+  @@unique([shipmentId, carrierId])
+  @@index([shipmentId, status])
+  @@index([carrierId, status])
+  @@index([submittedAt])
+}
+
+model WarehouseNeed {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  // Phase 6: Broker posts warehouse need
+  brokerId String
+  broker   Broker @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+
+  // Storage requirements
+  capacityM3 Float
+  capacityKg Float?
+
+  isRefrigerated Boolean @default(false)
+  isHazmat       Boolean @default(false)
+  requiresSecure Boolean @default(false)
+  requires24x7   Boolean @default(false)
+
+  // Dates
+  arrivalDate        DateTime
+  departureDate      DateTime
+  earlyReleaseOption Boolean  @default(false)
+
+  // Bid rules for warehouses
+  bidRulesJson Json? // Serialized rules
+
+  // Phase 8: Selected warehouse
+  selectedBidId     String?
+  selectedWarehouse Warehouse? @relation(fields: [warehouseId], references: [id]) // De-normalized for query efficiency
+
+  // FSM: POSTED → BIDDING_OPEN → BIDS_RECEIVED → WAREHOUSE_SELECTED → ASSIGNED → IN_STORAGE → COMPLETED
+  status WarehouseNeedStatus @default(posted)
+
+  // Phase 7: Bidding timeline
+  biddingOpenedAt  DateTime?
+  biddingOpenUntil DateTime?
+
+  // Penalty tracking
+  cancellationFee CancellationFee?
+
+  // Audit trail
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bids        WarehouseBid[]
+  warehouseId String?
+
+  @@index([shipmentId, status])
+  @@index([brokerId, status])
+  @@index([createdAt, status])
+  @@index([biddingOpenUntil, status])
+}
+
+model WarehouseBid {
+  id              String        @id @default(cuid())
+  warehouseNeedId String
+  warehouseNeed   WarehouseNeed @relation(fields: [warehouseNeedId], references: [id], onDelete: Cascade)
+
+  // Phase 7: Warehouse submits bid
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  // Bid terms
+  ratePerM3  Float // Base rate
+  surcharges Float @default(0.0)
+  totalRate  Float // Total cost
+
+  // Services offered
+  includesMonitoring Boolean  @default(false)
+  includedServices   String[]
+  guarantees         String? // E.g., "99% on-time release"
+
+  // Auto-validation result
+  status BidStatus @default(pending)
+
+  // Phase 8: Broker decision
+  acceptedAt      DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+
+  // Phase 9: Confirmation
+  confirmedCapacityAt DateTime?
+  capacityConfirmed   Boolean   @default(false)
+
+  // Counter-offer rounds (max 3)
+  counterOfferRound Int       @default(0)
+  counterOfferAt    DateTime?
+
+  // Audit trail
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([warehouseNeedId, warehouseId])
+  @@index([warehouseNeedId, status])
+  @@index([warehouseId, status])
+  @@index([submittedAt])
+}

@@ -1,0 +1,17 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# VEHICLE QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  getVehicle(id: ID!): Vehicle
+  listVehicles(input: PaginationInput!): VehicleConnection!
+  listVehiclesByCarrier(
+    carrierId: String!
+    input: PaginationInput!
+  ): VehicleConnection!
+}
+
+type VehicleConnection {
+  items: [Vehicle!]!
+  pageInfo: PageInfo!
+}

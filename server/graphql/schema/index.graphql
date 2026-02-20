@@ -1,0 +1,22 @@
+# GraphQL Schema Root Types
+
+type Query {
+  """
+  Placeholder for resolver queries
+  """
+  _empty: String
+}
+
+type Mutation {
+  """
+  Placeholder for resolver mutations
+  """
+  _empty: String
+}
+
+type Subscription {
+  """
+  Placeholder for resolver subscriptions
+  """
+  _empty: String
+}

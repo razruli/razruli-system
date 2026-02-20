@@ -1,0 +1,120 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# SHIPMENT TYPE DEFINITIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+"""
+Shipment status progression
+DRAFT → POSTED → BIDDING_OPEN → BIDS_RECEIVED → BID_SELECTED → ASSIGNED → IN_TRANSIT → DELIVERED → COMPLETED
+"""
+enum ShipmentStatus {
+  DRAFT
+  POSTED
+  BIDDING_OPEN
+  BIDS_RECEIVED
+  BID_SELECTED
+  ASSIGNED
+  IN_TRANSIT
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+"""
+Main orchestrator coordinating freight movement and bidding
+Phases 2-11: Broker creates, opens bidding, selects carrier/warehouse, executes
+"""
+type Shipment implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  # Identification
+  shipmentNumber: String!
+  status: ShipmentStatus!
+
+  # Parties
+  owner: FreightOwner!
+  ownerId: String!
+  broker: Broker!
+  brokerId: String!
+  carrier: Carrier
+  carrierId: String
+  driver: Driver
+  driverId: String
+  truck: Vehicle
+  truckId: String
+
+  # Warehouse routing
+  originWarehouse: Warehouse!
+  originWarehouseId: String!
+  destinationWarehouse: Warehouse
+  destinationWarehouseId: String
+
+  # Timeline
+  pickupScheduled: DateTime!
+  pickupActual: DateTime
+  deliveryScheduled: DateTime!
+  deliveryActual: DateTime
+  confirmedAt: DateTime
+  pickedUpAt: DateTime
+  deliveredAt: DateTime
+  cancelledAt: DateTime
+
+  # Rule #3: Upfront Margin Agreement
+  ownerBudget: BigInt
+  brokerMarginPercent: Float!
+  brokerMarginAmount: BigInt
+
+  # Rule #5: Decision Deadline
+  biddingOpenedAt: DateTime
+  biddingOpenUntil: DateTime
+  acceptedBidId: String
+
+  # Pricing
+  baseRate: BigInt
+  surchargeRate: BigInt!
+  fuelSurcharge: Float!
+  fuelSurchargeAmount: BigInt!
+  marketAdjustment: BigInt!
+  customerRate: BigInt
+  carrierRate: BigInt
+  estimatedRevenue: BigInt
+  estimatedCost: BigInt
+  estimatedMargin: BigInt
+  actualRevenue: BigInt
+  actualCost: BigInt
+  actualMargin: BigInt
+
+  # Route details
+  distance: Float
+  estimatedOD: Float
+  actualOD: Float
+
+  # Documentation
+  poNumber: String
+  referenceNumbers: [String!]!
+  specialInstructions: String
+
+  # Relations
+  freights: [Freight!]!
+  bids: [ShipmentBid!]!
+  events: [ShipmentEvent!]!
+}
+
+input CreateShipmentInput {
+  freightId: ID!
+  originWarehouseId: String!
+  destinationWarehouseId: String
+  pickupScheduled: DateTime!
+  deliveryScheduled: DateTime!
+  ownerBudget: BigInt
+  poNumber: String
+  specialInstructions: String
+}
+
+input UpdateShipmentInput {
+  pickupScheduled: DateTime
+  deliveryScheduled: DateTime
+  specialInstructions: String
+}

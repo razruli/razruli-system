@@ -1,0 +1,18 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# BROKER QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  getBroker(id: ID!): Broker
+  listBrokers(input: PaginationInput!): BrokerConnection!
+  searchBrokers(
+    specializations: [String!]
+    rating: Float
+    input: PaginationInput!
+  ): BrokerConnection!
+}
+
+type BrokerConnection {
+  items: [Broker!]!
+  pageInfo: PageInfo!
+}

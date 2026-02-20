@@ -1,0 +1,51 @@
+// server/db/prisma/models/supporting/reviews.prisma
+// ============================================================================
+// REVIEWS MODEL - Rating and feedback system for brokers and carriers
+// ============================================================================
+
+model Review {
+  id           String @id @default(cuid())
+  reviewNumber String @unique
+
+  reviewType String
+
+  brokerId String?
+  broker   Broker? @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+
+  carrierId String?
+  carrier   Carrier? @relation(fields: [carrierId], references: [id], onDelete: Cascade)
+
+  reviewedBy   String
+  reviewerType String
+
+  shipmentNumber String?
+
+  rating Int
+
+  categories      String[]
+  categoryRatings Float[]
+
+  title   String
+  content String
+
+  positivePoints String[]
+  negativePoints String[]
+
+  recommendedFix String?
+
+  isAnonymous Boolean @default(false)
+
+  helpfulCount   Int @default(0)
+  unhelpfulCount Int @default(0)
+
+  response    String?
+  respondedAt DateTime?
+  respondedBy String?
+
+  status String @default("published")
+
+  reviewDate DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,110 @@
+// server/db/prisma/models/supporting/junctions.prisma
+// ============================================================================
+// JUNCTION & TRACKING MODELS - Relationships and shipment activity logs
+// ============================================================================
+
+model ShipmentFreight {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  freightId String
+  freight   Freight @relation(fields: [freightId], references: [id], onDelete: Cascade)
+
+  sequenceNumber Int
+  pickedUpAt     DateTime?
+  deliveredAt    DateTime?
+
+  @@unique([shipmentId, freightId])
+}
+
+model ShipmentStop {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  sequenceNumber Int
+  stopType       String @default("intermediate")
+
+  warehouseId String?
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+
+  latitude  Float?
+  longitude Float?
+  address   String?
+
+  arrivedAt  DateTime?
+  departedAt DateTime?
+
+  duration Int?
+  notes    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShipmentLog {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  eventType String
+  eventTime DateTime
+
+  location  String?
+  latitude  Float?
+  longitude Float?
+
+  mileage   Float?
+  fuelLevel String?
+
+  temperature Float?
+  humidity    Float?
+
+  deviceId String?
+  notes    String?
+
+  createdAt DateTime @default(now())
+}
+
+model ShipmentEvent {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  eventCode        String
+  eventDescription String
+  eventTime        DateTime
+
+  severity       String  @default("info")
+  requiresAction Boolean @default(false)
+
+  actionTaken String?
+  actionDate  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShipmentDocument {
+  id         String   @id @default(cuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  documentType   String
+  documentNumber String?
+
+  fileName String
+  fileUrl  String
+  fileSize Int?
+
+  uploadedAt DateTime  @default(now())
+  expiresAt  DateTime?
+
+  issueDate  DateTime?
+  expiryDate DateTime?
+
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+  verifiedBy String?
+}

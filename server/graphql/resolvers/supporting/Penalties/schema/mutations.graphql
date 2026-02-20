@@ -1,0 +1,6 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# PENALTIES MUTATIONS (placeholder)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Penalties are calculated and distributed automatically
+# via shipment cancellation mutation
+# No direct mutations needed (handled by ShipmentResolver.cancelShipment)

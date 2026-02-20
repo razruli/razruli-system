@@ -1,0 +1,17 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# DRIVER QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  getDriver(id: ID!): Driver
+  listDrivers(input: PaginationInput!): DriverConnection!
+  listDriversByCarrier(
+    carrierId: String!
+    input: PaginationInput!
+  ): DriverConnection!
+}
+
+type DriverConnection {
+  items: [Driver!]!
+  pageInfo: PageInfo!
+}

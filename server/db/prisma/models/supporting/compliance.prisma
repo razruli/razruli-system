@@ -1,0 +1,89 @@
+// server/db/prisma/models/supporting/compliance.prisma
+// ============================================================================
+// COMPLIANCE MODELS - Driver violations and incidents
+// ============================================================================
+
+model DriverViolation {
+  id       String @id @default(cuid())
+  driverId String
+  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  violationNumber String @unique
+
+  violationType String
+  violationCode String
+
+  violationDate  DateTime
+  discoveredDate DateTime
+
+  location    String?
+  description String
+
+  fineAmount BigInt?
+
+  status String @default("open")
+
+  authority  String
+  reportedBy String?
+
+  injuryCount    Int    @default(0)
+  propertyDamage BigInt @default(0)
+
+  severity String @default("medium")
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DriverIncident {
+  id       String @id @default(cuid())
+  driverId String
+  driver   Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  incidentNumber String @unique
+
+  incidentType String
+  incidentDate DateTime
+  reportedDate DateTime
+
+  location  String?
+  latitude  Float?
+  longitude Float?
+
+  description String
+
+  injuryCount    Int     @default(0)
+  injurySeverity String?
+
+  propertyDamage BigInt  @default(0)
+  repairCost     BigInt?
+
+  thirdPartyInvolved Boolean @default(false)
+  thirdPartyName     String?
+
+  policeReportNumber String?
+  insuranceClaim     String?
+
+  weatherCondition String?
+  roadCondition    String?
+
+  driverFault Boolean @default(false)
+
+  resultingCharges String[]
+
+  severity String @default("medium")
+
+  investigationCompleted Boolean @default(false)
+  investigationNotes     String?
+
+  trainingRequired  Boolean   @default(false)
+  trainingCompleted Boolean   @default(false)
+  trainingDate      DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

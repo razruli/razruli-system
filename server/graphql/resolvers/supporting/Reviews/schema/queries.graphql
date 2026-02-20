@@ -1,0 +1,39 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# REVIEWS QUERIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+extend type Query {
+  """
+  Get review by ID
+  """
+  getReview(id: ID!): Review
+
+  """
+  List all reviews
+  """
+  listReviews(input: PaginationInput!): ReviewConnection!
+
+  """
+  List reviews for carrier
+  """
+  listReviewsForCarrier(
+    carrierId: String!
+    input: PaginationInput!
+  ): ReviewConnection!
+
+  """
+  Rule #10: Visible Assignment - get carrier average rating
+  """
+  getCarrierAverageRating(carrierId: ID!): CarrierRating!
+}
+
+type ReviewConnection {
+  items: [Review!]!
+  pageInfo: PageInfo!
+}
+
+type CarrierRating {
+  carrierId: ID!
+  averageRating: Float!
+  reviewCount: Int!
+}

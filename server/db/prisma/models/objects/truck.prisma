@@ -1,0 +1,62 @@
+// server/db/prisma/models/objects/truck.prisma
+// ============================================================================
+// TRUCK MODEL - Vehicle in carrier's fleet
+// ============================================================================
+
+model Truck {
+  id        String  @id @default(cuid())
+  carrierId String
+  carrier   Carrier @relation(fields: [carrierId], references: [id], onDelete: Cascade)
+
+  licensePlate String @unique
+  vin          String @unique
+
+  tractorNumber String  @unique
+  trailerNumber String? @unique
+  trailerType   String
+
+  make   String
+  model  String
+  year   Int
+  colors String?
+
+  maxWeightCapacity BigInt
+  maxVolumeCapacity Float
+
+  mileage             BigInt
+  nextMaintenanceDate DateTime?
+  lastInspectionDate  DateTime?
+  inspectionStatus    String    @default("pass")
+
+  registrationExpiry     DateTime
+  safetyInspectionDate   DateTime
+  safetyInspectionExpiry DateTime
+
+  hasGPS                Boolean @default(true)
+  hasTemperatureControl Boolean @default(false)
+  hasLiftGate           Boolean @default(false)
+  hasSideAwning         Boolean @default(false)
+  hasSecureStorage      Boolean @default(false)
+
+  status             TruckStatus @default(available)
+  currentDriverId    String?     @unique
+  currentDriver      Driver?     @relation("CurrentDriver", fields: [currentDriverId], references: [id], onDelete: SetNull)
+  lastKnownLocation  String?
+  lastLocationUpdate DateTime?
+
+  purchaseDate  DateTime
+  purchasePrice BigInt
+  insuranceCost BigInt   @default(0)
+
+  isActive       Boolean   @default(true)
+  retirementDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  shipments          Shipment[]
+  maintenanceRecords TruckMaintenance[]
+  inspections        TruckInspection[]
+  violations         TruckViolation[]
+}

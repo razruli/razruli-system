@@ -1,0 +1,105 @@
+// server/db/prisma/models/supporting/maintenance.prisma
+// ============================================================================
+// MAINTENANCE & INSPECTION MODELS - Vehicle upkeep and regulatory compliance
+// ============================================================================
+
+model TruckMaintenance {
+  id      String @id @default(cuid())
+  truckId String
+  truck   Truck  @relation(fields: [truckId], references: [id], onDelete: Cascade)
+
+  maintenanceNumber String @unique
+
+  maintenanceType String
+  description     String
+
+  scheduledDate DateTime
+  completedDate DateTime?
+
+  mileageAtService Float?
+
+  status String @default("scheduled")
+
+  estimatedCost BigInt
+  actualCost    BigInt?
+
+  servicedBy      String?
+  serviceProvider String?
+  warrantyExpires DateTime?
+
+  notes String?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+}
+
+model TruckInspection {
+  id      String @id @default(cuid())
+  truckId String
+  truck   Truck  @relation(fields: [truckId], references: [id], onDelete: Cascade)
+
+  inspectionNumber String @unique
+
+  inspectionType String
+  inspectionDate DateTime
+  nextDueDate    DateTime?
+
+  mileageAtInspection Float?
+
+  status String @default("passed")
+
+  inspectorName String
+  inspectorId   String?
+
+  criticalFindings String[]
+  minorFindings    String[]
+
+  safetyRating      Int?
+  maintenanceRating Int?
+
+  requiredActions String?
+  actionDeadline  DateTime?
+  actionCompleted Boolean   @default(false)
+
+  certificationExpires DateTime?
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TruckViolation {
+  id      String @id @default(cuid())
+  truckId String
+  truck   Truck  @relation(fields: [truckId], references: [id], onDelete: Cascade)
+
+  violationNumber String @unique
+
+  violationType String
+  violationCode String
+
+  violationDate  DateTime
+  discoveredDate DateTime
+
+  location    String?
+  description String
+
+  fineAmount BigInt?
+
+  status String @default("open")
+
+  authority  String
+  reportedBy String?
+
+  correctionDeadline DateTime?
+  correctionDate     DateTime?
+
+  severity String @default("medium")
+
+  notes String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

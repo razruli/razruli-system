@@ -12,11 +12,15 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
+    "components": "@/shared/ui/shadcn/components",
     "utils": "@/shared/lib/shadcn/utils",
-    "ui": "@/shared/ui",
+    "ui": "@/shared/ui/shadcn",
     "lib": "@/shared/lib/shadcn",
     "hooks": "@/shared/lib/shadcn/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@bundui": {
+      "url": "https://bundui.io/api/registry/{name}.json"
+    }
+  }
 }

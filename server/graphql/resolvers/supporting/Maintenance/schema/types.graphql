@@ -1,0 +1,26 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MAINTENANCE TYPES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+type MaintenanceRecord implements Node {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  vehicleId: ID!
+  vehicle: Vehicle!
+
+  maintenanceType: String!
+  description: String!
+  cost: BigInt
+  completedAt: DateTime
+  nextScheduledDate: DateTime
+}
+
+input MaintenanceInput {
+  maintenanceType: String!
+  description: String!
+  cost: BigInt
+  completedAt: DateTime
+  nextScheduledDate: DateTime
+}

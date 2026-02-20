@@ -1,0 +1,88 @@
+// server/db/prisma/models/parties/warehouse.prisma
+// ============================================================================
+// WAREHOUSE MODEL - Storage facility for freight
+// Phase 8-9: Active participant in reverse bidding for warehouse needs
+// ============================================================================
+
+model Warehouse {
+  id   String @id @default(cuid())
+  name String
+  code String @unique
+  type String // "cross_dock" | "cold_storage" | "general" | "hazmat"
+
+  // Location
+  address   String
+  city      String
+  state     String
+  zipCode   String
+  country   String @default("US")
+  latitude  Float
+  longitude Float
+
+  // Management
+  managerName  String
+  managerEmail String
+  managerPhone String
+
+  // Capacity
+  totalCapacityM3 Float
+  totalCapacityKg BigInt
+  usedCapacityM3  Float  @default(0)
+  usedCapacityKg  BigInt @default(0)
+
+  // Infrastructure
+  hasLoadingDocks    Int     @default(0)
+  hasRefrigeration   Boolean @default(false)
+  hasHazmatStorage   Boolean @default(false)
+  hasSecurityCameras Boolean @default(true)
+  operatingHours     String // E.g., "24/7" or "6am-10pm"
+  operates24x7       Boolean @default(true)
+
+  equipment      String[] // Forklifts, pallet jacks, etc.
+  certifications String[] // FDA, ISO, etc.
+
+  // ========================================================================
+  // PHASE 8-9: Rate Card Fields (for warehouse bidding)
+  // ========================================================================
+
+  // Base rates (per m³ per day)
+  baseRateStandard     Float? // Standard dry storage
+  baseRateRefrigerated Float? // Cold storage (e.g., 0-10°C)
+  baseRateHazmat       Float? // Hazmat-certified storage
+
+  // Surcharges (per unit or flat)
+  surchargesJson Json? // E.g., { "24x7_access": 5, "humidity_control": 3, "monitoring": 2 }
+
+  // Discounts (volume-based)
+  volumeDiscountsJson Json? // E.g., { "500m3": 0.05, "1000m3": 0.10 }
+
+  // SLA commitments
+  onTimeReleasePercent Float @default(100.0) // Target %
+  damageRatePercent    Float @default(0.0) // Actual damage rate
+
+  // Rating & reputation
+  rating          Float @default(5.0)
+  reviewCount     Int   @default(0)
+  totalWarehouses Int   @default(0)
+
+  // Status
+  isActive           Boolean            @default(true)
+  verificationStatus VerificationStatus @default(pending)
+
+  // Audit trail
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  freights             Freight[]
+  shipmentOrigins      Shipment[]      @relation("OriginWarehouse")
+  shipmentDestinations Shipment[]      @relation("DestinationWarehouse")
+  stops                ShipmentStop[]
+  warehouseBids        WarehouseBid[]
+  warehouseNeeds       WarehouseNeed[]
+
+  // Indexes for query performance
+  @@index([city, state, type])
+  @@index([isActive, rating])
+  @@index([createdAt])
+}
