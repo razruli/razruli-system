@@ -15,16 +15,17 @@
 
 **File:** `server/services/parties/`
 
-| Entity | Model | Role |
-|--------|-------|------|
-| **User** | User | Core identity (SF-01) |
-| **Broker** | Broker | Intermediary (Phase 2-11) |
-| **Carrier** | Carrier | Transporter (Phase 3-10) |
-| **Driver** | Driver | Operator |
-| **FreightOwner** | FreightOwner | Shipper (Phase 1) |
-| **Warehouse** | Warehouse | Storage facility |
+| Entity           | Model        | Role                      |
+| ---------------- | ------------ | ------------------------- |
+| **User**         | User         | Core identity (SF-01)     |
+| **Broker**       | Broker       | Intermediary (Phase 2-11) |
+| **Carrier**      | Carrier      | Transporter (Phase 3-10)  |
+| **Driver**       | Driver       | Operator                  |
+| **FreightOwner** | FreightOwner | Shipper (Phase 1)         |
+| **Warehouse**    | Warehouse    | Storage facility          |
 
 **Service Pattern:**
+
 ```
 parties/broker/
 ├── repository.ts      → Prisma queries
@@ -38,13 +39,14 @@ parties/broker/
 
 **File:** `server/services/objects/`
 
-| Entity | Model | Purpose |
-|--------|-------|---------|
-| **Freight** | Freight | Physical cargo (Phase 1) |
+| Entity       | Model    | Purpose                            |
+| ------------ | -------- | ---------------------------------- |
+| **Freight**  | Freight  | Physical cargo (Phase 1)           |
 | **Shipment** | Shipment | Coordinated transport (Phase 2-11) |
-| **Vehicle** | Truck | Transportation asset |
+| **Vehicle**  | Truck    | Transportation asset               |
 
 **Service Pattern:**
+
 ```
 objects/freight/
 ├── repository.ts      → Prisma queries
@@ -58,19 +60,20 @@ objects/freight/
 
 **File:** `server/services/supporting/`
 
-| Entity | Model | Purpose |
-|--------|-------|---------|
-| **Bidding** | ShipmentBid | Auction system (Phase 4-5) |
-| **BidRules** | BidRule | Auto-validation (Phase 4) |
-| **Contracts** | BrokerCarrierContract | Long-term agreements |
-| **Junctions** | ShipmentFreight, ShipmentStop, etc. | Many-to-many mappings |
-| **Audit** | ShipmentEvent, ShipmentLog | Immutable event trail |
-| **Penalties** | CancellationFee, PenaltyPayment | Fee distribution |
-| **Reviews** | Review | Rating system (Phase 11) |
-| **Compliance** | DriverViolation, DriverIncident | Regulatory checks |
-| **Maintenance** | TruckMaintenance, TruckInspection | Vehicle upkeep |
+| Entity          | Model                               | Purpose                    |
+| --------------- | ----------------------------------- | -------------------------- |
+| **Bidding**     | ShipmentBid                         | Auction system (Phase 4-5) |
+| **BidRules**    | BidRule                             | Auto-validation (Phase 4)  |
+| **Contracts**   | BrokerCarrierContract               | Long-term agreements       |
+| **Junctions**   | ShipmentFreight, ShipmentStop, etc. | Many-to-many mappings      |
+| **Audit**       | ShipmentEvent, ShipmentLog          | Immutable event trail      |
+| **Penalties**   | CancellationFee, PenaltyPayment     | Fee distribution           |
+| **Reviews**     | Review                              | Rating system (Phase 11)   |
+| **Compliance**  | DriverViolation, DriverIncident     | Regulatory checks          |
+| **Maintenance** | TruckMaintenance, TruckInspection   | Vehicle upkeep             |
 
 **Service Pattern:**
+
 ```
 supporting/bidding/
 ├── repository.ts      → Prisma queries
@@ -83,6 +86,7 @@ supporting/bidding/
 ## GraphQL Resolver Organization
 
 ### **Parties Resolvers**
+
 ```
 graphql/resolvers/parties/
 ├── Broker/
@@ -97,6 +101,7 @@ graphql/resolvers/parties/
 ```
 
 ### **Objects Resolvers**
+
 ```
 graphql/resolvers/objects/
 ├── Freight/
@@ -111,6 +116,7 @@ graphql/resolvers/objects/
 ```
 
 ### **Supporting Resolvers**
+
 ```
 graphql/resolvers/supporting/
 ├── Bidding/
@@ -141,6 +147,7 @@ Database
 ```
 
 **Rules:**
+
 - ✅ Resolvers → Services (direction: down)
 - ✅ Services → Repositories (direction: down)
 - ✅ Repositories → Prisma only (direction: down)
@@ -152,35 +159,37 @@ Database
 
 ## File Naming Conventions
 
-| File | Pattern | Example |
-|------|---------|---------|
-| **Repository** | `{entity}Repository.ts` | `BrokerRepository.ts` |
-| **Service** | `{entity}Service.ts` | `BrokerService.ts` |
-| **Resolver** | `{entity}Resolver.ts` | `BrokerResolver.ts` |
-| **Types** | `types.ts` (or use Prisma) | `types.ts` |
-| **Constants** | `constants.ts` | `constants.ts` |
-| **Tests** | `{entity}.test.ts` | `broker.test.ts` |
+| File           | Pattern                    | Example               |
+| -------------- | -------------------------- | --------------------- |
+| **Repository** | `{entity}Repository.ts`    | `BrokerRepository.ts` |
+| **Service**    | `{entity}Service.ts`       | `BrokerService.ts`    |
+| **Resolver**   | `{entity}Resolver.ts`      | `BrokerResolver.ts`   |
+| **Types**      | `types.ts` (or use Prisma) | `types.ts`            |
+| **Constants**  | `constants.ts`             | `constants.ts`        |
+| **Tests**      | `{entity}.test.ts`         | `broker.test.ts`      |
 
 ---
 
 ## Module Exports (No Wildcards)
 
 **❌ Bad:**
+
 ```typescript
 // broker/index.ts
-export * from './repository';
-export * from './service';  // Causes naming conflicts
+export * from "./repository";
+export * from "./service"; // Causes naming conflicts
 ```
 
 **✅ Good:**
+
 ```typescript
 // broker/index.ts
-export { BrokerRepository } from './repository';
-export { BrokerService } from './service';
+export { BrokerRepository } from "./repository";
+export { BrokerService } from "./service";
 
 // Or explicit imports in parent:
-import { BrokerService } from './broker/service';
-import { BrokerRepository } from './broker/repository';
+import { BrokerService } from "./broker/service";
+import { BrokerRepository } from "./broker/repository";
 ```
 
 ---
@@ -188,6 +197,7 @@ import { BrokerRepository } from './broker/repository';
 ## Adding a New Feature (Example: WarehouseNeed)
 
 **Step 1:** Create Prisma Model
+
 ```prisma
 // db/prisma/models/objects/warehouse-need.prisma
 model WarehouseNeed {
@@ -199,27 +209,38 @@ model WarehouseNeed {
 ```
 
 **Step 2:** Create Repository
+
 ```typescript
 // services/objects/warehouse-need/repository.ts
 export class WarehouseNeedRepository {
   constructor(private prisma: PrismaClient) {}
-  async findById(id: string) { /* Prisma query */ }
-  async create(input) { /* Prisma query */ }
+  async findById(id: string) {
+    /* Prisma query */
+  }
+  async create(input) {
+    /* Prisma query */
+  }
   // ...
 }
 ```
 
 **Step 3:** Create Service
+
 ```typescript
 // services/objects/warehouse-need/service.ts
 export class WarehouseNeedService extends BaseService {
-  async getWarehouseNeed(id: string) { /* business logic */ }
-  async submitBid(needId, bidInput) { /* validation + call repo */ }
+  async getWarehouseNeed(id: string) {
+    /* business logic */
+  }
+  async submitBid(needId, bidInput) {
+    /* validation + call repo */
+  }
   // ...
 }
 ```
 
 **Step 4:** Create Resolver (Functions, Not Classes)
+
 ```typescript
 // graphql/resolvers/objects/WarehouseNeed/queries.ts
 export const createWarehouseNeedQueries = (deps: ResolverDependencies) => ({
@@ -235,6 +256,7 @@ export const createWarehouseNeedMutations = (deps: ResolverDependencies) => ({
 ```
 
 **Step 5:** Register in Context
+
 ```typescript
 // graphql/context-builder/context-builder.ts
 const warehouseNeedService = new WarehouseNeedService(warehouseNeedRepository);
@@ -247,6 +269,7 @@ return {
 ```
 
 **Step 6:** Add to GraphQL Schema
+
 ```graphql
 # graphql/schema/typedefs.graphql
 type WarehouseNeed {

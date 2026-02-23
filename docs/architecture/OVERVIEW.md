@@ -5,6 +5,7 @@
 Gruzin is a **freight brokerage platform** connecting freight owners, brokers, carriers, and warehouses through a real-time bidding system.
 
 **Core Workflow:**
+
 1. Freight Owner posts cargo specs + budget
 2. Broker claims freight, defines shipment route + pricing
 3. Carriers bid on shipment (automated rule validation)
@@ -16,15 +17,15 @@ Gruzin is a **freight brokerage platform** connecting freight owners, brokers, c
 
 ## Technology Stack
 
-| Layer | Technology | Version |
-|-------|-----------|---------|
-| **Frontend** | Next.js 14 + TypeScript | 14.x |
-| **Backend** | Node.js + Express/Apollo | 20.x |
-| **Database** | PostgreSQL + Prisma | 5.x |
-| **GraphQL** | Apollo Server + Codegen | 4.x |
-| **Auth** | NextAuth.js v5 | 5.x |
-| **Styling** | Tailwind CSS | 3.x |
-| **Type Safety** | TypeScript + Codegen | 5.6+ |
+| Layer           | Technology               | Version |
+| --------------- | ------------------------ | ------- |
+| **Frontend**    | Next.js 14 + TypeScript  | 14.x    |
+| **Backend**     | Node.js + Express/Apollo | 20.x    |
+| **Database**    | PostgreSQL + Prisma      | 5.x     |
+| **GraphQL**     | Apollo Server + Codegen  | 4.x     |
+| **Auth**        | NextAuth.js v5           | 5.x     |
+| **Styling**     | Tailwind CSS             | 3.x     |
+| **Type Safety** | TypeScript + Codegen     | 5.6+    |
 
 ---
 
@@ -147,18 +148,21 @@ shared/
 **Pattern:** Repository → Service → Resolver
 
 ### **Repository Layer**
+
 - **Single Responsibility:** Prisma queries only
 - **No Business Logic:** Direct database access
 - **Return Type:** Prisma models (auto-generated types)
 - **Methods:** findById, create, update, delete, search
 
 ### **Service Layer**
+
 - **Business Logic:** State validation, rules enforcement, domain rules
 - **Dependencies:** Repository + Context loaders
 - **Error Handling:** Throw ValidationError, NotFoundError
 - **Return Type:** Domain Response types (Freight, Shipment, etc.)
 
 ### **Resolver Layer**
+
 - **Routing Only:** Call service, handle GraphQL response
 - **Middleware:** Auth, logging, transaction validation
 - **Type Safety:** GraphQL codegen types
@@ -194,18 +198,18 @@ Response → Frontend
 
 ## Current State
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **Prisma Schema** | ✅ Complete | 20+ models, migrations ready |
-| **Database** | ✅ Running | PostgreSQL with migrations applied |
-| **Services** | 🟡 Partial | 17 services exist, some incomplete methods |
-| **Repositories** | 🟡 Partial | Basic CRUD, type safety issues |
-| **GraphQL Schema** | ✅ Complete | All types defined in typedefs.graphql |
-| **GraphQL Resolvers** | 🟡 Mixed | Class + module patterns, needs consolidation |
-| **Frontend** | 🟡 Partial | UI components exist, GraphQL integration WIP |
-| **Auth** | ✅ Setup | NextAuth.js configured, middleware ready |
-| **Tests** | ❌ Missing | No test coverage yet |
-| **Error Handling** | 🟡 Partial | Custom errors defined, not used consistently |
+| Component             | Status      | Notes                                        |
+| --------------------- | ----------- | -------------------------------------------- |
+| **Prisma Schema**     | ✅ Complete | 20+ models, migrations ready                 |
+| **Database**          | ✅ Running  | PostgreSQL with migrations applied           |
+| **Services**          | 🟡 Partial  | 17 services exist, some incomplete methods   |
+| **Repositories**      | 🟡 Partial  | Basic CRUD, type safety issues               |
+| **GraphQL Schema**    | ✅ Complete | All types defined in typedefs.graphql        |
+| **GraphQL Resolvers** | 🟡 Mixed    | Class + module patterns, needs consolidation |
+| **Frontend**          | 🟡 Partial  | UI components exist, GraphQL integration WIP |
+| **Auth**              | ✅ Setup    | NextAuth.js configured, middleware ready     |
+| **Tests**             | ❌ Missing  | No test coverage yet                         |
+| **Error Handling**    | 🟡 Partial  | Custom errors defined, not used consistently |
 
 ---
 

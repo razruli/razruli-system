@@ -14,20 +14,21 @@
 
 **Issue:** Repository files reference Prisma models that don't exist in schema or are named incorrectly.
 
-| File | Line | Error | Model | Priority | Fix |
-|------|------|-------|-------|----------|-----|
-| audit/repository.ts | 7 | Property 'auditLog' does not exist | auditLog | HIGH | Rename to `shipmentEvent` (exists in schema) |
-| audit/repository.ts | 11 | Property 'auditLog' does not exist | auditLog | HIGH | Rename to `shipmentEvent` |
-| audit/repository.ts | 15 | Property 'auditLog' does not exist | auditLog | HIGH | Rename to `shipmentEvent` |
-| audit/repository.ts | 19 | Property 'auditLog' does not exist | auditLog | HIGH | Rename to `shipmentEvent` |
-| audit/repository.ts | 24 | Property 'auditLog' does not exist | auditLog | HIGH | Rename to `shipmentEvent` |
-| bidding/repository.ts | 7 | Property 'bid' does not exist | bid | HIGH | Rename to `shipmentBid` |
-| bidding/repository.ts | 11 | Property 'bid' does not exist | bid | HIGH | Rename to `shipmentBid` |
-| bidding/repository.ts | 15 | Property 'bid' does not exist | bid | HIGH | Rename to `shipmentBid` |
-| bidding/repository.ts | 19 | Property 'bid' does not exist | bid | HIGH | Rename to `shipmentBid` |
-| bidding/repository.ts | 24 | Property 'bid' does not exist | bid | HIGH | Rename to `shipmentBid` |
+| File                  | Line | Error                              | Model    | Priority | Fix                                          |
+| --------------------- | ---- | ---------------------------------- | -------- | -------- | -------------------------------------------- |
+| audit/repository.ts   | 7    | Property 'auditLog' does not exist | auditLog | HIGH     | Rename to `shipmentEvent` (exists in schema) |
+| audit/repository.ts   | 11   | Property 'auditLog' does not exist | auditLog | HIGH     | Rename to `shipmentEvent`                    |
+| audit/repository.ts   | 15   | Property 'auditLog' does not exist | auditLog | HIGH     | Rename to `shipmentEvent`                    |
+| audit/repository.ts   | 19   | Property 'auditLog' does not exist | auditLog | HIGH     | Rename to `shipmentEvent`                    |
+| audit/repository.ts   | 24   | Property 'auditLog' does not exist | auditLog | HIGH     | Rename to `shipmentEvent`                    |
+| bidding/repository.ts | 7    | Property 'bid' does not exist      | bid      | HIGH     | Rename to `shipmentBid`                      |
+| bidding/repository.ts | 11   | Property 'bid' does not exist      | bid      | HIGH     | Rename to `shipmentBid`                      |
+| bidding/repository.ts | 15   | Property 'bid' does not exist      | bid      | HIGH     | Rename to `shipmentBid`                      |
+| bidding/repository.ts | 19   | Property 'bid' does not exist      | bid      | HIGH     | Rename to `shipmentBid`                      |
+| bidding/repository.ts | 24   | Property 'bid' does not exist      | bid      | HIGH     | Rename to `shipmentBid`                      |
 
 **Fix Strategy:**
+
 ```bash
 # In audit/repository.ts: Replace all `prisma.auditLog` with `prisma.shipmentEvent`
 # In bidding/repository.ts: Replace all `prisma.bid` with `prisma.shipmentBid`
@@ -37,6 +38,7 @@
 ```
 
 **Verification:**
+
 ```bash
 cat server/db/prisma/schema.prisma | grep "model" | grep -E "(auditLog|bid|compliance|maintenance|penalty)"
 # Expected: shipmentEvent, shipmentBid (not auditLog or bid)
@@ -48,14 +50,15 @@ cat server/db/prisma/schema.prisma | grep "model" | grep -E "(auditLog|bid|compl
 
 **Issue:** `VehicleResponse` custom type expects fields not in Prisma `Truck` model.
 
-| File | Line | Error | Field | Priority | Fix |
-|------|------|-------|-------|----------|-----|
-| vehicle/repository.ts | 14 | TS2352: Conversion of PrismaPromise | capacity | HIGH | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
-| vehicle/repository.ts | 21 | TS2352: Conversion of PrismaPromise | capacity | HIGH | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
-| vehicle/repository.ts | 29 | TS2352: Conversion of PrismaPromise | capacity | HIGH | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
-| vehicle/repository.ts | 35 | TS2352: Conversion of PrismaPromise | capacity | HIGH | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
+| File                  | Line | Error                               | Field    | Priority | Fix                                                        |
+| --------------------- | ---- | ----------------------------------- | -------- | -------- | ---------------------------------------------------------- |
+| vehicle/repository.ts | 14   | TS2352: Conversion of PrismaPromise | capacity | HIGH     | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
+| vehicle/repository.ts | 21   | TS2352: Conversion of PrismaPromise | capacity | HIGH     | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
+| vehicle/repository.ts | 29   | TS2352: Conversion of PrismaPromise | capacity | HIGH     | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
+| vehicle/repository.ts | 35   | TS2352: Conversion of PrismaPromise | capacity | HIGH     | DELETE `VehicleResponse` type, use Prisma `Truck` directly |
 
-**Root Cause:** 
+**Root Cause:**
+
 ```typescript
 // WRONG in vehicle/repository.ts
 async listByCarrier(): Promise<VehicleResponse[]> {
@@ -69,6 +72,7 @@ async listByCarrier(): Promise<Truck[]> {  // Use Prisma Truck, not custom type
 ```
 
 **Fix Strategy:**
+
 1. Delete [server/services/objects/vehicle/types.ts](server/services/objects/vehicle/types.ts) if it exists
 2. Change all return types from `VehicleResponse` to `Truck` (Prisma type)
 3. Remove `mapToResponse()` calls
@@ -80,21 +84,23 @@ async listByCarrier(): Promise<Truck[]> {  // Use Prisma Truck, not custom type
 
 **Issue:** Repository methods reference Prisma models that don't exist.
 
-| File | Line | Error | Model | Status | Fix |
-|------|------|-------|-------|--------|-----|
-| compliance/repository.ts | 7-19 | Property 'compliance' does not exist | compliance | MISSING | Add model to Prisma schema OR rename to actual model |
-| maintenance/repository.ts | 7-19 | Property 'maintenance' does not exist | maintenance | MISSING | Add model to Prisma schema OR rename |
-| reviews/service.ts | 14 | Type ReviewsResponse not assignable | ReviewsResponse | CUSTOM TYPE | Delete custom type, return Prisma Review directly |
-| penalties/repository.ts | 7-19 | Property 'penalty' does not exist | penalty | MISSING | Rename to actual model (e.g., `cancellationFee`, `penaltyPayment`) |
-| contracts/repository.ts | 551-552 | BigInt literals not available | N/A | TSCONFIG | Change tsconfig target to ES2020+ |
+| File                      | Line    | Error                                 | Model           | Status      | Fix                                                                |
+| ------------------------- | ------- | ------------------------------------- | --------------- | ----------- | ------------------------------------------------------------------ |
+| compliance/repository.ts  | 7-19    | Property 'compliance' does not exist  | compliance      | MISSING     | Add model to Prisma schema OR rename to actual model               |
+| maintenance/repository.ts | 7-19    | Property 'maintenance' does not exist | maintenance     | MISSING     | Add model to Prisma schema OR rename                               |
+| reviews/service.ts        | 14      | Type ReviewsResponse not assignable   | ReviewsResponse | CUSTOM TYPE | Delete custom type, return Prisma Review directly                  |
+| penalties/repository.ts   | 7-19    | Property 'penalty' does not exist     | penalty         | MISSING     | Rename to actual model (e.g., `cancellationFee`, `penaltyPayment`) |
+| contracts/repository.ts   | 551-552 | BigInt literals not available         | N/A             | TSCONFIG    | Change tsconfig target to ES2020+                                  |
 
 **Verification:**
+
 ```bash
 # Check actual model names in schema
 grep "^model" server/db/prisma/schema.prisma | grep -i "compliance\|maintenance\|penalty\|review"
 ```
 
 **Fix Strategy:**
+
 1. Search Prisma schema for actual model names (e.g., is it `DriverViolation` not `compliance`?)
 2. Update repository files to use correct model names
 3. Run `npx prisma generate` to regenerate Prisma client types
@@ -105,12 +111,13 @@ grep "^model" server/db/prisma/schema.prisma | grep -i "compliance\|maintenance\
 
 **Issue:** BigInt literals used but TypeScript target is < ES2020.
 
-| File | Line | Error |
-|------|------|-------|
-| contracts/repository.ts | 551 | BigInt literals are not available when targeting lower than ES2020 |
-| contracts/repository.ts | 552 | BigInt literals are not available when targeting lower than ES2020 |
+| File                    | Line | Error                                                              |
+| ----------------------- | ---- | ------------------------------------------------------------------ |
+| contracts/repository.ts | 551  | BigInt literals are not available when targeting lower than ES2020 |
+| contracts/repository.ts | 552  | BigInt literals are not available when targeting lower than ES2020 |
 
 **Fix:**
+
 ```json
 // tsconfig.json - Change from:
 { "compilerOptions": { "target": "es2018" } }
@@ -125,14 +132,15 @@ grep "^model" server/db/prisma/schema.prisma | grep -i "compliance\|maintenance\
 
 **Issue:** GraphQL document types not exported from generated file.
 
-| File | Line | Error | Missing |
-|------|------|-------|---------|
-| app/[locale]/user/layout.tsx | 3 | Module has no exported member 'UsersDocument' | UsersDocument |
-| lib/helper/resolverHelpers.ts | 2 | Module has no exported member 'DataLoaders' | DataLoaders |
-| shared/graphql/hooks/index.ts | 1 | No exported member useBaseFormHook | useBaseFormHook |
-| shared/ui/table/hooks/index.ts | - | No exported member BaseColumn | BaseColumn |
+| File                           | Line | Error                                         | Missing         |
+| ------------------------------ | ---- | --------------------------------------------- | --------------- |
+| app/[locale]/user/layout.tsx   | 3    | Module has no exported member 'UsersDocument' | UsersDocument   |
+| lib/helper/resolverHelpers.ts  | 2    | Module has no exported member 'DataLoaders'   | DataLoaders     |
+| shared/graphql/hooks/index.ts  | 1    | No exported member useBaseFormHook            | useBaseFormHook |
+| shared/ui/table/hooks/index.ts | -    | No exported member BaseColumn                 | BaseColumn      |
 
 **Fix:**
+
 1. Regenerate GraphQL types: `npm run codegen:graphql`
 2. Check if UsersDocument needs to be created in schema
 3. Export missing types from [shared/graphql/generated/graphql.ts](shared/graphql/generated/graphql.ts)
@@ -143,17 +151,18 @@ grep "^model" server/db/prisma/schema.prisma | grep -i "compliance\|maintenance\
 
 **Issue:** UI component types don't match GraphQL types.
 
-| File | Line | Error | Reason |
-|------|------|-------|--------|
-| UserTableFilterDrawer.tsx | 61 | Property 'from' does not exist on string \| boolean | Type narrowing issue |
-| UserTableFilterDrawer.tsx | 61 | Property 'from' does not exist on string \| boolean | Type narrowing issue |
-| UserTableFilterDrawer.tsx | 61 | Property 'to' does not exist on string \| boolean | Type narrowing issue |
-| UserTableFilterDrawer.tsx | 61 | Property 'to' does not exist on string \| boolean | Type narrowing issue |
-| useUsersQuery.ts | 37 | No overload matches - sortOrder type | SortOrder enum wrong type |
-| useUsersDatasetData.ts | 58 | Property 'items' does not exist | Result shape mismatch |
-| useUsersDatasetData.ts | 60 | 'pageInfo.total' is possibly undefined | Null check needed |
+| File                      | Line | Error                                               | Reason                    |
+| ------------------------- | ---- | --------------------------------------------------- | ------------------------- |
+| UserTableFilterDrawer.tsx | 61   | Property 'from' does not exist on string \| boolean | Type narrowing issue      |
+| UserTableFilterDrawer.tsx | 61   | Property 'from' does not exist on string \| boolean | Type narrowing issue      |
+| UserTableFilterDrawer.tsx | 61   | Property 'to' does not exist on string \| boolean   | Type narrowing issue      |
+| UserTableFilterDrawer.tsx | 61   | Property 'to' does not exist on string \| boolean   | Type narrowing issue      |
+| useUsersQuery.ts          | 37   | No overload matches - sortOrder type                | SortOrder enum wrong type |
+| useUsersDatasetData.ts    | 58   | Property 'items' does not exist                     | Result shape mismatch     |
+| useUsersDatasetData.ts    | 60   | 'pageInfo.total' is possibly undefined              | Null check needed         |
 
 **Fix:**
+
 1. Update filter types to properly narrow date range type
 2. Use `SortOrder.Asc | SortOrder.Desc` enum instead of string
 3. Check UsersResult shape - should have `users` not `items`
@@ -165,31 +174,34 @@ grep "^model" server/db/prisma/schema.prisma | grep -i "compliance\|maintenance\
 
 **Issue:** Service methods incomplete or validation rules incomplete.
 
-| File | Error | Method | Status |
-|------|-------|--------|--------|
-| bidding/bidRuleValidator.ts | Line 12: Expected 2 arguments but got 1 | Service call missing parameter | FIX NEEDED |
-| Driver/mutations.ts | File not a module | TypeScript config issue | FIX NEEDED |
-| Warehouse/mutations.ts | File not a module | TypeScript config issue | FIX NEEDED |
-| contracts/repository.ts | BigInt usage | TypeScript target too old | FIX NEEDED |
-| shared/ui/table/components/index.ts | Cannot find TablePagination module | Missing file | FIX NEEDED |
+| File                                | Error                                   | Method                         | Status     |
+| ----------------------------------- | --------------------------------------- | ------------------------------ | ---------- |
+| bidding/bidRuleValidator.ts         | Line 12: Expected 2 arguments but got 1 | Service call missing parameter | FIX NEEDED |
+| Driver/mutations.ts                 | File not a module                       | TypeScript config issue        | FIX NEEDED |
+| Warehouse/mutations.ts              | File not a module                       | TypeScript config issue        | FIX NEEDED |
+| contracts/repository.ts             | BigInt usage                            | TypeScript target too old      | FIX NEEDED |
+| shared/ui/table/components/index.ts | Cannot find TablePagination module      | Missing file                   | FIX NEEDED |
 
 ---
 
 ## Priority Map
 
 ### **P0 - CRITICAL (Must fix before launch)**
+
 - [ ] Missing Prisma models (auditLog → shipmentEvent, bid → shipmentBid)
 - [ ] Compliance, maintenance, penalties models (rename or add to schema)
 - [ ] BigInt TypeScript target (update to ES2020)
 - [ ] GraphQL exports (regenerate codegen)
 
 ### **P1 - HIGH (Fix in next iteration)**
+
 - [ ] Delete custom response types (VehicleResponse, etc.)
 - [ ] Frontend type mismatches (filter types, GraphQL shape)
 - [ ] Field resolver implementations (bidRuleValidator)
 - [ ] Module export issues (Driver/mutations.ts, Warehouse/mutations.ts)
 
 ### **P2 - MEDIUM (Improve code quality)**
+
 - [ ] Type narrowing in UI filters
 - [ ] Null safety in hooks
 - [ ] Missing UI components (TablePagination)
@@ -241,7 +253,7 @@ npm run codegen:graphql
 // tsconfig.json
 {
   "compilerOptions": {
-    "target": "ES2020",  // Changed from ES2018
+    "target": "ES2020", // Changed from ES2018
     "lib": ["ES2020", "DOM"]
   }
 }
@@ -252,12 +264,15 @@ npm run codegen:graphql
 ## Models in Prisma Schema (Verification)
 
 **Parties (6):**
+
 - User, Broker, Carrier, Driver, FreightOwner, Warehouse ✅
 
 **Objects (3):**
+
 - Freight, Shipment, Truck ✅
 
 **Supporting (Expected):**
+
 - ShipmentBid (not `Bid`) ✅
 - ShipmentEvent (not `AuditLog`) ✅
 - CancellationFee, PenaltyPayment (not `Penalty`) ?
@@ -266,6 +281,7 @@ npm run codegen:graphql
 - Review ✅
 
 **Check:**
+
 ```bash
 cat server/db/prisma/schema.prisma | grep "^model" | sort
 ```
@@ -275,6 +291,7 @@ cat server/db/prisma/schema.prisma | grep "^model" | sort
 ## Next Steps (One Entity at a Time)
 
 ### **Step 1: Fix Broker Entity** (Simplest)
+
 - [ ] BrokerRepository: CRUD clean
 - [ ] BrokerService: Business logic
 - [ ] Resolvers: Factory functions pattern
@@ -282,20 +299,25 @@ cat server/db/prisma/schema.prisma | grep "^model" | sort
 - [ ] 0 errors related to Broker
 
 ### **Step 2: Fix Carrier Entity**
+
 - Same as Broker
 
 ### **Step 3: Fix Driver Entity**
+
 - Fix mutations.ts file issue
 - Same pattern
 
 ### **Step 4: Fix Freight Entity**
+
 - Objects domain
 - Same pattern
 
 ### **Step 5: Fix Shipment Entity**
+
 - Objects domain, more complex
 
 ### **Step 6-8: Fix remaining (User, Warehouse, Vehicle)**
+
 - Same pattern
 
 ---
@@ -341,11 +363,13 @@ cat server/db/prisma/schema.prisma | grep "^model" | sort
 ## Success Criteria
 
 ✅ **When you see:**
+
 ```
 tsc: 0 errors found
 ```
 
 ✅ **Test with:**
+
 ```bash
 npm run typecheck
 # or

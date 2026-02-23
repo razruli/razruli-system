@@ -48,16 +48,16 @@
 
 ### **Key Transitions**
 
-| From | To | Method | Conditions | Role |
-|------|----|----|-----------|------|
-| POSTED | BIDDING_OPEN | `openBidding()` | None | Broker or Carrier |
-| BIDDING_OPEN | BIDS_RECEIVED | (Auto) on first bid | ≥1 bid submitted | Carrier/Broker bidding |
-| BIDS_RECEIVED | BID_SELECTED | `selectBid()` | Choose bid ID | Posting broker/carrier |
-| BID_SELECTED | IN_PLANNING | `planRoutes()` | Create stops | Broker or carrier |
-| IN_PLANNING | IN_TRANSIT | `startTransit()` | Vehicle assigned | Dispatcher |
-| IN_TRANSIT | DELIVERED | `completeStop()` on last | All stops done | Driver or proofs system |
-| [Any] | CANCELLED | `cancelShipment()` | Reason provided | Posting party (before DELIVERED) |
-| [Any except ARCHIVED] | ARCHIVED | `archiveShipment()` | Manual action | Admin |
+| From                  | To            | Method                   | Conditions       | Role                             |
+| --------------------- | ------------- | ------------------------ | ---------------- | -------------------------------- |
+| POSTED                | BIDDING_OPEN  | `openBidding()`          | None             | Broker or Carrier                |
+| BIDDING_OPEN          | BIDS_RECEIVED | (Auto) on first bid      | ≥1 bid submitted | Carrier/Broker bidding           |
+| BIDS_RECEIVED         | BID_SELECTED  | `selectBid()`            | Choose bid ID    | Posting broker/carrier           |
+| BID_SELECTED          | IN_PLANNING   | `planRoutes()`           | Create stops     | Broker or carrier                |
+| IN_PLANNING           | IN_TRANSIT    | `startTransit()`         | Vehicle assigned | Dispatcher                       |
+| IN_TRANSIT            | DELIVERED     | `completeStop()` on last | All stops done   | Driver or proofs system          |
+| [Any]                 | CANCELLED     | `cancelShipment()`       | Reason provided  | Posting party (before DELIVERED) |
+| [Any except ARCHIVED] | ARCHIVED      | `archiveShipment()`      | Manual action    | Admin                            |
 
 ### **Validation Rules for Transitions**
 
@@ -179,15 +179,15 @@ canCancel(shipment) {
 
 ### **Key Transitions**
 
-| From | To | Method | Conditions | Role |
-|------|----|----|-----------|------|
-| (new) | PENDING | `submitBid()` | Input valid | Carrier or Broker |
-| PENDING | RULE_EVAL | (Auto) | Immediately after submit | System |
-| RULE_EVAL | RULE_COMPLIANT | (Auto) | All BidRules pass | System |
-| RULE_EVAL | NON_COMPLIANT | (Auto) | ≥1 BidRule fails | System |
-| RULE_COMPLIANT/NON_COMPLIANT | ACCEPTED | `selectBid()` | Shipment chooses this | Posting broker/carrier |
-| RULE_COMPLIANT/NON_COMPLIANT | REJECTED | `rejectBid()` | Shipment rejects | Posting broker/carrier |
-| [Any except ACCEPTED] | WITHDRAWN | `withdrawBid()` | Bidder cancels | Bidding carrier/broker |
+| From                         | To             | Method          | Conditions               | Role                   |
+| ---------------------------- | -------------- | --------------- | ------------------------ | ---------------------- |
+| (new)                        | PENDING        | `submitBid()`   | Input valid              | Carrier or Broker      |
+| PENDING                      | RULE_EVAL      | (Auto)          | Immediately after submit | System                 |
+| RULE_EVAL                    | RULE_COMPLIANT | (Auto)          | All BidRules pass        | System                 |
+| RULE_EVAL                    | NON_COMPLIANT  | (Auto)          | ≥1 BidRule fails         | System                 |
+| RULE_COMPLIANT/NON_COMPLIANT | ACCEPTED       | `selectBid()`   | Shipment chooses this    | Posting broker/carrier |
+| RULE_COMPLIANT/NON_COMPLIANT | REJECTED       | `rejectBid()`   | Shipment rejects         | Posting broker/carrier |
+| [Any except ACCEPTED]        | WITHDRAWN      | `withdrawBid()` | Bidder cancels           | Bidding carrier/broker |
 
 ### **Validation Rules for Transitions**
 
@@ -227,13 +227,13 @@ canWithdrawBid(bid) {
 
 ```typescript
 enum BidRuleType {
-  PRICE_RANGE = 'PRICE_RANGE',              // Min ≤ bid.price ≤ Max
-  CARRIER_REQUIREMENT = 'CARRIER_REQUIREMENT', // Bid must be from specific carrier
-  DRIVER_LICENSE_CHECK = 'DRIVER_LICENSE_CHECK', // All drivers must have valid license
-  VEHICLE_CAPACITY = 'VEHICLE_CAPACITY',    // Vehicle capacity ≥ freight weight
-  MAX_BIDS_PER_CARRIER = 'MAX_BIDS_PER_CARRIER', // Only N bids per carrier
-  REPUTATION_SCORE = 'REPUTATION_SCORE',    // Carrier avgRating ≥ min
-  NO_RECENT_VIOLATIONS = 'NO_RECENT_VIOLATIONS', // No violations in last N days
+  PRICE_RANGE = "PRICE_RANGE", // Min ≤ bid.price ≤ Max
+  CARRIER_REQUIREMENT = "CARRIER_REQUIREMENT", // Bid must be from specific carrier
+  DRIVER_LICENSE_CHECK = "DRIVER_LICENSE_CHECK", // All drivers must have valid license
+  VEHICLE_CAPACITY = "VEHICLE_CAPACITY", // Vehicle capacity ≥ freight weight
+  MAX_BIDS_PER_CARRIER = "MAX_BIDS_PER_CARRIER", // Only N bids per carrier
+  REPUTATION_SCORE = "REPUTATION_SCORE", // Carrier avgRating ≥ min
+  NO_RECENT_VIOLATIONS = "NO_RECENT_VIOLATIONS", // No violations in last N days
 }
 ```
 
@@ -243,19 +243,19 @@ enum BidRuleType {
 async evaluateBidCompliance(bid: ShipmentBid) {
   const shipment = bid.shipment;
   const rules = shipment.bidRules;
-  
+
   const results = await Promise.all(
     rules.map(rule => evaluateRule(bid, rule))
   );
-  
+
   const allPass = results.every(r => r.passed);
-  
+
   bid.compliance = allPass ? 'RULE_COMPLIANT' : 'NON_COMPLIANT';
   bid.complianceReason = results
     .filter(r => !r.passed)
     .map(r => r.message)
     .join('; ');
-  
+
   return bid.save();
 }
 ```
@@ -298,12 +298,12 @@ async evaluateBidCompliance(bid: ShipmentBid) {
 
 ### **Key Transitions**
 
-| From | To | Method | Conditions | Role |
-|------|----|----|-----------|------|
-| ACTIVE | MAINTENANCE | `moveToMaintenance()` | No active shipments | Fleet manager |
-| MAINTENANCE | ACTIVE | `returnFromMaintenance()` | Inspection complete | Fleet manager |
-| ACTIVE/MAINTENANCE | INACTIVE | `decommission()` | Manual | Fleet manager |
-| [Any] | ARCHIVED | `archive()` | Manual | Admin |
+| From               | To          | Method                    | Conditions          | Role          |
+| ------------------ | ----------- | ------------------------- | ------------------- | ------------- |
+| ACTIVE             | MAINTENANCE | `moveToMaintenance()`     | No active shipments | Fleet manager |
+| MAINTENANCE        | ACTIVE      | `returnFromMaintenance()` | Inspection complete | Fleet manager |
+| ACTIVE/MAINTENANCE | INACTIVE    | `decommission()`          | Manual              | Fleet manager |
+| [Any]              | ARCHIVED    | `archive()`               | Manual              | Admin         |
 
 ---
 
@@ -352,13 +352,13 @@ async evaluateBidCompliance(bid: ShipmentBid) {
 
 ### **Key Transitions**
 
-| From | To | Method | Conditions | Role |
-|------|----|----|-----------|------|
-| ACTIVE | SUSPENDED | (Auto) on 3rd violation | `recordViolation()` called 3x | System |
-| SUSPENDED | ACTIVE | `unsuspendDriver()` | Manual unsuspend | Fleet manager |
-| SUSPENDED | ACTIVE | (Auto) | 30 days passed, no new violations | System |
-| ACTIVE/SUSPENDED | INACTIVE | `deactivate()` | Manual | Fleet manager |
-| [Any] | ARCHIVED | `archive()` | Manual | Admin |
+| From             | To        | Method                  | Conditions                        | Role          |
+| ---------------- | --------- | ----------------------- | --------------------------------- | ------------- |
+| ACTIVE           | SUSPENDED | (Auto) on 3rd violation | `recordViolation()` called 3x     | System        |
+| SUSPENDED        | ACTIVE    | `unsuspendDriver()`     | Manual unsuspend                  | Fleet manager |
+| SUSPENDED        | ACTIVE    | (Auto)                  | 30 days passed, no new violations | System        |
+| ACTIVE/SUSPENDED | INACTIVE  | `deactivate()`          | Manual                            | Fleet manager |
+| [Any]            | ARCHIVED  | `archive()`             | Manual                            | Admin         |
 
 ### **Violation Rules**
 
@@ -366,7 +366,7 @@ async evaluateBidCompliance(bid: ShipmentBid) {
 async recordViolation(driverId: string, input: RecordViolationInput) {
   const driver = this.drivers.findById(driverId);
   const violations = driver.violations;
-  
+
   // Create new violation record
   const violation = await this.repository.createViolation({
     driverId,
@@ -374,28 +374,28 @@ async recordViolation(driverId: string, input: RecordViolationInput) {
     description: input.description,
     recordedAt: new Date(),
   });
-  
+
   // Count violations in past 12 months
   const recentCount = violations.filter(
     v => v.recordedAt > 12monthsAgo
   ).length;
-  
+
   // If 3rd violation in 12 months, suspend
   if (recentCount >= 3) {
     await this.suspendDriver(driverId, `${recentCount} violations in 12 months`);
   }
-  
+
   return violation;
 }
 
 async unsuspendDriver(driverId: string) {
   const driver = this.drivers.findById(driverId);
-  
+
   // Check: no violations in past 30 days
   const recentViolations = driver.violations.filter(
     v => v.recordedAt > 30daysAgo
   );
-  
+
   if (recentViolations.length === 0) {
     driver.status = 'ACTIVE';
     await driver.save();
@@ -405,12 +405,12 @@ async unsuspendDriver(driverId: string) {
 // Auto-unsuspend scheduled daily
 async autoUnsuspendExpired() {
   const suspendedDrivers = driver.query.where({ status: 'SUSPENDED' });
-  
+
   for (const driver of suspendedDrivers) {
     const violationsInLast30Days = driver.violations.filter(
       v => v.recordedAt > 30daysAgo
     );
-    
+
     if (violationsInLast30Days.length === 0) {
       driver.status = 'ACTIVE';
       await driver.save();
@@ -457,12 +457,12 @@ async autoUnsuspendExpired() {
 
 ### **Key Transitions**
 
-| From | To | Method | Conditions | Role |
-|------|----|----|-----------|------|
-| PLANNED | IN_TRANSIT | (Auto) via shipment.startTransit() | Shipment IN_TRANSIT | System |
-| IN_TRANSIT | COMPLETED | `completeStop()` | Proof provided | Driver |
-| IN_TRANSIT | SKIPPED | `skipStop()` | Authorization | Dispatcher |
-| PLANNED | SKIPPED | `skipStop()` | Before transit | Dispatcher |
+| From       | To         | Method                             | Conditions          | Role       |
+| ---------- | ---------- | ---------------------------------- | ------------------- | ---------- |
+| PLANNED    | IN_TRANSIT | (Auto) via shipment.startTransit() | Shipment IN_TRANSIT | System     |
+| IN_TRANSIT | COMPLETED  | `completeStop()`                   | Proof provided      | Driver     |
+| IN_TRANSIT | SKIPPED    | `skipStop()`                       | Authorization       | Dispatcher |
+| PLANNED    | SKIPPED    | `skipStop()`                       | Before transit      | Dispatcher |
 
 ### **Validation Rules**
 
@@ -526,16 +526,16 @@ async transitionFreight(
   validator: (f: Freight) => boolean
 ) {
   const freight = await this.repo.load(freightId);
-  
+
   if (!validator(freight)) {
     throw new InvalidStateTransition(
       `Cannot transition ${freight.status} → ${toState}`
     );
   }
-  
+
   freight.status = toState;
   await this.repo.save(freight);
-  
+
   // Emit event for audit log
   await this.events.emit('FreightStateChanged', {
     freightId,

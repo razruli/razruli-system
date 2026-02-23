@@ -15,20 +15,23 @@ All queries and mutations require a valid session. Authentication is handled via
 
 ```typescript
 // Automatic in resolvers
-ctx.user  // Current authenticated user
-ctx.logger.info()  // Request logger
+ctx.user; // Current authenticated user
+ctx.logger.info(); // Request logger
 ```
 
 **Unauthenticated Request:**
+
 ```graphql
 query {
-  getFreight(id: "123") {  # Will error - requires auth
+  getFreight(id: "123") {
+    # Will error - requires auth
     id
   }
 }
 ```
 
 **Error Response:**
+
 ```json
 {
   "errors": [
@@ -54,7 +57,7 @@ query {
 type Freight {
   id: ID!
   freightNumber: String!
-  status: String!          # DRAFT, AVAILABLE, CLAIMED, etc.
+  status: String! # DRAFT, AVAILABLE, CLAIMED, etc.
   freightOwner: FreightOwner!
   description: String!
   pickupLocation: Location!
@@ -79,7 +82,7 @@ type Location {
 type Shipment {
   id: ID!
   shipmentNumber: String!
-  status: String!          # POSTED, BIDDING_OPEN, etc.
+  status: String! # POSTED, BIDDING_OPEN, etc.
   broker: Broker
   creatingCarrier: Carrier
   freights: [Freight!]!
@@ -100,11 +103,11 @@ type Shipment {
 type ShipmentBid {
   id: ID!
   shipment: Shipment!
-  bidder: User!            # Carrier or Broker
-  compliance: String!      # PENDING, COMPLIANT, NON_COMPLIANT
+  bidder: User! # Carrier or Broker
+  compliance: String! # PENDING, COMPLIANT, NON_COMPLIANT
   price: Decimal!
   estimatedDays: Int!
-  status: String!          # ACCEPTED, REJECTED, WITHDRAWN
+  status: String! # ACCEPTED, REJECTED, WITHDRAWN
   createdAt: DateTime!
 }
 ```
@@ -128,24 +131,24 @@ query GetFreight {
 
 # List available freight
 query ListAvailableFreight {
-  listAvailableFreights(
-    limit: 50
-    offset: 0
-  ) {
+  listAvailableFreights(limit: 50, offset: 0) {
     id
     freightNumber
-    pickupLocation { latitude, longitude }
-    dropoffLocation { latitude, longitude }
+    pickupLocation {
+      latitude
+      longitude
+    }
+    dropoffLocation {
+      latitude
+      longitude
+    }
   }
 }
 
 # Search freight by filters
 query SearchFreight {
   searchFreights(
-    filters: {
-      status: "AVAILABLE"
-      createdAfter: "2024-01-01"
-    }
+    filters: { status: "AVAILABLE", createdAfter: "2024-01-01" }
     limit: 50
   ) {
     id
@@ -160,16 +163,19 @@ query SearchFreight {
 ```graphql
 # List open shipments (for bidding)
 query ListOpenShipments {
-  listShipments(
-    filter: { status: "BIDDING_OPEN" }
-    limit: 50
-  ) {
+  listShipments(filter: { status: "BIDDING_OPEN" }, limit: 50) {
     id
     shipmentNumber
-    freights { freightNumber, description }
+    freights {
+      freightNumber
+      description
+    }
     bids {
       id
-      bidder { firstName, lastName }
+      bidder {
+        firstName
+        lastName
+      }
       compliance
       price
     }
@@ -188,7 +194,9 @@ query GetShipmentDetails {
     stops {
       id
       sequence
-      location { address }
+      location {
+        address
+      }
       plannedArrival
     }
   }
@@ -202,7 +210,9 @@ query GetShipmentDetails {
 query GetShipmentBids {
   getBidsForShipment(shipmentId: "sp-456") {
     id
-    bidder { companyName }
+    bidder {
+      companyName
+    }
     compliance
     price
     estimatedDays
@@ -215,7 +225,10 @@ query GetCompliantBids {
   listCompliantBids(shipmentId: "sp-456") {
     id
     price
-    bidder { companyName, avgRating }
+    bidder {
+      companyName
+      avgRating
+    }
   }
 }
 ```
@@ -229,20 +242,22 @@ query GetCompliantBids {
 ```graphql
 # Create freight
 mutation CreateFreight {
-  createFreight(input: {
-    freightNumber: "FR-001"
-    description: "Electronics shipment"
-    pickupLocation: {
-      latitude: 40.7128
-      longitude: -74.0060
-      address: "New York"
+  createFreight(
+    input: {
+      freightNumber: "FR-001"
+      description: "Electronics shipment"
+      pickupLocation: {
+        latitude: 40.7128
+        longitude: -74.0060
+        address: "New York"
+      }
+      dropoffLocation: {
+        latitude: 34.0522
+        longitude: -118.2437
+        address: "Los Angeles"
+      }
     }
-    dropoffLocation: {
-      latitude: 34.0522
-      longitude: -118.2437
-      address: "Los Angeles"
-    }
-  }) {
+  ) {
     id
     status
     freightNumber
@@ -281,10 +296,7 @@ mutation CancelFreight {
 ```graphql
 # Create shipment
 mutation CreateShipment {
-  createShipment(input: {
-    shipmentNumber: "SP-001"
-    freightIds: ["fr-123"]
-  }) {
+  createShipment(input: { shipmentNumber: "SP-001", freightIds: ["fr-123"] }) {
     id
     status
   }
@@ -300,13 +312,15 @@ mutation OpenBidding {
 
 # Submit bid
 mutation SubmitBid {
-  submitBid(input: {
-    shipmentId: "sp-456"
-    price: 5000.00
-    estimatedDays: 2
-    fullTerms: true
-    termsAgreed: ["PAYMENT_30", "NO_SUBCONTRACT"]
-  }) {
+  submitBid(
+    input: {
+      shipmentId: "sp-456"
+      price: 5000.00
+      estimatedDays: 2
+      fullTerms: true
+      termsAgreed: ["PAYMENT_30", "NO_SUBCONTRACT"]
+    }
+  ) {
     id
     compliance
     complianceReason
@@ -318,29 +332,41 @@ mutation SelectBid {
   selectBid(shipmentId: "sp-456", bidId: "bid-789") {
     id
     status
-    selectedBid { id, bidder { companyName } }
+    selectedBid {
+      id
+      bidder {
+        companyName
+      }
+    }
   }
 }
 
 # Plan routes (add stops)
 mutation PlanRoutes {
-  planRoutes(shipmentId: "sp-456", stops: [
-    {
-      sequence: 1
-      location: { latitude: 40.7128, longitude: -74.0060 }
-      stopType: "PICKUP"
-      plannedArrival: "2024-02-22T10:00:00Z"
-    },
-    {
-      sequence: 2
-      location: { latitude: 34.0522, longitude: -118.2437 }
-      stopType: "DROPOFF"
-      plannedArrival: "2024-02-24T15:00:00Z"
-    }
-  ]) {
+  planRoutes(
+    shipmentId: "sp-456"
+    stops: [
+      {
+        sequence: 1
+        location: { latitude: 40.7128, longitude: -74.0060 }
+        stopType: "PICKUP"
+        plannedArrival: "2024-02-22T10:00:00Z"
+      }
+      {
+        sequence: 2
+        location: { latitude: 34.0522, longitude: -118.2437 }
+        stopType: "DROPOFF"
+        plannedArrival: "2024-02-24T15:00:00Z"
+      }
+    ]
+  ) {
     id
     status
-    stops { id, sequence, status }
+    stops {
+      id
+      sequence
+      status
+    }
   }
 }
 
@@ -354,10 +380,11 @@ mutation StartTransit {
 
 # Complete a stop (driver action)
 mutation CompleteStop {
-  completeStop(shipmentId: "sp-456", stopId: "stop-123", proof: {
-    type: "PHOTO"
-    url: "s3://bucket/proof.jpg"
-  }) {
+  completeStop(
+    shipmentId: "sp-456"
+    stopId: "stop-123"
+    proof: { type: "PHOTO", url: "s3://bucket/proof.jpg" }
+  ) {
     id
     status
     completionProof
@@ -378,12 +405,14 @@ mutation CompleteShipment {
 ```graphql
 # Create bid rule (automatic validation rules)
 mutation CreateBidRule {
-  createBidRule(input: {
-    shipmentId: "sp-456"
-    type: "PRICE_RANGE"
-    minValue: 4000
-    maxValue: 6000
-  }) {
+  createBidRule(
+    input: {
+      shipmentId: "sp-456"
+      type: "PRICE_RANGE"
+      minValue: 4000
+      maxValue: 6000
+    }
+  ) {
     id
     type
   }
@@ -456,7 +485,7 @@ query {
 
 ## Subscriptions
 
-*Planned for Phase 12 - Real-time updates*
+_Planned for Phase 12 - Real-time updates_
 
 ```graphql
 # Subscribe to shipment status changes
@@ -478,6 +507,7 @@ subscription OnShipmentStatusChanged {
 - **Unauthenticated:** 100 requests/hour
 
 Headers:
+
 ```
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
@@ -506,6 +536,7 @@ http://localhost:3000/api/graphql
 ```
 
 Browser-based IDE with:
+
 - Query documentation
 - Auto-completion
 - Variable editor
@@ -520,6 +551,7 @@ Browser-based IDE with:
 **Source:** [server/graphql/schema/typedefs.graphql](../server/graphql/schema/typedefs.graphql)
 
 **Update:**
+
 ```bash
 npm run codegen:graphql
 ```
@@ -536,37 +568,46 @@ query GetShipmentWithAllDetails {
     id
     shipmentNumber
     status
-    
+
     # Linked freight
     freights {
       id
       freightNumber
-      freightOwner { companyName }
+      freightOwner {
+        companyName
+      }
     }
-    
+
     # Bidding details
     bids {
       id
-      bidder { companyName, avgRating }
+      bidder {
+        companyName
+        avgRating
+      }
       compliance
       price
     }
     selectedBid {
       id
       price
-      bidder { id }
+      bidder {
+        id
+      }
     }
-    
+
     # Route planning
     stops {
       id
       sequence
-      location { address }
+      location {
+        address
+      }
       status
       plannedArrival
       actualArrival
     }
-    
+
     # Audit trail
     events {
       id
