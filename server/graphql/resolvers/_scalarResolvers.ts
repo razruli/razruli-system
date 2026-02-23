@@ -1,9 +1,9 @@
 import {
   DateTimeResolver,
   BigIntResolver,
-  GraphQLDeweyDecimalResolver,
   JSONResolver,
 } from "graphql-scalars";
+
 import { Resolvers } from "../types/generated";
 
 export const scalarResolvers: Partial<Resolvers> = {

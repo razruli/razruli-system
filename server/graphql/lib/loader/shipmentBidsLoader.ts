@@ -4,6 +4,7 @@
  */
 
 import DataLoader from "dataloader";
+
 import prisma from "@/server/db/prisma/lib/prisma";
 
 // NOTE: Bid model is defined in schema but may require migration

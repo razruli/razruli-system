@@ -1,9 +1,0 @@
-# ═══════════════════════════════════════════════════════════════════════════════
-# DRIVER MUTATIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-extend type Mutation {
-  createDriver(input: CreateDriverInput!): Driver!
-  updateDriver(id: ID!, input: CreateDriverInput!): Driver!
-  updateDriverStatus(id: ID!, status: DriverStatus!): Driver!
-}

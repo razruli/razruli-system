@@ -15,13 +15,13 @@ import { logger } from "../utils/logger/logger";
 import { createContext } from "./context";
 import { GraphQLContext } from "./context";
 import { ContextBuilder } from "./context-builder/context-builder";
-import { resolvers } from "./resolvers/resolvers";
 import {
   ErrorBoundaryPlugin,
   AuthPlugin,
   LoggingPlugin,
   ComplexityPlugin,
 } from "./lib/middleware";
+import { resolvers } from "./resolvers/resolvers";
 
 /**
  * Load GraphQL schema files including fragments

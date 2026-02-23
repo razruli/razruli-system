@@ -2,11 +2,10 @@ import type { Resolvers } from "../types/generated";
 
 // Field resolvers (type definitions)
 
-import { typeResolvers } from "./_typeResolvers";
 import { scalarResolvers } from "./_scalarResolvers";
-
-import * as partiesResolvers from "./parties";
+import { typeResolvers } from "./_typeResolvers";
 import * as objectsResolvers from "./objects";
+import * as partiesResolvers from "./parties";
 import * as supportingResolvers from "./supporting";
 
 /**

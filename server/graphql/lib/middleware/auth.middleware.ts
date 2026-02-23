@@ -3,30 +3,21 @@ import {
   BaseContext,
   GraphQLRequestListener,
 } from "@apollo/server";
+
 import { AuthError } from "@/server/utils/errors/errors";
 import { logger } from "@/server/utils/logger/logger";
+
 import { GraphQLContext } from "../../context";
 
 const PROTECTED_OPERATIONS = new Set([
   // Mutations
-  "createCarrier",
-  "updateCarrier",
-  "deleteCarrier",
-  "createBroker",
-  "updateBroker",
-  "createShipment",
-  "updateShipment",
-  "acceptBid",
-  "submitBid",
-  "cancelShipment",
+
   // Protected queries
   "me",
-  "myCarrier",
-  "myBroker",
 ]);
 
 export class AuthPlugin implements ApolloServerPlugin<BaseContext> {
-  async requestDidStart(requestContext: any) {
+  async requestDidStart() {
     return {
       async didResolveOperation({ operationName, contextValue }: any) {
         if (operationName && PROTECTED_OPERATIONS.has(operationName)) {

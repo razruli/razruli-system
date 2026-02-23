@@ -1,12 +1,11 @@
 // server/services/user/userService.ts
-import { logger } from "@/server/utils/logger/logger";
 import {
   BaseService,
   LoaderRegistry,
 } from "@/server/services/common/BaseService";
+import { logger } from "@/server/utils/logger/logger";
 
 import { UserResult, ListUsersInput, UsersListResult } from "./types";
-
 import { UserRepository } from "./userRepository";
 
 export class UserService extends BaseService {

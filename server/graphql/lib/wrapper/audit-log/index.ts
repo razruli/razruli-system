@@ -3,8 +3,9 @@
  * Records all state changes for compliance and debugging
  */
 
-import { GraphQLContext } from "../../../context";
 import { logger } from "@/server/utils/logger/logger";
+
+import { GraphQLContext } from "../../../context";
 
 /**
  * Higher-order function to wrap resolvers with audit logging

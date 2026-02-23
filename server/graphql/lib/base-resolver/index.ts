@@ -1,7 +1,9 @@
 import { ZodSchema } from "zod/v3";
-import { GraphQLContext } from "../../context";
+
 import { AuthError, ValidationError } from "@/server/utils/errors/errors";
 import { logger } from "@/server/utils/logger/logger";
+
+import { GraphQLContext } from "../../context";
 
 /**
  * Base resolver class with common resolver patterns

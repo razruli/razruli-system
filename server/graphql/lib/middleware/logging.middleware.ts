@@ -3,6 +3,7 @@ import {
   BaseContext,
   GraphQLRequestListener,
 } from "@apollo/server";
+
 import { logger } from "@/server/utils/logger/logger";
 
 export class LoggingPlugin implements ApolloServerPlugin<BaseContext> {

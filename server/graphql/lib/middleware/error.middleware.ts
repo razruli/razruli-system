@@ -3,12 +3,13 @@ import {
   BaseContext,
   GraphQLRequestListener,
 } from "@apollo/server";
-import { logger } from "@/server/utils/logger/logger";
+
 import {
   AppError,
   ValidationError,
   AuthError,
 } from "@/server/utils/errors/errors";
+import { logger } from "@/server/utils/logger/logger";
 
 export class ErrorBoundaryPlugin implements ApolloServerPlugin<BaseContext> {
   async requestDidStart() {

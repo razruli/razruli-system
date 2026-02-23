@@ -1,8 +1,9 @@
 import { ZodSchema } from "zod/v3";
-import { DataLoaders, GraphQLContext } from "../../context";
+
 import { AuthError, ValidationError } from "@/server/utils/errors/errors";
 import { logger } from "@/server/utils/logger/logger";
 
+import { DataLoaders, GraphQLContext } from "../../context";
 /**
  * Resolve entity by batching ID through dataloader
  * Prevents N+1 queries on frequently accessed relations

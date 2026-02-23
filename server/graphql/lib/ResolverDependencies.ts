@@ -6,12 +6,7 @@ import { logger } from "@/server/utils/logger/logger";
  */
 export interface Services {
   userService: any;
-  brokerService: any;
-  carrierService: any;
-  warehouseService: any;
-  driverService: any;
-  freightService: any;
-  shipmentService: any;
+
   [key: string]: any;
 }
 

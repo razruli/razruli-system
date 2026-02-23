@@ -1,11 +1,12 @@
 import { getUserFromRequest } from "../auth/getUserFromRequest";
 import prisma from "../db/prisma/lib/prisma";
+import { logger } from "../utils/logger/logger";
+
 import {
   ContextBuilder,
   ServicesRegistry,
 } from "./context-builder/context-builder";
-import { createLoaders, LoaderRegistry } from "./lib/loaders";
-import { logger } from "../utils/logger/logger";
+import { LoaderRegistry } from "./lib/loaders";
 
 /**
  * GraphQL Context Type Definition

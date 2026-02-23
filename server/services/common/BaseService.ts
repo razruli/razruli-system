@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 
-import { logger } from "@/server/utils/logger/logger";
 import { AppError, ValidationError } from "@/server/utils/errors/errors";
+import { logger } from "@/server/utils/logger/logger";
 
 /**
  * Registry of all DataLoader factories
@@ -9,12 +9,6 @@ import { AppError, ValidationError } from "@/server/utils/errors/errors";
  */
 export interface LoaderRegistry {
   user: () => DataLoader<string, any>;
-  broker: () => DataLoader<string, any>;
-  carrier: () => DataLoader<string, any>;
-  warehouse: () => DataLoader<string, any>;
-  driver: () => DataLoader<string, any>;
-  freight: () => DataLoader<string, any>;
-  shipment: () => DataLoader<string, any>;
   [key: string]: () => DataLoader<string, any>;
 }
 

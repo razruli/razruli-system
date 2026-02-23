@@ -1,8 +1,0 @@
-# ═══════════════════════════════════════════════════════════════════════════════
-# BROKER MUTATIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# extend type Mutation {
-#   createBroker(input: CreateBrokerInput!): Broker!
-#   updateBroker(id: ID!, input: CreateBrokerInput!): Broker!
-# }
