@@ -1,0 +1,51 @@
+// ============================================================================
+// CORE DOMAIN - Company & Organization Infrastructure
+// ============================================================================
+// Manages companies, departments, and organizational structure
+// ============================================================================
+
+/// Company entity with timezone and working hours configuration
+model Company {
+  id                String       @id @default(cuid())
+  name              String       @db.VarChar(255)
+  timezone          String       @default("UTC+3") @db.VarChar(50)
+  workingHoursDay   Int          @default(8)
+  workingDaysPerMonth Int        @default(21)
+
+  // Relations
+  employees         Employee[]
+  departments       Department[]
+  processes         Process[]
+  taskAssignments   TaskAssignment[]
+  loadSnapshots     LoadSnapshot[]
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@map("company")
+}
+
+/// Department entity representing organizational units
+model Department {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name              String       @db.VarChar(255)
+  headId            String?      @unique
+  head              Employee?    @relation("DepartmentHead", fields: [headId], references: [id])
+
+  // Relations
+  employees         Employee[]
+  processes         Process[]
+  taskAssignments   TaskAssignment[]
+  loadSnapshots     LoadSnapshot[]
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([headId])
+  @@map("department")
+}

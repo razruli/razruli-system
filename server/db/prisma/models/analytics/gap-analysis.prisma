@@ -1,0 +1,72 @@
+// ============================================================================
+// ANALYTICS DOMAIN - Gap Analysis & Hiring
+// ============================================================================
+// Manages gap analysis results and hiring workflow
+// ============================================================================
+
+/// Gap analysis result with hiring recommendations
+/// Analyzes capacity deficit (ΔP) and recommends hiring by grade
+model GapAnalysisResult {
+  id                String       @id @default(cuid())
+  companyId         String
+  departmentId      String
+
+  // Analysis Metrics
+  analysisType      String       @db.VarChar(100)
+  currentLoadIndex  Float        @db.DoublePrecision
+  requiredLoadIndex Float        @default(1.0) @db.DoublePrecision
+
+  // Hiring Recommendations
+  deficitCU         Float        @db.DoublePrecision
+  recommendedGrade  String       @db.VarChar(100)
+  recommendedCount  Int
+
+  recommendations   String?      @db.Text
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([createdAt])
+  @@map("gap_analysis_result")
+}
+
+/// Hiring request workflow for staffing decisions
+model HiringRequest {
+  id                String       @id @default(cuid())
+  companyId         String
+  departmentId      String?
+
+  // Position Details
+  position          String       @db.VarChar(255)
+  gradeId           Int
+  candidatesNeeded  Int
+
+  // Qualifications
+  experienceYears   Int
+  experienceJustification String? @db.Text
+
+  // Compensation
+  salaryMin         Int
+  salaryMax         Int
+
+  // Process Configuration
+  interviewStages   Int          @default(2)
+  trialPeriodMonths Int          @default(3)
+
+  // KPIs for Hiring Success
+  kpiTrial          String?      @db.Text
+  kpiPermanent      String?      @db.Text
+
+  // Metadata
+  trigger           String       @db.VarChar(50)
+  status            String       @default("draft") @db.VarChar(50)
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([status])
+  @@map("hiring_request")
+}

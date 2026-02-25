@@ -17,28 +17,37 @@ const config: CodegenConfig = {
     "server/graphql/types/generated.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
-        contextType: "../context#GraphQLContext",
+        contextType: "../context#ServiceContext",
         avoidOptionals: true,
         resolverValidationOptions: {
           requireResolversForResolveType: false,
           requireResolversForAllFields: false,
         },
         mappers: {
-          User: "../../db/generated/prisma/models#UserModel",
-          FreightOwner: "../../db/generated/prisma/models#FreightOwnerModel",
-          Broker: "../../db/generated/prisma/models#BrokerModel",
-          Carrier: "../../db/generated/prisma/models#CarrierModel",
-          Warehouse: "../../db/generated/prisma/models#WarehouseModel",
-          Driver: "../../db/generated/prisma/models#DriverModel",
-          Freight: "../../db/generated/prisma/models#FreightModel",
-          Shipment: "../../db/generated/prisma/models#ShipmentModel",
-          Truck: "../../db/generated/prisma/models#TruckModel",
-          Bid: "../../db/generated/prisma/models#ShipmentBidModel",
-          BidRule: "../../db/generated/prisma/models#BidRuleModel",
-          BidRequirement:
-            "../../db/generated/prisma/models#BidRequirementModel",
-          WarehouseNeed: "../../db/generated/prisma/models#WarehouseNeedModel",
-          WarehouseBid: "../../db/generated/prisma/models#WarehouseBidModel",
+          // Auth (better-auth)
+          User: "@/server/db/generated/prisma#User",
+          Session: "@/server/db/generated/prisma#Session",
+          Account: "@/server/db/generated/prisma#Account",
+          Verification: "@/server/db/generated/prisma#Verification",
+
+          // Core Domain
+          Company: "@/server/db/generated/prisma#Company",
+          Department: "@/server/db/generated/prisma#Department",
+          Employee: "@/server/db/generated/prisma#Employee",
+          Grade: "@/server/db/generated/prisma#Grade",
+
+          // Operations Domain
+          Process: "@/server/db/generated/prisma#Process",
+          TaskAssignment: "@/server/db/generated/prisma#TaskAssignment",
+
+          // Analytics Domain
+          LoadSnapshot: "@/server/db/generated/prisma#LoadSnapshot",
+          GapAnalysisResult: "@/server/db/generated/prisma#GapAnalysisResult",
+          HiringRequest: "@/server/db/generated/prisma#HiringRequest",
+
+          // Audit Domain
+          EmployeeHistory: "@/server/db/generated/prisma#EmployeeHistory",
+          AuditLog: "@/server/db/generated/prisma#AuditLog",
         },
         scalars: {
           DateTime: "Date",

@@ -1,0 +1,55 @@
+// ============================================================================
+// CORE DOMAIN - Employees & Capacity Management
+// ============================================================================
+// Manages employee master data and capacity coefficients
+// P_day = 1.0 * K_grade * K_gen * K_age * K_tenure * K_efficiency
+// ============================================================================
+
+/// Employee with capacity coefficients and employment details
+model Employee {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  departmentId      String
+  department        Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  // Identity & Demographics
+  fio               String       @db.VarChar(255)
+  gradeId           Int
+  grade             Grade        @relation(fields: [gradeId], references: [id])
+
+  gender            String       @db.Char(1)
+  birthDate         DateTime?    @db.Timestamp(3)
+
+  // Employment Dates
+  hireDate          DateTime     @db.Timestamp(3)
+  fireDate          DateTime?    @db.Timestamp(3)
+
+  // Capacity Coefficients
+  kEfficiency       Float        @default(1.0) @db.DoublePrecision
+  workingHoursPerDay Int         @default(8)
+
+  // Employment Classification
+  employmentType    String       @default("ТД") @db.VarChar(50)
+  status            String       @default("active") @db.VarChar(50)
+
+  // Relations
+  managedDepartment Department?  @relation("DepartmentHead")
+  taskAssignments   TaskAssignment[]
+  loadSnapshots     LoadSnapshot[]
+  history           EmployeeHistory[] @relation("EmployeeToHistory")
+
+  // Metadata
+  metadata          Json         @default("{}") @db.JsonB
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@unique([companyId, fio])
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([gradeId])
+  @@index([status])
+  @@map("employee")
+}

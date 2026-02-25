@@ -1,0 +1,47 @@
+// ============================================================================
+// OPERATIONS DOMAIN - Task Assignments & Load Tracking
+// ============================================================================
+// Tracks task assignments to employees with actual hours and calculated load
+// ============================================================================
+
+/// Assignment of a process task to an employee
+/// Tracks planned vs actual hours and calculated load index
+model TaskAssignment {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  departmentId      String
+  department        Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  employeeId        String
+  employee          Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  processId         String
+  process           Process      @relation(fields: [processId], references: [id], onDelete: Cascade)
+
+  // Time Tracking
+  plannedHours      Float        @db.DoublePrecision
+  actualHours       Float?       @db.DoublePrecision
+
+  // Calculated Workload (in Capacity Units)
+  calculatedLoad    Float?       @db.DoublePrecision
+
+  // Status Tracking
+  status            String       @default("pending") @db.VarChar(50)
+  startedAt         DateTime?    @db.Timestamp(3)
+  completedAt       DateTime?    @db.Timestamp(3)
+
+  // Metadata for Additional Context
+  metadata          Json         @default("{}") @db.JsonB
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([processId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("task_assignment")
+}

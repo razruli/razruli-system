@@ -1,0 +1,46 @@
+// ============================================================================
+// OPERATIONS DOMAIN - Processes & Workload Management
+// ============================================================================
+// Defines business processes with resource consumption parameters
+// L = (T_hours / 8) * (1 + K_burn + K_crit + K_new) * K_diff
+// ============================================================================
+
+/// Business process with estimated workload and complexity multipliers
+model Process {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  departmentId      String
+  department        Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  // Process Metadata
+  title             String       @db.VarChar(255)
+  description       String?      @db.Text
+
+  // Resource Consumption (hours and complexity multipliers)
+  plannedHours      Int
+  kBurn             Float        @default(0.0) @db.DoublePrecision
+  kCrit             Float        @default(0.0) @db.DoublePrecision
+  kNew              Float        @default(0.0) @db.DoublePrecision
+
+  // Target Skill Level for Execution
+  targetGradeId     Int
+  targetGrade       Grade        @relation(fields: [targetGradeId], references: [id])
+
+  // Status Tracking
+  status            String       @default("open") @db.VarChar(50)
+  priority          String       @default("medium") @db.VarChar(50)
+
+  // Relations
+  taskAssignments   TaskAssignment[]
+
+  createdAt         DateTime     @default(now()) @db.Timestamp(3)
+  updatedAt         DateTime     @updatedAt @db.Timestamp(3)
+
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([targetGradeId])
+  @@index([status])
+  @@map("process")
+}

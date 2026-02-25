@@ -1,0 +1,21 @@
+// ============================================================================
+// CORE DOMAIN - Employee Grades & Experience Levels
+// ============================================================================
+// Defines compensation and expertise multipliers by grade
+// ============================================================================
+
+/// Employee grade/seniority levels with capacity multipliers
+/// Used in capacity planning (P calculation) with kGrade coefficient
+/// Grades: Intern (0.4), Junior (0.6), Middle (0.9), Senior (1.2), Lead (1.5), C-level (1.7)
+model Grade {
+  id                Int          @id
+  name              String       @unique @db.VarChar(100)
+  kGrade            Float        @db.DoublePrecision
+  description       String?      @db.Text
+
+  // Relations
+  employees         Employee[]
+  processes         Process[]
+
+  @@map("grade")
+}

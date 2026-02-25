@@ -1,20 +1,31 @@
-// server/db/prisma/schema.prisma
 // ============================================================================
-// MAIN SCHEMA - Prisma v7 modular schema composition
+// ROOT SCHEMA - Prisma Configuration
 // ============================================================================
-// Single source of truth that imports modular model definitions
-// Models are organized by domain in separate files for maintainability
+// Configuration only - models are loaded from /models subdirectories
+// Prisma v7 auto-discovers all .prisma files in this folder recursively
 // ============================================================================
 
+// PostgreSQL Configuration
 datasource db {
   provider = "postgresql"
 }
 
+// Prisma Client Generator
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
-// =============================================================================
-// SHARED ENUMS (Used across all models)
-// =============================================================================
+// ============================================================================
+// SCHEMA ORGANIZATION
+// ============================================================================
+// Models are organized by domain in separate files:
+//
+// /models/auth/   - Authentication & User Management (from better-auth)
+// /models/core/   - Company, Departments, Employees, Grades
+// /models/operations/ - Processes, Tasks, Workload Management
+// /models/analytics/  - Load Snapshots, Gap Analysis, Hiring
+// /models/audit/      - Historical Records, Audit Logs
+//
+// Each domain has one or more .prisma files with related models
+// ============================================================================

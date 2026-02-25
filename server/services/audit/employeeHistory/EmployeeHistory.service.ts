@@ -1,0 +1,141 @@
+// ============================================================================
+// EmployeeHistory Service
+// ============================================================================
+// Business logic for EmployeeHistory domain (immutable audit log)
+// ============================================================================
+
+import { BaseService } from "@/server/services/base";
+import type { ServiceContext } from "@/server/types/context";
+
+import { EmployeeHistoryRepository } from "./EmployeeHistory.repository";
+
+export class EmployeeHistoryService extends BaseService {
+  readonly domain = "employeeHistory";
+  private repository: EmployeeHistoryRepository;
+
+  constructor(context: ServiceContext) {
+    super(context);
+    this.repository = new EmployeeHistoryRepository(context.prisma);
+  }
+
+  async getById(id: string) {
+    const cacheKey = this.cacheKey(id);
+    return this.getOrFetch(cacheKey, () => this.repository.findById(id));
+  }
+
+  async getByEmployee(employeeId: string) {
+    const cacheKey = this.listCacheKey({ employeeId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByEmployee(employeeId),
+    );
+  }
+
+  async getAll() {
+    const cacheKey = this.listCacheKey({});
+    return this.getOrFetch(cacheKey, () => this.repository.findAll());
+  }
+
+  async create(data: any) {
+    const item = await this.repository.create(data);
+    this.invalidateAll();
+    return item;
+  }
+
+  // ==================== HISTORY TRACKING METHODS ====================
+
+  async recordHire(
+    employeeId: string,
+    departmentId: string,
+    gradeId: number,
+    hireDate: Date,
+  ) {
+    this.log("info", `Recording hire for employee`, { employeeId });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "status",
+      oldValue: null,
+      newValue: "active",
+      changedBy: this.context.userId || "system",
+      changedAt: new Date(),
+      reason: "Hire",
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
+  async recordGradeChange(
+    employeeId: string,
+    oldGradeId: number,
+    newGradeId: number,
+  ) {
+    this.log("info", `Recording grade change for employee`, { employeeId });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "gradeId",
+      oldValue: oldGradeId.toString(),
+      newValue: newGradeId.toString(),
+      changedBy: this.context.userId || "system",
+      changedAt: new Date(),
+      reason: `Grade change from ${oldGradeId} to ${newGradeId}`,
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
+  async recordTransfer(
+    employeeId: string,
+    oldDepartmentId: string,
+    newDepartmentId: string,
+  ) {
+    this.log("info", `Recording department transfer for employee`, {
+      employeeId,
+    });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "departmentId",
+      oldValue: oldDepartmentId,
+      newValue: newDepartmentId,
+      changedBy: this.context.userId || "system",
+      changedAt: new Date(),
+      reason: `Transfer from department ${oldDepartmentId} to ${newDepartmentId}`,
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
+  async recordDismissal(
+    employeeId: string,
+    dismissalDate: Date,
+    reason?: string,
+  ) {
+    this.log("info", `Recording dismissal for employee`, { employeeId });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "status",
+      oldValue: "active",
+      newValue: "dismissed",
+      changedBy: this.context.userId || "system",
+      changedAt: dismissalDate,
+      reason: reason || "Dismissal",
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
+  async getEmployeeHistory(employeeId: string) {
+    this.log("info", `Getting history for employee`, { employeeId });
+
+    const cacheKey = this.listCacheKey({ employeeId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByEmployee(employeeId),
+    );
+  }
+}

@@ -1,0 +1,49 @@
+// ============================================================================
+// ANALYTICS DOMAIN - Load Snapshots & Performance Metrics
+// ============================================================================
+// Stores calculated load indices and capacity metrics by period
+// I_ind = Σ(L_tasks) / P_month (for employee)
+// I_dept = Σ(L_all) / Σ(P_month) (for department)
+// ============================================================================
+
+/// Snapshot of load metrics for an employee or department in a period
+model LoadSnapshot {
+  id                String       @id @default(cuid())
+  companyId         String
+  company           Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  // Either employee or department (exclusive)
+  employeeId        String?
+  employee          Employee?    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  departmentId      String?
+  department        Department?  @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  // Time period for this snapshot
+  periodStart       DateTime     @db.Timestamp(3)
+  periodEnd         DateTime     @db.Timestamp(3)
+
+  // Calculated Metrics
+  loadIndex         Float        @db.DoublePrecision
+  totalLoadCU       Float        @db.DoublePrecision
+  totalCapacityCU   Float        @db.DoublePrecision
+  percentUsed       Float        @db.DoublePrecision
+
+  // Employee-specific Metrics
+  employeeStatus    String?      @db.VarChar(50)
+  workingDays       Int?
+
+  // Department-specific Metrics
+  activeEmployeeCount Int?
+  overloadedCount   Int?
+
+  calculatedAt      DateTime     @default(now()) @db.Timestamp(3)
+
+  @@unique([companyId, employeeId, periodStart, periodEnd])
+  @@unique([companyId, departmentId, periodStart, periodEnd])
+  @@index([companyId])
+  @@index([employeeId])
+  @@index([departmentId])
+  @@index([periodStart, periodEnd])
+  @@map("load_snapshot")
+}

@@ -1,0 +1,52 @@
+// ============================================================================
+// AUDIT DOMAIN - Employee History & Change Tracking
+// ============================================================================
+// Maintains complete change history for compliance and analysis
+// ============================================================================
+
+/// Historical record of employee attribute changes
+model EmployeeHistory {
+  id                String       @id @default(cuid())
+  employeeId        String
+  employee          Employee     @relation("EmployeeToHistory", fields: [employeeId], references: [id], onDelete: Cascade)
+
+  // Change Metadata
+  fieldName         String       @db.VarChar(100)
+  oldValue          String?      @db.Text
+  newValue          String?      @db.Text
+
+  // Audit Trail
+  changedBy         String       @db.VarChar(255)
+  changedAt         DateTime     @default(now()) @db.Timestamp(3)
+  reason            String?      @db.Text
+
+  @@index([employeeId])
+  @@index([changedAt])
+  @@index([fieldName])
+  @@map("employee_history")
+}
+
+/// Comprehensive audit log for all entity changes
+model AuditLog {
+  id                String       @id @default(cuid())
+  companyId         String
+
+  // Entity Tracked
+  entityType        String       @db.VarChar(100)
+  entityId          String
+
+  // Change Details
+  action            String       @db.VarChar(50)
+  oldValues         Json?        @db.JsonB
+  newValues         Json?        @db.JsonB
+
+  // Audit Trail
+  changedBy         String       @db.VarChar(255)
+  changedAt         DateTime     @default(now()) @db.Timestamp(3)
+
+  @@index([companyId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([changedAt])
+  @@map("audit_log")
+}
