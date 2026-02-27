@@ -12,8 +12,21 @@ export class LoadSnapshotRepository extends BaseRepository<LoadSnapshot> {
 
   // ==================== READ OPERATIONS ====================
 
+  async findById(id: string): Promise<LoadSnapshot | null> {
+    return this.prisma.loadSnapshot.findUnique({
+      where: { id },
+    });
+  }
+
   async findAll(): Promise<LoadSnapshot[]> {
     return this.prisma.loadSnapshot.findMany();
+  }
+
+  async findByEmployee(employeeId: string): Promise<LoadSnapshot[]> {
+    return this.prisma.loadSnapshot.findMany({
+      where: { employeeId },
+      orderBy: { snapshotDate: "desc" },
+    });
   }
 
   // ==================== WRITE OPERATIONS ====================

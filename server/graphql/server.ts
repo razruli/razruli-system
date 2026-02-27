@@ -9,12 +9,10 @@ import {
 } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next";
 
-import prisma from "../db/prisma/lib/prisma";
 import { logger } from "../utils/logger/logger";
 
 import { createContext } from "./context";
 import { GraphQLContext } from "./context";
-import { ContextBuilder } from "./context-builder/context-builder";
 import {
   ErrorBoundaryPlugin,
   AuthPlugin,
@@ -28,6 +26,7 @@ import { resolvers } from "./resolvers/resolvers";
  * Dynamically loads all .graphql files from schema directory structure
  */
 function loadSchema(): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const fs = require("fs");
   const schemaPath = path.join(process.cwd(), "server/graphql/schema");
 
@@ -164,9 +163,6 @@ function createApolloServer(): ApolloServer<GraphQLContext> {
   const isProduction = process.env.NODE_ENV === "production";
   const isDevelopment = process.env.NODE_ENV === "development";
 
-  // Initialize services
-  ContextBuilder.initializeServices(prisma);
-
   return new ApolloServer<GraphQLContext>({
     typeDefs,
     resolvers,
@@ -222,16 +218,30 @@ function getApolloServer(): ApolloServer<GraphQLContext> {
   return apolloServer;
 }
 
-async function contextCreator(): Promise<GraphQLContext & { services: any }> {
+/**
+ * Context creator for Next.js Apollo integration
+ * Called ONCE per GraphQL request
+ *
+ * Creates fresh GraphQL context with:
+ * - New DataLoaders (fresh batch window per request)
+ * - New Services (fresh state per request)
+ * - Isolated user auth per request
+ *
+ * This ensures:
+ * - No N+1 query batching across requests
+ * - No cache pollution between users
+ * - Proper request isolation
+ */
+async function contextCreator(): Promise<GraphQLContext> {
   try {
-    const baseContext = await createContext();
-    const enrichedContext = ContextBuilder.enrichContext(baseContext);
+    const context = await createContext();
 
-    logger.debug("Context created successfully", {
-      authenticated: !!baseContext.user,
+    logger.debug("GraphQL context created successfully", {
+      requestId: context.requestId,
+      authenticated: !!context.user,
     });
 
-    return enrichedContext;
+    return context;
   } catch (error) {
     logger.error("Failed to create GraphQL context", error);
     throw error;

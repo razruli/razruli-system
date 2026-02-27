@@ -12,6 +12,7 @@ import { LoadSnapshotService } from "./analytics/loadSnapshot";
 import { AuditLogService } from "./audit/auditLog";
 import { EmployeeHistoryService } from "./audit/employeeHistory";
 import { CompanyService } from "./core/company";
+import { DepartmentService } from "./core/department";
 import { EmployeeService } from "./core/employee";
 import { GradeService } from "./core/grade";
 import { ProcessService } from "./operations/process";
@@ -37,6 +38,7 @@ export class ServiceFactory {
   // Lazy-loaded service instances (memoized)
   private _services: {
     company?: CompanyService;
+    department?: DepartmentService;
     employee?: EmployeeService;
     grade?: GradeService;
     process?: ProcessService;
@@ -64,6 +66,23 @@ export class ServiceFactory {
       this._services.company = new CompanyService(this.context);
     }
     return this._services.company;
+  }
+
+  /**
+   * Department services
+   * Location: services/core/department/Department.service.ts
+   *
+   * Handles:
+   * - Department CRUD operations
+   * - Reporting structure management (parent/child departments)
+   * - Employee assignment to departments
+   * - Department-wide load aggregation
+   */
+  getDepartmentService(): DepartmentService {
+    if (!this._services.department) {
+      this._services.department = new DepartmentService(this.context);
+    }
+    return this._services.department;
   }
 
   /**
@@ -214,12 +233,13 @@ export class ServiceFactory {
 
   /**
    * Get all services as an object (for destructuring)
-   * Usage: const { company, employee, process } = factory.getServices();
+   * Usage: const { company, department, employee, process } = factory.getServices();
    */
   getServices() {
     return {
       // Core
       company: this.getCompanyService(),
+      department: this.getDepartmentService(),
       employee: this.getEmployeeService(),
       grade: this.getGradeService(),
 

@@ -7,22 +7,42 @@
 import DataLoader from "dataloader";
 
 import { User } from "../db/generated/prisma/browser";
-import { PrismaClient } from "../db/generated/prisma/client";
+import type {
+  Company,
+  Department,
+  Employee,
+  Grade,
+  Process,
+  TaskAssignment,
+  LoadSnapshot,
+  GapAnalysisResult,
+  EmployeeHistory,
+  AuditLog,
+  PrismaClient,
+} from "../db/generated/prisma/client";
 
 /**
  * DataLoaders for preventing N+1 queries
  * Per-request lifecycle - batches queries automatically
  */
 export interface DataLoaders {
-  employee: DataLoader<string, any>;
-  department: DataLoader<string, any>;
-  process: DataLoader<string, any>;
-  grade: DataLoader<number, any>;
-  taskAssignment: DataLoader<string, any>;
-  loadSnapshot: DataLoader<string, any>;
-  gapAnalysis: DataLoader<string, any>;
-  employeeHistory: DataLoader<string, any>;
-  auditLog: DataLoader<string, any>;
+  // Single entity loaders
+  user: DataLoader<string, User | null>;
+  company: DataLoader<string, Company | null>;
+  department: DataLoader<string, Department | null>;
+  employee: DataLoader<string, Employee | null>;
+  grade: DataLoader<number, Grade | null>;
+  process: DataLoader<string, Process | null>;
+  taskAssignment: DataLoader<string, TaskAssignment | null>;
+  loadSnapshot: DataLoader<string, LoadSnapshot | null>;
+  gapAnalysis: DataLoader<string, GapAnalysisResult | null>;
+  employeeHistory: DataLoader<string, EmployeeHistory | null>;
+  auditLog: DataLoader<string, AuditLog | null>;
+
+  // Batch collection loaders
+  employeesByDepartment: DataLoader<string, Employee[]>;
+  tasksByEmployee: DataLoader<string, TaskAssignment[]>;
+  snapshotsByEmployee: DataLoader<string, LoadSnapshot[]>;
 }
 
 /**

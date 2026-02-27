@@ -1,5 +1,16 @@
 # General GraphQL Types (Shared Across All Features)
 
+# Date Range
+input DateRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+type DateRange {
+  from: DateTime!
+  to: DateTime!
+}
+
 # Pagination
 type PageInfo {
   total: Int!
@@ -24,7 +35,7 @@ interface Node {
   id: ID!
 }
 
-#S tatus Types
+#Status Types
 enum SortOrder {
   ASC
   DESC

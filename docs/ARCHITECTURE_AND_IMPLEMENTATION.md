@@ -911,17 +911,16 @@ The `schema: "./server/db/prisma/"` setting tells Prisma to auto-discover all `.
 
 ```typescript
 // companyService.ts
-- getCompany(id)
-- listCompanies()
-- createCompany(data)
-- updateCompany(id, data)
-
-// employeeService.ts
-- getEmployee(id)
-- listEmployees(departmentId)
-- createEmployee(data)
-- updateEmployee(id, data)
-- getEmployeeLoadIndex(id, period)
+-getCompany(id) -
+  listCompanies() -
+  createCompany(data) -
+  updateCompany(id, data) -
+  // employeeService.ts
+  getEmployee(id) -
+  listEmployees(departmentId) -
+  createEmployee(data) -
+  updateEmployee(id, data) -
+  getEmployeeLoadIndex(id, period);
 ```
 
 ---
@@ -944,16 +943,15 @@ The `schema: "./server/db/prisma/"` setting tells Prisma to auto-discover all `.
 
 ```typescript
 // processService.ts
-- getProcess(id)
-- createProcess(data)
-- updateProcess(id, data)
-- listProcessesByDepartment(deptId)
-
-// taskAssignmentService.ts
-- assignTask(employeeId, processId, plannedHours)
-- updateTaskProgress(id, actualHours)
-- getEmployeeTasks(employeeId, period)
-- calculateTaskLoad(processData, executorGrade)
+-getProcess(id) -
+  createProcess(data) -
+  updateProcess(id, data) -
+  listProcessesByDepartment(deptId) -
+  // taskAssignmentService.ts
+  assignTask(employeeId, processId, plannedHours) -
+  updateTaskProgress(id, actualHours) -
+  getEmployeeTasks(employeeId, period) -
+  calculateTaskLoad(processData, executorGrade);
 ```
 
 ---
@@ -977,16 +975,15 @@ The `schema: "./server/db/prisma/"` setting tells Prisma to auto-discover all `.
 
 ```typescript
 // loadSnapshotService.ts
-- createLoadSnapshot(companyId, employeeId, period, metrics)
-- getLatestSnapshot(employeeId, period)
-- listDepartmentSnapshots(departmentId)
-- calculateLoadIndex(totalLoad, capacity)
-
-// gapAnalysisService.ts
-- analyzeGap(departmentId, period)
-- getHiringRecommendations(departmentId)
-- createHiringRequest(data)
-- updateHiringStatus(id, status)
+-createLoadSnapshot(companyId, employeeId, period, metrics) -
+  getLatestSnapshot(employeeId, period) -
+  listDepartmentSnapshots(departmentId) -
+  calculateLoadIndex(totalLoad, capacity) -
+  // gapAnalysisService.ts
+  analyzeGap(departmentId, period) -
+  getHiringRecommendations(departmentId) -
+  createHiringRequest(data) -
+  updateHiringStatus(id, status);
 ```
 
 ---
@@ -1008,14 +1005,13 @@ The `schema: "./server/db/prisma/"` setting tells Prisma to auto-discover all `.
 
 ```typescript
 // employeeHistoryService.ts
-- trackChange(employeeId, fieldName, oldValue, newValue, changedBy)
-- getChangeHistory(employeeId)
-- getFieldHistory(employeeId, fieldName)
-
-// auditLogService.ts
-- logAction(entityType, entityId, action, oldValues, newValues, changedBy)
-- getAuditTrail(companyId, period)
-- getEntityAuditLog(entityType, entityId)
+-trackChange(employeeId, fieldName, oldValue, newValue, changedBy) -
+  getChangeHistory(employeeId) -
+  getFieldHistory(employeeId, fieldName) -
+  // auditLogService.ts
+  logAction(entityType, entityId, action, oldValues, newValues, changedBy) -
+  getAuditTrail(companyId, period) -
+  getEntityAuditLog(entityType, entityId);
 ```
 
 ---
@@ -1272,4 +1268,3 @@ This ensures complete tenant isolation at the database level.
 - [ ] Event sourcing for complete audit trail
 - [ ] Full-text search on process descriptions
 - [ ] Partitioning of LoadSnapshot by date range
-

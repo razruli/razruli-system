@@ -28,6 +28,13 @@ export class LoadSnapshotService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
+  async findByEmployee(employeeId: string) {
+    const cacheKey = this.listCacheKey({ employeeId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByEmployee(employeeId),
+    );
+  }
+
   async create(data: any) {
     const item = await this.repository.create(data);
     this.invalidateAll();

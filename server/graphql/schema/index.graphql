@@ -1,22 +1,79 @@
-# GraphQL Schema Root Types
+# ============================================================================
+# GraphQL Root Schema
+# Defines Query, Mutation, Subscription roots
+# All domain schemas extend these types
+# ============================================================================
 
+"""
+Root Query type
+Extended by each domain module (core, operations, analytics, audit)
+"""
 type Query {
   """
-  Placeholder for resolver queries
+  Health check endpoint
   """
-  _empty: String
+  health: String!
+
+  """
+  Get current authenticated user
+  """
+  me: User
 }
 
+"""
+Root Mutation type
+Extended by each domain module
+"""
 type Mutation {
   """
-  Placeholder for resolver mutations
+  Placeholder - replaced by domain mutations
   """
-  _empty: String
+  _placeholder: String
 }
 
+"""
+Root Subscription type
+Extended by each domain module
+"""
 type Subscription {
   """
-  Placeholder for resolver subscriptions
+  Placeholder - replaced by domain subscriptions
   """
-  _empty: String
+  _placeholder: String
 }
+
+"""
+User type from authentication
+"""
+type User {
+  id: String!
+  email: String!
+  name: String
+  createdAt: DateTime!
+}
+
+# ============================================================================
+# DOMAIN SCHEMAS (Auto-imported by build process)
+# ============================================================================
+
+# 🏢 CORE DOMAIN - Company, Department, Employee, Grade
+# Location: ./core/*.graphql
+# - company.graphql
+# - department.graphql
+# - employee.graphql
+# - grade.graphql
+
+# 📋 OPERATIONS DOMAIN - Process, TaskAssignment
+# Location: ./operations/*.graphql
+# - process.graphql
+# - taskAssignment.graphql
+
+# 📊 ANALYTICS DOMAIN - LoadSnapshot, GapAnalysis
+# Location: ./analytics/*.graphql
+# - loadSnapshot.graphql
+# - gapAnalysis.graphql
+
+# 📝 AUDIT DOMAIN - EmployeeHistory, AuditLog
+# Location: ./audit/*.graphql
+# - employeeHistory.graphql
+# - auditLog.graphql

@@ -2,11 +2,11 @@
 // GraphQL Context - Export All
 // ============================================================================
 
-export * from "./builder";
-export * from "./dataloaders";
-export * from "./cache";
+export { buildGraphQLContext } from "./builder";
+export { createDataLoaders } from "./dataloaders";
+export { CacheService, cacheKeyBuilder } from "./cache";
 export type {
-  ServiceContext,
-  DataLoaders,
-  CacheManager,
-} from "@/server/types/context";
+  GraphQLContext,
+  DataLoaderRegistry,
+  ServicesRegistry,
+} from "./types";

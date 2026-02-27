@@ -1,0 +1,375 @@
+# ============================================================================
+# LOAD SNAPSHOT DOMAIN - Capacity Snapshot Analytics Schema
+# ============================================================================
+
+"""
+LoadSnapshot type representing point-in-time capacity measurement
+"""
+type LoadSnapshot {
+  id: String!
+
+  """
+  Snapshot details
+  """
+  companyId: String!
+  snapshotDate: DateTime!
+
+  """
+  Employee data (at time of snapshot)
+  """
+  employeeId: String!
+  kGrade: Float!
+
+  """
+  Capacity measurements
+  """
+  totalCapacityUnits: Int!
+  allocatedCapacityUnits: Int!
+  availableCapacityUnits: Int!
+  utilizationRate: Float! # allocated / total * 100
+  """
+  Load measurements
+  """
+  calculatedLoad: Float!
+  loadIndex: Float!
+  loadStatus: LoadStatus!
+
+  """
+  Relative metrics
+  """
+  departmentLoadIndex: Float!
+  companyLoadIndex: Float!
+
+  """
+  Associated entities
+  """
+  company: Company!
+  employee: Employee!
+  department: Department!
+  process: Process
+  taskAssignment: TaskAssignment
+
+  """
+  Source information
+  """
+  snapshotType: SnapshotType!
+  sourceId: String # processId or taskAssignmentId
+  sourceType: String
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+}
+
+"""
+Snapshot type enumeration
+"""
+enum SnapshotType {
+  SCHEDULED
+  ON_DEMAND
+  PROCESS_START
+  PROCESS_COMPLETION
+  TASK_ALLOCATION
+  TASK_COMPLETION
+  EMPLOYEE_UPDATE
+}
+
+"""
+Load status enumeration
+"""
+enum LoadStatus {
+  UNDER_UTILIZED # utilizationRate < 60%
+  OPTIMAL # utilizationRate 60-90%
+  HEAVILY_LOADED # utilizationRate 90-110%
+  OVERLOADED # utilizationRate > 110%
+}
+
+"""
+Load snapshot filter input
+"""
+input LoadSnapshotFilterInput {
+  companyId: String
+  employeeId: String
+  departmentId: String
+  dateRange: DateRangeInput
+  loadStatus: LoadStatus
+  snapshotType: SnapshotType
+}
+
+"""
+Date range input
+"""
+input DateRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+"""
+Pagination input for load snapshots
+"""
+input LoadSnapshotPaginationInput {
+  skip: Int
+  take: Int
+  orderBy: LoadSnapshotSortInput
+}
+
+"""
+Load snapshot sort input
+"""
+input LoadSnapshotSortInput {
+  field: LoadSnapshotSortField!
+  order: SortOrder!
+}
+
+"""
+Load snapshot sort fields
+"""
+enum LoadSnapshotSortField {
+  SNAPSHOT_DATE
+  UTILIZATION_RATE
+  LOAD_INDEX
+}
+
+"""
+Load snapshot response wrapper
+"""
+type LoadSnapshotConnection {
+  nodes: [LoadSnapshot!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+"""
+Load trend data point
+"""
+type LoadTrendPoint {
+  snapshotDate: DateTime!
+  utilizationRate: Float!
+  loadIndex: Float!
+  allocatedCapacityUnits: Int!
+  loadStatus: LoadStatus!
+}
+
+"""
+Employee load history
+"""
+type EmployeeLoadHistory {
+  employee: Employee!
+  snapshots: [LoadSnapshot!]!
+  averageUtilizationRate: Float!
+  averageLoadIndex: Float!
+  trend: [LoadTrendPoint!]!
+  isIncreasing: Boolean!
+  trendDirection: TrendDirection!
+}
+
+"""
+Department load overview
+"""
+type DepartmentLoadOverview {
+  department: Department!
+  totalEmployees: Int!
+  overloadedEmployees: Int!
+  averageUtilizationRate: Float!
+  averageLoadIndex: Float!
+  employeeBreakdown: [EmployeeLoadBreakdown!]!
+  riskLevel: LoadRiskLevel!
+}
+
+"""
+Employee load breakdown
+"""
+type EmployeeLoadBreakdown {
+  employee: Employee!
+  utilizationRate: Float!
+  loadStatus: LoadStatus!
+  allocatedCapacity: Int!
+}
+
+"""
+Trend direction enumeration
+"""
+enum TrendDirection {
+  INCREASING
+  STABLE
+  DECREASING
+}
+
+"""
+Load risk level enumeration
+"""
+enum LoadRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+# ============================================================================
+# Extended Query Type
+# ============================================================================
+
+extend type Query {
+  """
+  Get load snapshot by ID
+  """
+  loadSnapshot(id: String!): LoadSnapshot
+
+  """
+  List load snapshots with filtering
+  """
+  loadSnapshots(
+    filter: LoadSnapshotFilterInput!
+    pagination: LoadSnapshotPaginationInput
+  ): LoadSnapshotConnection!
+
+  """
+  Get latest load snapshot for employee
+  """
+  latestEmployeeSnapshot(employeeId: String!): LoadSnapshot
+
+  """
+  Get employee load trend
+  """
+  employeeLoadTrend(
+    employeeId: String!
+    dateRange: DateRangeInput!
+  ): EmployeeLoadHistory!
+
+  """
+  Get department load overview
+  """
+  departmentLoadOverview(
+    departmentId: String!
+    snapshotDate: DateTime
+  ): DepartmentLoadOverview!
+
+  """
+  Get load snapshots by department
+  """
+  departmentSnapshots(departmentId: String!, limit: Int): [LoadSnapshot!]!
+
+  """
+  Get company-wide load analysis
+  """
+  companyLoadAnalysis(
+    companyId: String!
+    dateRange: DateRangeInput
+  ): CompanyLoadAnalysis!
+
+  """
+  Find employees requiring load adjustment
+  """
+  loadAnomalies(companyId: String!, threshold: Float): [LoadSnapshot!]!
+}
+
+"""
+Company load analysis
+"""
+type CompanyLoadAnalysis {
+  company: Company!
+  totalEmployees: Int!
+  snapshotDate: DateTime!
+  metrics: LoadAnalysisMetrics!
+  departmentMetrics: [DepartmentLoadOverview!]!
+  recommendations: [LoadRecommendation!]!
+}
+
+"""
+Load analysis metrics
+"""
+type LoadAnalysisMetrics {
+  averageUtilizationRate: Float!
+  medianUtilizationRate: Float!
+  minimumUtilizationRate: Float!
+  maximumUtilizationRate: Float!
+  standardDeviation: Float!
+  percentileP90: Float!
+  percentileP95: Float!
+  employeesOverloaded: Int!
+  employeesUnderutilized: Int!
+  employeesOptimal: Int!
+}
+
+"""
+Load recommendation
+"""
+type LoadRecommendation {
+  type: RecommendationType!
+  priority: RecommendationPriority!
+  description: String!
+  affectedEmployees: Int!
+  estimatedImpact: String!
+  suggestedActions: [String!]!
+}
+
+"""
+Recommendation type
+"""
+enum RecommendationType {
+  ACCELERATE_HIRING
+  OPTIMIZE_ALLOCATION
+  REDISTRIBUTE_WORKLOAD
+  REDUCE_SCOPE
+  EXTEND_TIMELINE
+}
+
+"""
+Recommendation priority
+"""
+enum RecommendationPriority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+# ============================================================================
+# Extended Mutation Type
+# ============================================================================
+
+extend type Mutation {
+  """
+  Create a load snapshot
+  """
+  createLoadSnapshot(
+    employeeId: String!
+    snapshotType: SnapshotType!
+    sourceId: String
+  ): LoadSnapshot!
+
+  """
+  Create snapshots for all employees
+  """
+  createCompanyLoadSnapshots(companyId: String!): [LoadSnapshot!]!
+}
+
+# ============================================================================
+# Extended Subscription Type
+# ============================================================================
+
+extend type Subscription {
+  """
+  Subscribe to load threshold events
+  """
+  loadThresholdCrossed(employeeId: String): LoadThresholdEvent!
+}
+
+"""
+Load threshold crossing event
+"""
+type LoadThresholdEvent {
+  snapshot: LoadSnapshot!
+  threshold: Float!
+  crossedDirection: CrossDirection!
+  timestamp: DateTime!
+}
+
+"""
+Direction of threshold crossing
+"""
+enum CrossDirection {
+  ABOVE
+  BELOW
+}

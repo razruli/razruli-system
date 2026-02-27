@@ -57,26 +57,26 @@ $$P_{month} = P_{day} \times 21 = P_{hour} \times 168$$
 
 #### K_gen (Gender Balance)
 
-| Gender | K_gen | Note                                |
-| ------ | ----- | ----------------------------------- |
-| Male   | 1.0   | Baseline                           |
+| Gender | K_gen | Note                                 |
+| ------ | ----- | ------------------------------------ |
+| Male   | 1.0   | Baseline                             |
 | Female | 0.7   | Accounts for physical/social factors |
 
 #### K_age (Age Coefficient)
 
-| Age        | K_age | Note                     |
-| ---------- | ----- | ------------------------ |
-| 30–35      | 1.1   | Peak productivity        |
-| 25–29, 36–45 | 1.0   | Normal                   |
-| Other      | 0.85  | Reduced efficiency       |
+| Age          | K_age | Note               |
+| ------------ | ----- | ------------------ |
+| 30–35        | 1.1   | Peak productivity  |
+| 25–29, 36–45 | 1.0   | Normal             |
+| Other        | 0.85  | Reduced efficiency |
 
 #### K_tenure (Experience in Grade)
 
-| Time in Grade | K_tenure | Note                             |
-| ------------- | -------- | -------------------------------- |
+| Time in Grade | K_tenure | Note                                  |
+| ------------- | -------- | ------------------------------------- |
 | 1–3 years     | 1.1      | Adaptation complete + high motivation |
 | 3+ years      | 0.9      | Professional, but stagnation risk     |
-| < 1 year      | 0.9      | Adaptation period                    |
+| < 1 year      | 0.9      | Adaptation period                     |
 
 ### 2.5 P_monthly Examples
 
@@ -109,13 +109,13 @@ $$L = \frac{T_{hours}}{8} \times (1 + K_{burn} + K_{crit} + K_{new}) \times K_{d
 
 ### 3.2 L Components
 
-| Component       | Symbol  | Range   | Description                           |
-| --------------- | ------- | ------- | ------------------------------------- |
-| **Time**        | T_hours | ≥0      | Planned execution time (hours)        |
-| **Burnout**     | K_burn  | 0.0–0.2 | +0.2 for high intensity               |
-| **Criticality** | K_crit  | 0.0–0.2 | +0.2 for high responsibility          |
-| **Novelty**     | K_new   | 0.0–0.1 | +0.1 for lack of template             |
-| **Heroism**     | K_diff  | 1.0–2.0 | If task grade > executor grade        |
+| Component       | Symbol  | Range   | Description                    |
+| --------------- | ------- | ------- | ------------------------------ |
+| **Time**        | T_hours | ≥0      | Planned execution time (hours) |
+| **Burnout**     | K_burn  | 0.0–0.2 | +0.2 for high intensity        |
+| **Criticality** | K_crit  | 0.0–0.2 | +0.2 for high responsibility   |
+| **Novelty**     | K_new   | 0.0–0.1 | +0.1 for lack of template      |
+| **Heroism**     | K_diff  | 1.0–2.0 | If task grade > executor grade |
 
 ### 3.3 Heroism Multiplier (K_diff)
 
@@ -169,33 +169,33 @@ But **K_diff shows the pain experienced by the person**:
 
 $$I_{ind} = \frac{\sum L_{\text{all tasks in period}}}{P_{\text{month}}}$$
 
-| I_ind   | Status                  | Action                      |
-| ------- | ----------------------- | --------------------------- |
-| < 0.8   | Underutilized          | Redistribute tasks          |
-| 0.8–1.0 | **NORMAL**              | Optimal state               |
-| 1.0–1.2 | Elevated               | Monitor, check health       |
-| > 1.2   | **Overload / Heroism**  | Intervention required       |
+| I_ind   | Status                 | Action                |
+| ------- | ---------------------- | --------------------- |
+| < 0.8   | Underutilized          | Redistribute tasks    |
+| 0.8–1.0 | **NORMAL**             | Optimal state         |
+| 1.0–1.2 | Elevated               | Monitor, check health |
+| > 1.2   | **Overload / Heroism** | Intervention required |
 
 ### 5.2 Department Power Index (I_dept)
 
 $$I_{dept} = \frac{\sum L_{\text{all tasks in period}}}{\sum P_{\text{month for all employees}}}$$
 
-| I_dept  | Status                      | Solution                                 |
-| ------- | --------------------------- | ---------------------------------------- |
-| < 0.7   | Underutilization           | Training, optimization, redistribution   |
-| 0.7–1.0 | **NORMAL**                  | Stable                                   |
-| 1.0–1.2 | High load                  | Monitoring, prepare for hiring           |
-| > 1.2   | **CRITICAL OVERLOAD**       | **OPEN VACANCY**                         |
+| I_dept  | Status                | Solution                               |
+| ------- | --------------------- | -------------------------------------- |
+| < 0.7   | Underutilization      | Training, optimization, redistribution |
+| 0.7–1.0 | **NORMAL**            | Stable                                 |
+| 1.0–1.2 | High load             | Monitoring, prepare for hiring         |
+| > 1.2   | **CRITICAL OVERLOAD** | **OPEN VACANCY**                       |
 
 ### 5.3 Example: Monthly Calculation (Backend Department)
 
 **Composition (21 working days):**
 
-| Team Member | Grade    | P_day | P_month | Month Tasks        | Σ L  | I_ind   |
-| ----------- | -------- | ----- | ------- | ------------------ | ---- | ------- |
-| Alexander   | Senior M | 1.21  | 25.4    | 8h + 6h + 8h       | 20   | 0.79    |
+| Team Member | Grade    | P_day | P_month | Month Tasks            | Σ L  | I_ind   |
+| ----------- | -------- | ----- | ------- | ---------------------- | ---- | ------- |
+| Alexander   | Senior M | 1.21  | 25.4    | 8h + 6h + 8h           | 20   | 0.79    |
 | Victoria    | Middle F | 0.504 | 10.6    | 8h + 8h + 8h + 6h + 5h | 14.6 | 1.38 🔴 |
-| Eugene      | Junior M | 0.459 | 9.6     | 5h + 4h + 3h       | 7    | 0.73    |
+| Eugene      | Junior M | 0.459 | 9.6     | 5h + 4h + 3h           | 7    | 0.73    |
 
 $$P_{month,total} = 25.4 + 10.6 + 9.6 = 45.6 \text{ CU}$$
 $$L_{total} = 20 + 14.6 + 7 = 41.6 \text{ CU}$$
@@ -363,24 +363,24 @@ $$\Delta P = 480 \times (1.3 - 1.0) = 480 \times 0.3 = 144 \text{ CU/month}$$
 
 **Group L by target grade and compare to available P:**
 
-| Target Grade | Σ L | Σ P (current) | Deficit | Action                       |
-| ------------ | --- | ------------- | ------- | ---------------------------- |
-| Senior       | 200 | 180           | +20     | Hire Senior                  |
-| Middle       | 150 | 140           | +10     | Hire Middle or Junior        |
-| Junior       | 80  | 100           | -20     | All good                     |
-| **TOTAL**    | 430 | 420           | +10     | I_dept = 1.02 (normal)      |
+| Target Grade | Σ L | Σ P (current) | Deficit | Action                 |
+| ------------ | --- | ------------- | ------- | ---------------------- |
+| Senior       | 200 | 180           | +20     | Hire Senior            |
+| Middle       | 150 | 140           | +10     | Hire Middle or Junior  |
+| Junior       | 80  | 100           | -20     | All good               |
+| **TOTAL**    | 430 | 420           | +10     | I_dept = 1.02 (normal) |
 
 ---
 
 ### 3.2 Decision Matrix
 
-| Symptom                         | Diagnosis           | Recommendation                   |
-| ------------------------------- | ------------------- | -------------------------------- |
-| ΣL_Senior > ΣP_Senior by 20%+   | Expertise deficit   | Hire **Senior** or **Manager**   |
-| ΣL_Middle > ΣP_Middle by 20%+   | Worker deficit      | Hire **Middle** (1–2 people)     |
-| ΣL_Junior > ΣP_Junior by 20%+   | Hand deficit        | Hire **Junior** or **Intern**    |
-| 70%+ K_diff > 1.0 in Middle     | Qualitative gap     | Hire **Senior** (not Middle!)    |
-| K_diff > 1.3 for women constantly | Exploitation       | Hire **male executor**           |
+| Symptom                           | Diagnosis         | Recommendation                 |
+| --------------------------------- | ----------------- | ------------------------------ |
+| ΣL_Senior > ΣP_Senior by 20%+     | Expertise deficit | Hire **Senior** or **Manager** |
+| ΣL_Middle > ΣP_Middle by 20%+     | Worker deficit    | Hire **Middle** (1–2 people)   |
+| ΣL_Junior > ΣP_Junior by 20%+     | Hand deficit      | Hire **Junior** or **Intern**  |
+| 70%+ K_diff > 1.0 in Middle       | Qualitative gap   | Hire **Senior** (not Middle!)  |
+| K_diff > 1.3 for women constantly | Exploitation      | Hire **male executor**         |
 
 ---
 
@@ -394,12 +394,12 @@ This is not discrimination, but reality: social obligations, maternity leave, ph
 
 **Cost calculation to cover 140 CU:**
 
-| Option | Composition         | Σ P | Salary | Cost  | Note             |
-| ------ | ------------------- | --- | ------ | ----- | ---------------- |
-| A      | 1 Senior M          | 26  | 300k   | 300k  | Fast, expensive  |
-| B      | 2 Middle (1M+1F)    | 26  | 210k   | 210k  | Cheaper, balance |
-| C      | 2 Middle F          | 21  | 360k   | 360k  | Even more        |
-| D      | 1 Manager           | 30  | 350k   | 350k  | Powerful, pricey |
+| Option | Composition      | Σ P | Salary | Cost | Note             |
+| ------ | ---------------- | --- | ------ | ---- | ---------------- |
+| A      | 1 Senior M       | 26  | 300k   | 300k | Fast, expensive  |
+| B      | 2 Middle (1M+1F) | 26  | 210k   | 210k | Cheaper, balance |
+| C      | 2 Middle F       | 21  | 360k   | 360k | Even more        |
+| D      | 1 Manager        | 30  | 350k   | 350k | Powerful, pricey |
 
 **Conclusion:** Option B is often optimal
 
@@ -461,12 +461,12 @@ This is not discrimination, but reality: social obligations, maternity leave, ph
 
 ### 6.1 Expected Index Changes (3 months)
 
-| Metric              | Before | After 1 mo. | After 3 mo. | Target  |
-| ------------------- | ------ | ----------- | ----------- | ------- |
-| I_dept              | 1.30   | 0.95        | 0.85        | 0.8–1.0 |
-| I_overloaded        | 1.35   | 0.90        | 0.85        | 0.8–1.0 |
-| I_underloaded       | 0.80   | 0.85        | 0.90        | 0.8–1.0 |
-| I_newbie            | —      | 0.70        | 0.85        | 0.8–0.9 |
+| Metric        | Before | After 1 mo. | After 3 mo. | Target  |
+| ------------- | ------ | ----------- | ----------- | ------- |
+| I_dept        | 1.30   | 0.95        | 0.85        | 0.8–1.0 |
+| I_overloaded  | 1.35   | 0.90        | 0.85        | 0.8–1.0 |
+| I_underloaded | 0.80   | 0.85        | 0.90        | 0.8–1.0 |
+| I_newbie      | —      | 0.70        | 0.85        | 0.8–0.9 |
 
 ### 6.2 When to Terminate Trial
 
@@ -669,21 +669,21 @@ export function computekDiff(
 export async function calculateDepartmentLoad(
   departmentId: string,
   periodStart: Date,
-  periodEnd: Date
+  periodEnd: Date,
 ): Promise<LoadSnapshot> {
   // 1. Get all active employees
   const employees = await db.employee.findMany({
-    where: { departmentId, status: 'active' },
-    include: { grade: true }
+    where: { departmentId, status: "active" },
+    include: { grade: true },
   });
 
   // 2. Get all task assignments for period
   const tasks = await db.taskAssignment.findMany({
     where: {
       departmentId,
-      createdAt: { gte: periodStart, lte: periodEnd }
+      createdAt: { gte: periodStart, lte: periodEnd },
     },
-    include: { employee: true, process: true }
+    include: { employee: true, process: true },
   });
 
   // 3. Compute each employee's capacity
@@ -702,13 +702,16 @@ export async function calculateDepartmentLoad(
   for (const task of tasks) {
     if (!task.calculatedLoad) {
       // Compute on the fly
-      const kDiff = computeKDiff(task.process.targetGradeId, task.employee.gradeId);
+      const kDiff = computeKDiff(
+        task.process.targetGradeId,
+        task.employee.gradeId,
+      );
       const L = computeTaskLoad(
         task.plannedHours,
         task.process.kBurn,
         task.process.kCrit,
         task.process.kNew,
-        kDiff
+        kDiff,
       );
       totalLoadCU += L;
     } else {
@@ -724,21 +727,21 @@ export async function calculateDepartmentLoad(
   const snapshot = await db.loadSnapshot.upsert({
     where: {
       companyId_departmentId_periodStart_periodEnd: {
-        companyId: employees[0]?.company?.id || '',
+        companyId: employees[0]?.company?.id || "",
         departmentId,
         periodStart,
-        periodEnd
-      }
+        periodEnd,
+      },
     },
     update: {
       loadIndex,
       totalLoadCU,
       totalCapacityCU,
       percentUsed,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     create: {
-      companyId: employees[0]?.companyId || '',
+      companyId: employees[0]?.companyId || "",
       departmentId,
       periodStart,
       periodEnd,
@@ -747,8 +750,8 @@ export async function calculateDepartmentLoad(
       totalCapacityCU,
       percentUsed,
       activeEmployeeCount: employees.length,
-      calculatedAt: new Date()
-    }
+      calculatedAt: new Date(),
+    },
   });
 
   return snapshot;
@@ -767,4 +770,3 @@ export async function calculateDepartmentLoad(
 - ✅ Typescript calculations
 - ✅ Complete audit logic
 - ✅ Integration with hiring system
-

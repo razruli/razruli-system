@@ -57,6 +57,68 @@ export class EmployeeService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
+  async find(
+    filters: {
+      companyId?: string;
+      departmentId?: string;
+      gradeId?: number;
+      status?: string;
+      search?: string;
+    },
+    pagination?: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    },
+  ): Promise<{
+    data: Employee[];
+    total: number;
+    hasMore: boolean;
+  }> {
+    this.log("info", `Finding employees with filters`, { filters, pagination });
+
+    const offset = pagination?.offset || 0;
+    const limit = pagination?.limit || 20;
+
+    // Find all matching employees
+    const filterData: any = {};
+    if (filters.companyId) filterData.companyId = filters.companyId;
+    if (filters.departmentId) filterData.departmentId = filters.departmentId;
+    if (filters.gradeId) filterData.gradeId = filters.gradeId;
+    if (filters.status) filterData.status = filters.status;
+
+    // For search, we'll need to filter in memory (simple implementation)
+    let data = await this.repository.findByFilters({
+      status: filters.status,
+    });
+
+    // Apply additional filters
+    if (filters.companyId) {
+      data = data.filter((e) => e.companyId === filters.companyId);
+    }
+    if (filters.departmentId) {
+      data = data.filter((e) => e.departmentId === filters.departmentId);
+    }
+    if (filters.gradeId) {
+      data = data.filter((e) => e.gradeId === filters.gradeId);
+    }
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      data = data.filter((e) => e.fio.toLowerCase().includes(searchLower));
+    }
+
+    const total = data.length;
+    const paginatedData = data.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return {
+      data: paginatedData,
+      total,
+      hasMore,
+    };
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: {
@@ -114,6 +176,8 @@ export class EmployeeService extends BaseService {
       gender: string;
       status?: string;
       kEfficiency?: number;
+      workingHoursPerDay?: number;
+      fireDate?: Date;
     }>,
   ): Promise<Employee> {
     this.log("info", `Updating employee`, { id });
@@ -127,8 +191,12 @@ export class EmployeeService extends BaseService {
     if (data.gradeId) updateData.grade = { connect: { id: data.gradeId } };
     if (data.departmentId)
       updateData.department = { connect: { id: data.departmentId } };
-    if (data.status) updateData.status = data.status;
-    if (data.kEfficiency) updateData.kEfficiency = data.kEfficiency;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.kEfficiency !== undefined)
+      updateData.kEfficiency = data.kEfficiency;
+    if (data.workingHoursPerDay !== undefined)
+      updateData.workingHoursPerDay = data.workingHoursPerDay;
+    if (data.fireDate !== undefined) updateData.fireDate = data.fireDate;
 
     const updated = await this.repository.update(id, updateData);
 
@@ -166,13 +234,45 @@ export class EmployeeService extends BaseService {
     return monthlyCapacity;
   }
 
+  async calculateLoadIndex(
+    employeeId: string,
+    periodStart: Date,
+    periodEnd: Date,
+  ): Promise<number> {
+    this.log("info", `Calculating load index for employee`, {
+      employeeId,
+      periodStart,
+      periodEnd,
+    });
+
+    // Verify employee exists
+    await this.getByIdOrThrow(employeeId);
+
+    // Get total capacity for the period
+    const _capacity = await this.calculateCapacity(employeeId);
+    const _daysInPeriod = Math.ceil(
+      (periodEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    // TODO: Use periodCapacity when task assignment filtering is implemented
+    // const periodCapacity = (_capacity / 30) * _daysInPeriod; // Normalize to period
+
+    // Get all task assignments in the period
+    // TODO: Implement task assignment filtering by date range
+    // For now, return a default load index
+    const defaultLoadIndex = 50; // 50% load
+
+    return defaultLoadIndex;
+  }
+
   async dismiss(employeeId: string): Promise<Employee> {
     this.log("info", `Dismissing employee`, { employeeId });
 
-    const employee = await this.getByIdOrThrow(employeeId);
+    // Verify employee exists
+    await this.getByIdOrThrow(employeeId);
 
     const updated = await this.repository.update(employeeId, {
       status: "dismissed",
+      fireDate: new Date(),
     });
 
     this.invalidate(employeeId);

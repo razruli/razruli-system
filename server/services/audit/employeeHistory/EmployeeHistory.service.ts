@@ -45,9 +45,9 @@ export class EmployeeHistoryService extends BaseService {
 
   async recordHire(
     employeeId: string,
-    departmentId: string,
-    gradeId: number,
-    hireDate: Date,
+    _departmentId: string,
+    _gradeId: number,
+    _hireDate: Date,
   ) {
     this.log("info", `Recording hire for employee`, { employeeId });
 
@@ -130,6 +130,54 @@ export class EmployeeHistoryService extends BaseService {
     return item;
   }
 
+  async recordFire(
+    employeeId: string,
+    departmentId: string,
+    gradeId: number,
+    fireDate: Date,
+    reason: string,
+    changedBy: string,
+  ) {
+    this.log("info", `Recording fire/dismissal for employee`, { employeeId });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "fireDate",
+      oldValue: null,
+      newValue: fireDate.toISOString(),
+      changedBy: changedBy || "system",
+      changedAt: fireDate,
+      reason: reason || "Employee termination",
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
+  async recordEfficiencyUpdate(
+    employeeId: string,
+    oldValue: number,
+    newValue: number,
+    changedBy: string,
+  ) {
+    this.log("info", `Recording efficiency update for employee`, {
+      employeeId,
+    });
+
+    const item = await this.repository.create({
+      employee: { connect: { id: employeeId } },
+      fieldName: "kEfficiency",
+      oldValue: oldValue.toString(),
+      newValue: newValue.toString(),
+      changedBy: changedBy || "system",
+      changedAt: new Date(),
+      reason: `Efficiency coefficient updated from ${oldValue} to ${newValue}`,
+    });
+
+    this.invalidateAll();
+    return item;
+  }
+
   async getEmployeeHistory(employeeId: string) {
     this.log("info", `Getting history for employee`, { employeeId });
 
@@ -137,5 +185,9 @@ export class EmployeeHistoryService extends BaseService {
     return this.getOrFetch(cacheKey, () =>
       this.repository.findByEmployee(employeeId),
     );
+  }
+
+  async findByEmployee(employeeId: string) {
+    return this.getEmployeeHistory(employeeId);
   }
 }

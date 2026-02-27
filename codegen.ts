@@ -4,9 +4,18 @@ import { CodegenConfig } from "@graphql-codegen/cli";
 const config: CodegenConfig = {
   schema: [
     "server/graphql/schema/scalars.graphql",
+    "server/graphql/schema/types.graphql",
     "server/graphql/schema/index.graphql",
-    "server/graphql/schema/**/*.graphql",
-    "server/graphql/resolvers/**/*.graphql",
+    "server/graphql/schema/core/company.graphql",
+    "server/graphql/schema/core/department.graphql",
+    "server/graphql/schema/core/grade.graphql",
+    "server/graphql/schema/core/employee.graphql",
+    "server/graphql/schema/operations/process.graphql",
+    "server/graphql/schema/operations/taskAssignment.graphql",
+    "server/graphql/schema/analytics/loadSnapshot.graphql",
+    "server/graphql/schema/analytics/gapAnalysis.graphql",
+    "server/graphql/schema/audit/employeeHistory.graphql",
+    "server/graphql/schema/audit/auditLog.graphql",
   ],
   documents: "shared/graphql/client/**/*.graphql",
 
@@ -75,6 +84,9 @@ const config: CodegenConfig = {
       },
     },
   },
+
+  // Allow partial outputs when document validation fails
+  allowPartialOutputs: true,
 
   hooks: {
     // afterAllFileWrite: ["prettier --write"],

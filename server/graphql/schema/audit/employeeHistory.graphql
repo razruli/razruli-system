@@ -1,0 +1,318 @@
+# ============================================================================
+# EMPLOYEE HISTORY DOMAIN - Employee Change Audit Schema
+# ============================================================================
+
+"""
+EmployeeHistory type tracking changes to employee data and status
+"""
+type EmployeeHistory {
+  id: String!
+
+  """
+  Employee reference
+  """
+  employeeId: String!
+  employee: Employee!
+
+  """
+  Change details
+  """
+  changeType: EmployeeChangeType!
+  changedField: String!
+  previousValue: JSON
+  newValue: JSON
+
+  """
+  Status transitions
+  """
+  fromStatus: EmploymentStatus
+  toStatus: EmploymentStatus
+
+  """
+  Context
+  """
+  reason: String
+  comment: String
+
+  """
+  Capacity impact
+  """
+  capacityImpact: Int # capacity units gained/lost
+  loadImpact: Float # load index change
+  """
+  Audit information
+  """
+  changedBy: String!
+  approvedBy: String
+
+  """
+  Timestamps
+  """
+  changedAt: DateTime!
+  effectiveDate: DateTime!
+  approvedAt: DateTime
+}
+
+"""
+Employee change type
+"""
+enum EmployeeChangeType {
+  HIRE
+  PROMOTION
+  DEMOTION
+  DEPARTMENT_TRANSFER
+  SALARY_ADJUSTMENT
+  EFFICIENCY_UPDATE
+  GRADE_CHANGE
+  STATUS_CHANGE
+  TERMINATION
+  LEAVE_START
+  LEAVE_END
+  CONTRACT_RENEWAL
+  OTHER
+}
+
+"""
+Employment status
+"""
+enum EmploymentStatus {
+  ACTIVE
+  ON_LEAVE
+  NOTICE_PERIOD
+  TERMINATED
+  RETIRED
+  INACTIVE
+}
+
+"""
+Employee history filter input
+"""
+input EmployeeHistoryFilterInput {
+  employeeId: String
+  changeType: EmployeeChangeType
+  changedBy: String
+  dateRange: DateRangeInput
+}
+
+"""
+Pagination input for employee history
+"""
+input EmployeeHistoryPaginationInput {
+  skip: Int
+  take: Int
+  orderBy: EmployeeHistorySortInput
+}
+
+"""
+Employee history sort input
+"""
+input EmployeeHistorySortInput {
+  field: EmployeeHistorySortField!
+  order: SortOrder!
+}
+
+"""
+Employee history sort fields
+"""
+enum EmployeeHistorySortField {
+  CHANGED_AT
+  EFFECTIVE_DATE
+  CHANGE_TYPE
+}
+
+"""
+Employee history response wrapper
+"""
+type EmployeeHistoryConnection {
+  nodes: [EmployeeHistory!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+"""
+Employee timeline entry
+"""
+type EmployeeTimelineEntry {
+  event: EmployeeHistory!
+  summary: String!
+  icon: String!
+  color: String!
+}
+
+"""
+Employee audit report
+"""
+type EmployeeAuditReport {
+  employee: Employee!
+  reportPeriod: DateRange!
+  generatedAt: DateTime!
+
+  """
+  Summary statistics
+  """
+  totalChanges: Int!
+  changesByType: [ChangeTypeSummary!]!
+
+  """
+  Timeline
+  """
+  timeline: [EmployeeTimelineEntry!]!
+
+  """
+  Notable changes
+  """
+  capacityChanges: [EmployeeHistory!]!
+  statusChanges: [EmployeeHistory!]!
+  efficiencyChanges: [EmployeeHistory!]!
+}
+
+"""
+Change type summary
+"""
+type ChangeTypeSummary {
+  changeType: EmployeeChangeType!
+  count: Int!
+  lastChanged: DateTime
+}
+
+"""
+Department history summary
+"""
+type DepartmentEmployeeHistory {
+  department: Department!
+  reportPeriod: DateRange!
+
+  """
+  Staff movements
+  """
+  newHires: Int!
+  departures: Int!
+  transfers: Int!
+  promotions: Int!
+  demotions: Int!
+
+  """
+  Timeline of changes
+  """
+  timeline: [EmployeeTimelineEntry!]!
+
+  """
+  Capacity trends
+  """
+  capacityAdded: Int!
+  capacityLost: Int!
+  netCapacityChange: Int!
+}
+
+# ============================================================================
+# Extended Query Type
+# ============================================================================
+
+extend type Query {
+  """
+  Get employee history entry by ID
+  """
+  employeeHistoryEntry(id: String!): EmployeeHistory
+
+  """
+  Get full history for an employee
+  """
+  employeeHistory(
+    employeeId: String!
+    filter: EmployeeHistoryFilterInput
+    pagination: EmployeeHistoryPaginationInput
+  ): EmployeeHistoryConnection!
+
+  """
+  Get employee timeline
+  """
+  employeeTimeline(employeeId: String!, limit: Int): [EmployeeTimelineEntry!]!
+
+  """
+  Get audit report for employee
+  """
+  employeeAuditReport(
+    employeeId: String!
+    dateRange: DateRangeInput!
+  ): EmployeeAuditReport!
+
+  """
+  Get department employee history summary
+  """
+  departmentEmployeeHistory(
+    departmentId: String!
+    dateRange: DateRangeInput!
+  ): DepartmentEmployeeHistory!
+
+  """
+  Get all changes by a specific user
+  """
+  changesBy(userId: String!, dateRange: DateRangeInput): [EmployeeHistory!]!
+
+  """
+  Find unapproved changes
+  """
+  unapprovedChanges(departmentId: String): [EmployeeHistory!]!
+}
+
+# ============================================================================
+# Extended Mutation Type
+# ============================================================================
+
+extend type Mutation {
+  """
+  Record employee history entry
+  """
+  recordEmployeeHistory(input: RecordEmployeeHistoryInput!): EmployeeHistory!
+
+  """
+  Approve employee history change
+  """
+  approveEmployeeHistory(id: String!): EmployeeHistory!
+
+  """
+  Reject employee history change
+  """
+  rejectEmployeeHistory(id: String!, rejectionReason: String!): EmployeeHistory!
+}
+
+"""
+Input for recording employee history
+"""
+input RecordEmployeeHistoryInput {
+  employeeId: String!
+  changeType: EmployeeChangeType!
+  changedField: String
+  previousValue: JSON
+  newValue: JSON
+  fromStatus: EmploymentStatus
+  toStatus: EmploymentStatus
+  reason: String
+  comment: String
+  effectiveDate: DateTime
+}
+
+# ============================================================================
+# Extended Subscription Type
+# ============================================================================
+
+extend type Subscription {
+  """
+  Subscribe to employee changes
+  """
+  employeeChanged(employeeId: String): EmployeeHistory!
+
+  """
+  Subscribe to status changes
+  """
+  employeeStatusChanged: EmployeeStatusChangeEvent!
+}
+
+"""
+Employee status change event
+"""
+type EmployeeStatusChangeEvent {
+  history: EmployeeHistory!
+  employeeName: String!
+  timestamp: DateTime!
+}
