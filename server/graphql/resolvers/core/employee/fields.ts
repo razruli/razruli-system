@@ -6,16 +6,25 @@
  * Only includes fields explicitly defined in the GraphQL schema
  */
 
-import { EmployeeResolvers } from "@/server/graphql/generated";
+import { EmployeeResolvers } from "@/server/graphql/types/generated";
 
-export const employeeFieldResolvers: EmployeeResolvers = {
+export const employeeFieldResolvers: Pick<
+  EmployeeResolvers,
+  "department" | "grade" | "taskAssignments" | "loadSnapshots" | "history"
+> = {
   /**
    * Resolve employee's department
    * Using service's internal DataLoader for batching
    */
   department: async (parent, _args, context) => {
     try {
-      return await context.services.department.getById(parent.departmentId);
+      const department = await context.services.department.getById(
+        parent.departmentId,
+      );
+      if (!department) {
+        throw new Error(`Department not found: ${parent.departmentId}`);
+      }
+      return department;
     } catch (error) {
       throw new Error(`Failed to load department: ${error}`);
     }
@@ -27,7 +36,13 @@ export const employeeFieldResolvers: EmployeeResolvers = {
    */
   grade: async (parent, _args, context) => {
     try {
-      return await context.services.grade.getById(parent.gradeId.toString());
+      const grade = await context.services.grade.getById(
+        parent.gradeId.toString(),
+      );
+      if (!grade) {
+        throw new Error(`Grade not found: ${parent.gradeId}`);
+      }
+      return grade;
     } catch (error) {
       throw new Error(`Failed to load grade: ${error}`);
     }
