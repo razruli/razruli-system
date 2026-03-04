@@ -62,10 +62,20 @@ export class DepartmentService extends BaseService {
   }
 
   /**
+   * Alias for getByCompanyId - find departments by company
+   */
+  async findByCompany(companyId: string): Promise<Department[]> {
+    return this.getByCompanyId(companyId);
+  }
+
+  /**
    * Get departments by head
    */
   async getByHeadId(headId: string): Promise<Department[]> {
-    return this.repository.findByHeadId(headId);
+    const cacheKey = this.listCacheKey({ headId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByHeadId(headId),
+    );
   }
 
   /**

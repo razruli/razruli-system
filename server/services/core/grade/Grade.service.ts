@@ -22,21 +22,19 @@ export class GradeService extends BaseService {
 
   // ==================== READ OPERATIONS ====================
 
-  async getById(id: number): Promise<Grade | null> {
+  async getById(id: string): Promise<Grade | null> {
     this.log("info", `Getting grade by ID`, { id });
-    const cacheKey = this.cacheKey(String(id));
+    const cacheKey = this.cacheKey(id);
 
-    return this.getOrFetch(cacheKey, () =>
-      this.repository.findById(String(id)),
-    );
+    return await this.getOrFetch(cacheKey, () => this.repository.findById(id));
   }
 
-  async getByIdOrThrow(id: number): Promise<Grade> {
+  async getByIdOrThrow(id: string): Promise<Grade> {
     const grade = await this.getById(id);
     return this.ensureExists(grade, "Grade", id);
   }
 
-  async getByIds(ids: number[]): Promise<(Grade | null)[]> {
+  async getByIds(ids: string[]): Promise<(Grade | null)[]> {
     if (ids.length === 0) return [];
 
     return this.repository.findMany(ids.map(String));
@@ -82,7 +80,7 @@ export class GradeService extends BaseService {
   //   }
 
   async update(
-    id: number,
+    id: string,
     data: Partial<{
       name: string;
       description: string;
@@ -103,7 +101,7 @@ export class GradeService extends BaseService {
 
   // ==================== BUSINESS LOGIC ====================
 
-  async getWithStats(id: number) {
+  async getWithStats(id: string) {
     const grade = await this.getByIdOrThrow(id);
 
     const employeeCount = await this.repository.getEmployeeCount(id);

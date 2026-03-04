@@ -17,6 +17,7 @@ import { EmployeeService } from "./core/employee";
 import { GradeService } from "./core/grade";
 import { ProcessService } from "./operations/process";
 import { TaskAssignmentService } from "./operations/taskAssignment";
+import { UserService } from "./user/user.service";
 
 /**
  * Service Factory - DI Container for all services
@@ -37,6 +38,7 @@ import { TaskAssignmentService } from "./operations/taskAssignment";
 export class ServiceFactory {
   // Lazy-loaded service instances (memoized)
   private _services: {
+    user?: UserService;
     company?: CompanyService;
     department?: DepartmentService;
     employee?: EmployeeService;
@@ -55,6 +57,22 @@ export class ServiceFactory {
     }
   }
 
+  /**
+   * User services
+   * Location: services/user/user.service.ts
+   *
+   * Handles:
+   * - User CRUD operations
+   * - Authentication/authorization logic (if needed)
+   * - Integration with better-auth (if used)
+   * - User-specific caching strategies
+   */
+  getUserService(): UserService {
+    if (!this._services.user) {
+      this._services.user = new UserService(this.context);
+    }
+    return this._services.user;
+  }
   // ==================== CORE DOMAIN ====================
 
   /**
@@ -237,6 +255,8 @@ export class ServiceFactory {
    */
   getServices() {
     return {
+      // Auth & User
+      user: this.getUserService(),
       // Core
       company: this.getCompanyService(),
       department: this.getDepartmentService(),

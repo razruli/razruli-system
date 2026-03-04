@@ -26,7 +26,7 @@ export class CompanyService extends BaseService {
     this.log("info", `Getting company by ID`, { id });
     const cacheKey = this.cacheKey(id);
 
-    return this.getOrFetch(cacheKey, () => this.repository.findById(id));
+    return await this.getOrFetch(cacheKey, () => this.repository.findById(id));
   }
 
   async getByIdOrThrow(id: string): Promise<Company> {

@@ -1,5 +1,4 @@
 // server/services/user/userService.ts
-import { User } from "better-auth";
 
 import { BaseService } from "@/server/services/base/BaseService";
 import { ServiceContext } from "@/server/types/context";
@@ -9,7 +8,7 @@ import { UserResult, ListUsersInput, UsersListResult } from "./types";
 import { UserRepository } from "./user.repository";
 
 export class UserService extends BaseService {
-  readonly domain = "employee";
+  readonly domain = "user";
   private repository: UserRepository;
 
   constructor(context: ServiceContext) {
@@ -67,6 +66,4 @@ export class UserService extends BaseService {
       throw error;
     }
   }
-
-  // ... other methods
 }

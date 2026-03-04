@@ -31,6 +31,27 @@ export class TaskAssignmentRepository extends BaseRepository<TaskAssignment> {
     });
   }
 
+  async findByCompany(companyId: string): Promise<TaskAssignment[]> {
+    return this.prisma.taskAssignment.findMany({
+      where: { companyId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async findByProcess(processId: string): Promise<TaskAssignment[]> {
+    return this.prisma.taskAssignment.findMany({
+      where: { processId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async findByDepartment(departmentId: string): Promise<TaskAssignment[]> {
+    return this.prisma.taskAssignment.findMany({
+      where: { departmentId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   async findAll(): Promise<TaskAssignment[]> {
     return this.prisma.taskAssignment.findMany({
       orderBy: { createdAt: "desc" },

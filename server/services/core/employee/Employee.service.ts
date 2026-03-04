@@ -51,6 +51,26 @@ export class EmployeeService extends BaseService {
     );
   }
 
+  async findByGrade(gradeId: number): Promise<Employee[]> {
+    this.log("info", `Finding employees by grade`, { gradeId });
+
+    const cacheKey = this.listCacheKey({ gradeId: gradeId.toString() });
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByGrade(gradeId),
+    );
+  }
+
+  async findByCompany(companyId: string): Promise<Employee[]> {
+    this.log("info", `Finding employees by company`, { companyId });
+
+    const cacheKey = this.listCacheKey({ companyId });
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByCompany(companyId),
+    );
+  }
+
   async getAll(): Promise<Employee[]> {
     const cacheKey = this.listCacheKey({});
 

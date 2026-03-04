@@ -35,6 +35,34 @@ export class LoadSnapshotService extends BaseService {
     );
   }
 
+  async findByCompany(companyId: string) {
+    const cacheKey = this.listCacheKey({ companyId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByCompany(companyId),
+    );
+  }
+
+  async findByDepartment(departmentId: string) {
+    const cacheKey = this.listCacheKey({ departmentId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByDepartment(departmentId),
+    );
+  }
+
+  async findByProcess(processId: string) {
+    const cacheKey = this.listCacheKey({ processId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByProcess(processId),
+    );
+  }
+
+  async findByTaskAssignmentId(taskAssignmentId: string) {
+    const cacheKey = this.listCacheKey({ taskAssignmentId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByTaskAssignmentId(taskAssignmentId),
+    );
+  }
+
   async create(data: any) {
     const item = await this.repository.create(data);
     this.invalidateAll();

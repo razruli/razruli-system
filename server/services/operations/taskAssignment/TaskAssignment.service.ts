@@ -39,6 +39,27 @@ export class TaskAssignmentService extends BaseService {
     return this.getByEmployee(employeeId);
   }
 
+  async findByCompany(companyId: string): Promise<TaskAssignment[]> {
+    const cacheKey = this.listCacheKey({ companyId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByCompany(companyId),
+    );
+  }
+
+  async findByProcess(processId: string): Promise<TaskAssignment[]> {
+    const cacheKey = this.listCacheKey({ processId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByProcess(processId),
+    );
+  }
+
+  async findByDepartment(departmentId: string): Promise<TaskAssignment[]> {
+    const cacheKey = this.listCacheKey({ departmentId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByDepartment(departmentId),
+    );
+  }
+
   async getAll(): Promise<TaskAssignment[]> {
     const cacheKey = this.listCacheKey({});
     return this.getOrFetch(cacheKey, () => this.repository.findAll());

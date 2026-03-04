@@ -34,6 +34,20 @@ export class EmployeeRepository extends BaseRepository<Employee> {
     });
   }
 
+  async findByCompany(companyId: string): Promise<Employee[]> {
+    return this.prisma.employee.findMany({
+      where: { companyId },
+      orderBy: { fio: "asc" },
+    });
+  }
+
+  async findByGrade(gradeId: number): Promise<Employee[]> {
+    return this.prisma.employee.findMany({
+      where: { gradeId },
+      orderBy: { fio: "asc" },
+    });
+  }
+
   async findByCompanyAndName(
     companyId: string,
     fio: string,

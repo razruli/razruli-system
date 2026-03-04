@@ -34,6 +34,24 @@ export class ProcessService extends BaseService {
     );
   }
 
+  async findByDepartment(departmentId: string): Promise<Process[]> {
+    return this.getByDepartment(departmentId);
+  }
+
+  async findByCompany(companyId: string): Promise<Process[]> {
+    const cacheKey = this.listCacheKey({ companyId });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByCompany(companyId),
+    );
+  }
+
+  async findByGrade(gradeId: number): Promise<Process[]> {
+    const cacheKey = this.listCacheKey({ gradeId: gradeId.toString() });
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findByGrade(gradeId),
+    );
+  }
+
   async getAll(): Promise<Process[]> {
     const cacheKey = this.listCacheKey({});
     return this.getOrFetch(cacheKey, () => this.repository.findAll());

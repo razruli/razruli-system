@@ -28,6 +28,20 @@ export class ProcessRepository extends BaseRepository<Process> {
     });
   }
 
+  async findByCompany(companyId: string): Promise<Process[]> {
+    return this.prisma.process.findMany({
+      where: { companyId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async findByGrade(gradeId: number): Promise<Process[]> {
+    return this.prisma.process.findMany({
+      where: { targetGradeId: gradeId },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   async findAll(): Promise<Process[]> {
     return this.prisma.process.findMany({
       orderBy: { createdAt: "desc" },

@@ -63,9 +63,9 @@ export class GradeRepository {
 
   // ==================== RELATED QUERIES ====================
 
-  async getEmployeeCount(gradeId: number): Promise<number> {
+  async getEmployeeCount(gradeId: string): Promise<number> {
     return this.prisma.employee.count({
-      where: { gradeId },
+      where: { gradeId: parseInt(gradeId, 10) },
     });
   }
 }
