@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { User, Session, Account, Verification, Company, Department, Employee, Grade, Process, TaskAssignment, LoadSnapshot, GapAnalysisResult, HiringRequest, EmployeeHistory, AuditLog } from '@/server/db/generated/prisma';
-import { ServiceContext } from './context';
+import { UserModel, SessionModel, AccountModel, VerificationModel, CompanyModel, DepartmentModel, EmployeeModel, GradeModel, ProcessModel, TaskAssignmentModel, LoadSnapshotModel, GapAnalysisResultModel, HiringRequestModel, EmployeeHistoryModel, AuditLogModel } from '@/server/db/generated/prisma/models';
+import { GraphQLContext } from '../context/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -173,19 +173,19 @@ export type Company = {
   /** Created at */
   createdAt: Scalars['DateTime']['output'];
   /** All departments */
-  departments: Array<Department>;
+  departments: Maybe<Array<Maybe<Department>>>;
   /** All employees */
-  employees: Array<Employee>;
+  employees: Maybe<Array<Maybe<Employee>>>;
   /** Unique identifier */
   id: Scalars['String']['output'];
   /** All load snapshots */
-  loadSnapshots: Array<LoadSnapshot>;
+  loadSnapshots: Maybe<Array<Maybe<LoadSnapshot>>>;
   /** Company name */
   name: Scalars['String']['output'];
   /** All processes */
-  processes: Array<Process>;
+  processes: Maybe<Array<Maybe<Process>>>;
   /** All task assignments */
-  taskAssignments: Array<TaskAssignment>;
+  taskAssignments: Maybe<Array<Maybe<TaskAssignment>>>;
   /** Timezone (default UTC+3) */
   timezone: Scalars['String']['output'];
   /** Updated at */
@@ -437,19 +437,19 @@ export type Employee = {
   /** Hire date */
   hireDate: Scalars['DateTime']['output'];
   /** Change history */
-  history: Array<EmployeeHistory>;
+  history: Maybe<Array<Maybe<EmployeeHistory>>>;
   /** Unique identifier */
   id: Scalars['String']['output'];
   /** Efficiency coefficient (multiplier, default 1.0) */
   kEfficiency: Scalars['Float']['output'];
   /** Load snapshots */
-  loadSnapshots: Array<LoadSnapshot>;
+  loadSnapshots: Maybe<Array<Maybe<LoadSnapshot>>>;
   /** Metadata (JSON) */
   metadata: Maybe<Scalars['JSON']['output']>;
   /** Current status (active/vacation/sick/dismissed) */
   status: Scalars['String']['output'];
   /** Task assignments */
-  taskAssignments: Array<TaskAssignment>;
+  taskAssignments: Maybe<Array<Maybe<TaskAssignment>>>;
   /** Updated at */
   updatedAt: Scalars['DateTime']['output'];
   /** Working hours per day */
@@ -957,10 +957,10 @@ export type LoadSnapshot = {
   companyLoadIndex: Scalars['Float']['output'];
   /** Timestamps */
   createdAt: Scalars['DateTime']['output'];
-  department: Department;
+  department: Maybe<Department>;
   /** Relative metrics */
   departmentLoadIndex: Scalars['Float']['output'];
-  employee: Employee;
+  employee: Maybe<Employee>;
   /** Employee data (at time of snapshot) */
   employeeId: Scalars['String']['output'];
   id: Scalars['String']['output'];
@@ -1091,7 +1091,7 @@ export type Mutation = {
   /** Complete a task assignment */
   completeTaskAssignment: TaskAssignment;
   /** Create new company (admin only) */
-  createCompany: Company;
+  createCompany: Maybe<Company>;
   /** Create snapshots for all employees */
   createCompanyLoadSnapshots: Array<LoadSnapshot>;
   /** Create new department */
@@ -1133,7 +1133,7 @@ export type Mutation = {
   /** Unblock a task */
   unblockTaskAssignment: TaskAssignment;
   /** Update company settings */
-  updateCompany: Company;
+  updateCompany: Maybe<Company>;
   /** Update department */
   updateDepartment: Department;
   /** Update employee */
@@ -1586,14 +1586,14 @@ export type Process = {
   estimatedDurationDays: Maybe<Scalars['Int']['output']>;
   id: Scalars['String']['output'];
   kMultiplier: Scalars['Float']['output'];
-  loadSnapshots: Array<LoadSnapshot>;
+  loadSnapshots: Maybe<Array<Maybe<LoadSnapshot>>>;
   name: Scalars['String']['output'];
   priority: ProcessPriority;
   processType: ProcessType;
   startedAt: Maybe<Scalars['DateTime']['output']>;
   /** Status tracking */
   status: ProcessStatus;
-  taskAssignments: Array<TaskAssignment>;
+  taskAssignments: Maybe<Array<Maybe<TaskAssignment>>>;
   updatedAt: Scalars['DateTime']['output'];
   updatedBy: Maybe<Scalars['String']['output']>;
 };
@@ -1716,7 +1716,7 @@ export type Query = {
   /** Get all changes by a specific user */
   changesBy: Array<EmployeeHistory>;
   /** Get all companies (admin only) */
-  companies: Array<Company>;
+  companies: Maybe<Array<Maybe<Company>>>;
   /** Get company by ID */
   company: Maybe<Company>;
   /** Get company-wide load analysis */
@@ -1751,10 +1751,16 @@ export type Query = {
   employeeAuditReport: EmployeeAuditReport;
   /** Get employee capacity metrics */
   employeeCapacity: Scalars['Float']['output'];
-  /** Get full history for an employee */
-  employeeHistory: EmployeeHistoryConnection;
+  /** Get history for a specific employee */
+  employeeChangeHistory: Array<EmployeeHistory>;
+  /** List employee history records with filtering and pagination */
+  employeeHistories: EmployeeHistoryConnection;
+  /** Get single employee history record by ID */
+  employeeHistory: Maybe<EmployeeHistory>;
   /** Get employee history entry by ID */
   employeeHistoryEntry: Maybe<EmployeeHistory>;
+  /** Get full history for an employee (alternative) */
+  employeeHistoryList: EmployeeHistoryConnection;
   /** Get employee load index */
   employeeLoadIndex: Scalars['Float']['output'];
   /** Get employee load trend */
@@ -1801,7 +1807,6 @@ export type Query = {
   loadSnapshot: Maybe<LoadSnapshot>;
   /** List load snapshots with filtering */
   loadSnapshots: LoadSnapshotConnection;
-  /** Get current authenticated user */
   me: Maybe<User>;
   /** Get authenticated user's company */
   myCompany: Maybe<Company>;
@@ -1829,6 +1834,7 @@ export type Query = {
   unapprovedChanges: Array<EmployeeHistory>;
   /** Get user activity summary */
   userActivitySummary: UserActivitySummary;
+  users: UsersResult;
 };
 
 
@@ -2038,8 +2044,16 @@ export type QueryEmployeeCapacityArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
-export type QueryEmployeeHistoryArgs = {
+export type QueryEmployeeChangeHistoryArgs = {
   employeeId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoriesArgs = {
   filter: InputMaybe<EmployeeHistoryFilterInput>;
   pagination: InputMaybe<EmployeeHistoryPaginationInput>;
 };
@@ -2049,8 +2063,28 @@ export type QueryEmployeeHistoryArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryEmployeeHistoryArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryEmployeeHistoryEntryArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoryListArgs = {
+  employeeId: Scalars['String']['input'];
+  filter: InputMaybe<EmployeeHistoryFilterInput>;
+  pagination: InputMaybe<EmployeeHistoryPaginationInput>;
 };
 
 
@@ -2368,6 +2402,15 @@ export type QueryUserActivitySummaryArgs = {
   userId: Scalars['String']['input'];
 };
 
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryUsersArgs = {
+  input: UsersInput;
+};
+
 /** Recommendation priority */
 export enum RecommendationPriority {
   High = 'HIGH',
@@ -2473,15 +2516,34 @@ export type Subscription = {
   departmentCreated: Department;
   /** Subscribe to department changes */
   departmentUpdated: Department;
+  /**
+   * Subscribe to employee capacity changes
+   * Fires when capacity allocation changes for a specific employee
+   */
+  employeeCapacityChanged: Employee;
   /** Subscribe to employee changes */
   employeeChanged: EmployeeHistory;
-  /** Subscribe to new employees */
+  /**
+   * Subscribe to new employee creation
+   * Can subscribe to department-specific or company-wide
+   */
   employeeCreated: Employee;
-  /** Subscribe to dismissals */
+  /**
+   * Subscribe to employee dismissals
+   * Can subscribe to department-specific or company-wide
+   */
   employeeDismissed: Employee;
+  /**
+   * Subscribe to employee load threshold events
+   * Fires when employee load crosses a specified threshold
+   */
+  employeeLoadThresholdCrossed: Employee;
   /** Subscribe to status changes */
   employeeStatusChanged: EmployeeStatusChangeEvent;
-  /** Subscribe to employee changes */
+  /**
+   * Subscribe to employee changes (updates)
+   * Can subscribe to all updates if no departmentId provided
+   */
   employeeUpdated: Employee;
   /** Subscribe to gap analysis updates */
   gapAnalysisUpdated: GapAnalysis;
@@ -2539,6 +2601,15 @@ export type SubscriptionDepartmentUpdatedArgs = {
  * Root Subscription type
  * Extended by each domain module
  */
+export type SubscriptionEmployeeCapacityChangedArgs = {
+  employeeId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
 export type SubscriptionEmployeeChangedArgs = {
   employeeId: InputMaybe<Scalars['String']['input']>;
 };
@@ -2559,6 +2630,16 @@ export type SubscriptionEmployeeCreatedArgs = {
  */
 export type SubscriptionEmployeeDismissedArgs = {
   departmentId: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeLoadThresholdCrossedArgs = {
+  employeeId: Scalars['String']['input'];
+  threshold: InputMaybe<Scalars['Float']['input']>;
 };
 
 
@@ -2703,7 +2784,7 @@ export type TaskAssignment = {
   employeeId: Scalars['String']['output'];
   estimatedDaysToComplete: Maybe<Scalars['Int']['output']>;
   id: Scalars['String']['output'];
-  loadSnapshots: Array<LoadSnapshot>;
+  loadSnapshots: Maybe<Array<Maybe<LoadSnapshot>>>;
   name: Scalars['String']['output'];
   priority: TaskPriority;
   /** Relations */
@@ -2901,13 +2982,17 @@ export type UpdateTaskAssignmentInput = {
   status: InputMaybe<TaskStatus>;
 };
 
-/** User type from authentication */
-export type User = {
+export type User = Node & {
   __typename?: 'User';
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  image: Maybe<Scalars['String']['output']>;
   name: Maybe<Scalars['String']['output']>;
+  phone: Maybe<Scalars['String']['output']>;
+  role: Maybe<UserRole>;
+  status: UserStatus;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 /** User access summary for compliance */
@@ -2937,6 +3022,39 @@ export type UserActivitySummary = {
   /** Risk indicators */
   unusualActivities: Scalars['String']['output'];
   user: User;
+};
+
+export enum UserRole {
+  Admin = 'admin',
+  Broker = 'broker',
+  Carrier = 'carrier',
+  Driver = 'driver',
+  Warehouse = 'warehouse'
+}
+
+export enum UserStatus {
+  Active = 'active',
+  Inactive = 'inactive',
+  Pending = 'pending',
+  Suspended = 'suspended'
+}
+
+export type UsersInput = {
+  createdAfter: InputMaybe<Scalars['DateTime']['input']>;
+  createdBefore: InputMaybe<Scalars['DateTime']['input']>;
+  emailVerified: InputMaybe<Scalars['Boolean']['input']>;
+  limit: InputMaybe<Scalars['Int']['input']>;
+  offset: InputMaybe<Scalars['Int']['input']>;
+  search: InputMaybe<Scalars['String']['input']>;
+  sortBy: InputMaybe<Scalars['String']['input']>;
+  sortOrder: InputMaybe<SortOrder>;
+  status: InputMaybe<UserStatus>;
+};
+
+export type UsersResult = {
+  __typename?: 'UsersResult';
+  pageInfo: PageInfo;
+  users: Array<User>;
 };
 
 
@@ -3011,7 +3129,7 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
-  Node: never;
+  Node: ( UserModel );
 };
 
 /** Mapping between all available schema types and the resolvers types */
@@ -3019,7 +3137,7 @@ export type ResolversTypes = {
   AccessRiskLevel: AccessRiskLevel;
   ActionTypeSummary: ResolverTypeWrapper<ActionTypeSummary>;
   AuditActionType: AuditActionType;
-  AuditLog: ResolverTypeWrapper<AuditLog>;
+  AuditLog: ResolverTypeWrapper<AuditLogModel>;
   AuditLogConnection: ResolverTypeWrapper<Omit<AuditLogConnection, 'nodes'> & { nodes: Array<ResolversTypes['AuditLog']> }>;
   AuditLogFilterInput: AuditLogFilterInput;
   AuditLogPaginationInput: AuditLogPaginationInput;
@@ -3031,7 +3149,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   ChangeByUser: ResolverTypeWrapper<Omit<ChangeByUser, 'user'> & { user: ResolversTypes['User'] }>;
   ChangeTypeSummary: ResolverTypeWrapper<ChangeTypeSummary>;
-  Company: ResolverTypeWrapper<Company>;
+  Company: ResolverTypeWrapper<CompanyModel>;
   CompanyLoadAnalysis: ResolverTypeWrapper<Omit<CompanyLoadAnalysis, 'company' | 'departmentMetrics'> & { company: ResolversTypes['Company'], departmentMetrics: Array<ResolversTypes['DepartmentLoadOverview']> }>;
   ComplianceReport: ResolverTypeWrapper<Omit<ComplianceReport, 'company' | 'highRiskActivities' | 'userAccessSummary'> & { company: ResolversTypes['Company'], highRiskActivities: Array<ResolversTypes['AuditLog']>, userAccessSummary: Array<ResolversTypes['UserAccessSummary']> }>;
   CreateCompanyInput: CreateCompanyInput;
@@ -3044,19 +3162,19 @@ export type ResolversTypes = {
   DateRange: ResolverTypeWrapper<DateRange>;
   DateRangeInput: DateRangeInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
-  Department: ResolverTypeWrapper<Department>;
+  Department: ResolverTypeWrapper<DepartmentModel>;
   DepartmentEmployeeHistory: ResolverTypeWrapper<Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversTypes['Department'], timeline: Array<ResolversTypes['EmployeeTimelineEntry']> }>;
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: ResolverTypeWrapper<Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversTypes['Department'], gapAnalysis: Maybe<ResolversTypes['GapAnalysis']> }>;
   DepartmentListResponse: ResolverTypeWrapper<Omit<DepartmentListResponse, 'items'> & { items: Array<ResolversTypes['Department']> }>;
   DepartmentLoadOverview: ResolverTypeWrapper<Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversTypes['Department'], employeeBreakdown: Array<ResolversTypes['EmployeeLoadBreakdown']> }>;
   DepartmentMetrics: ResolverTypeWrapper<Omit<DepartmentMetrics, 'department'> & { department: ResolversTypes['Department'] }>;
-  Employee: ResolverTypeWrapper<Employee>;
+  Employee: ResolverTypeWrapper<EmployeeModel>;
   EmployeeAuditReport: ResolverTypeWrapper<Omit<EmployeeAuditReport, 'capacityChanges' | 'efficiencyChanges' | 'employee' | 'statusChanges' | 'timeline'> & { capacityChanges: Array<ResolversTypes['EmployeeHistory']>, efficiencyChanges: Array<ResolversTypes['EmployeeHistory']>, employee: ResolversTypes['Employee'], statusChanges: Array<ResolversTypes['EmployeeHistory']>, timeline: Array<ResolversTypes['EmployeeTimelineEntry']> }>;
   EmployeeChangeType: EmployeeChangeType;
   EmployeeConnection: ResolverTypeWrapper<Omit<EmployeeConnection, 'nodes'> & { nodes: Array<ResolversTypes['Employee']> }>;
   EmployeeFilterInput: EmployeeFilterInput;
-  EmployeeHistory: ResolverTypeWrapper<EmployeeHistory>;
+  EmployeeHistory: ResolverTypeWrapper<EmployeeHistoryModel>;
   EmployeeHistoryConnection: ResolverTypeWrapper<Omit<EmployeeHistoryConnection, 'nodes'> & { nodes: Array<ResolversTypes['EmployeeHistory']> }>;
   EmployeeHistoryFilterInput: EmployeeHistoryFilterInput;
   EmployeeHistoryPaginationInput: EmployeeHistoryPaginationInput;
@@ -3085,7 +3203,7 @@ export type ResolversTypes = {
   GapStatus: GapStatus;
   GapThresholdEvent: ResolverTypeWrapper<Omit<GapThresholdEvent, 'analysis'> & { analysis: ResolversTypes['GapAnalysis'] }>;
   GapTrend: ResolverTypeWrapper<GapTrend>;
-  Grade: ResolverTypeWrapper<Grade>;
+  Grade: ResolverTypeWrapper<GradeModel>;
   GradeStats: ResolverTypeWrapper<Omit<GradeStats, 'grade'> & { grade: ResolversTypes['Grade'] }>;
   HiringForecast: ResolverTypeWrapper<Omit<HiringForecast, 'gapAnalysis'> & { gapAnalysis: ResolversTypes['GapAnalysis'] }>;
   HiringPhase: ResolverTypeWrapper<HiringPhase>;
@@ -3099,7 +3217,7 @@ export type ResolversTypes = {
   LoadAnalysisMetrics: ResolverTypeWrapper<LoadAnalysisMetrics>;
   LoadRecommendation: ResolverTypeWrapper<LoadRecommendation>;
   LoadRiskLevel: LoadRiskLevel;
-  LoadSnapshot: ResolverTypeWrapper<LoadSnapshot>;
+  LoadSnapshot: ResolverTypeWrapper<LoadSnapshotModel>;
   LoadSnapshotConnection: ResolverTypeWrapper<Omit<LoadSnapshotConnection, 'nodes'> & { nodes: Array<ResolversTypes['LoadSnapshot']> }>;
   LoadSnapshotFilterInput: LoadSnapshotFilterInput;
   LoadSnapshotPaginationInput: LoadSnapshotPaginationInput;
@@ -3113,7 +3231,7 @@ export type ResolversTypes = {
   Node: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Node']>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginationInput: PaginationInput;
-  Process: ResolverTypeWrapper<Process>;
+  Process: ResolverTypeWrapper<ProcessModel>;
   ProcessConnection: ResolverTypeWrapper<Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversTypes['Process']> }>;
   ProcessFilterInput: ProcessFilterInput;
   ProcessMetrics: ResolverTypeWrapper<Omit<ProcessMetrics, 'process'> & { process: ResolversTypes['Process'] }>;
@@ -3138,7 +3256,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<Record<PropertyKey, never>>;
   TalentCategory: ResolverTypeWrapper<Omit<TalentCategory, 'grade'> & { grade: ResolversTypes['Grade'] }>;
-  TaskAssignment: ResolverTypeWrapper<TaskAssignment>;
+  TaskAssignment: ResolverTypeWrapper<TaskAssignmentModel>;
   TaskAssignmentConnection: ResolverTypeWrapper<Omit<TaskAssignmentConnection, 'nodes'> & { nodes: Array<ResolversTypes['TaskAssignment']> }>;
   TaskAssignmentFilterInput: TaskAssignmentFilterInput;
   TaskAssignmentMetrics: ResolverTypeWrapper<Omit<TaskAssignmentMetrics, 'assignment'> & { assignment: ResolversTypes['TaskAssignment'] }>;
@@ -3160,15 +3278,19 @@ export type ResolversTypes = {
   UpdateProcessInput: UpdateProcessInput;
   UpdateTaskAssignmentInput: UpdateTaskAssignmentInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<UserModel>;
   UserAccessSummary: ResolverTypeWrapper<Omit<UserAccessSummary, 'user'> & { user: ResolversTypes['User'] }>;
   UserActivitySummary: ResolverTypeWrapper<Omit<UserActivitySummary, 'recentActions' | 'user'> & { recentActions: Array<ResolversTypes['AuditLog']>, user: ResolversTypes['User'] }>;
+  UserRole: UserRole;
+  UserStatus: UserStatus;
+  UsersInput: UsersInput;
+  UsersResult: ResolverTypeWrapper<Omit<UsersResult, 'users'> & { users: Array<ResolversTypes['User']> }>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   ActionTypeSummary: ActionTypeSummary;
-  AuditLog: AuditLog;
+  AuditLog: AuditLogModel;
   AuditLogConnection: Omit<AuditLogConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['AuditLog']> };
   AuditLogFilterInput: AuditLogFilterInput;
   AuditLogPaginationInput: AuditLogPaginationInput;
@@ -3177,7 +3299,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   ChangeByUser: Omit<ChangeByUser, 'user'> & { user: ResolversParentTypes['User'] };
   ChangeTypeSummary: ChangeTypeSummary;
-  Company: Company;
+  Company: CompanyModel;
   CompanyLoadAnalysis: Omit<CompanyLoadAnalysis, 'company' | 'departmentMetrics'> & { company: ResolversParentTypes['Company'], departmentMetrics: Array<ResolversParentTypes['DepartmentLoadOverview']> };
   ComplianceReport: Omit<ComplianceReport, 'company' | 'highRiskActivities' | 'userAccessSummary'> & { company: ResolversParentTypes['Company'], highRiskActivities: Array<ResolversParentTypes['AuditLog']>, userAccessSummary: Array<ResolversParentTypes['UserAccessSummary']> };
   CreateCompanyInput: CreateCompanyInput;
@@ -3189,18 +3311,18 @@ export type ResolversParentTypes = {
   DateRange: DateRange;
   DateRangeInput: DateRangeInput;
   DateTime: Scalars['DateTime']['output'];
-  Department: Department;
+  Department: DepartmentModel;
   DepartmentEmployeeHistory: Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversParentTypes['Department'], timeline: Array<ResolversParentTypes['EmployeeTimelineEntry']> };
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversParentTypes['Department'], gapAnalysis: Maybe<ResolversParentTypes['GapAnalysis']> };
   DepartmentListResponse: Omit<DepartmentListResponse, 'items'> & { items: Array<ResolversParentTypes['Department']> };
   DepartmentLoadOverview: Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversParentTypes['Department'], employeeBreakdown: Array<ResolversParentTypes['EmployeeLoadBreakdown']> };
   DepartmentMetrics: Omit<DepartmentMetrics, 'department'> & { department: ResolversParentTypes['Department'] };
-  Employee: Employee;
+  Employee: EmployeeModel;
   EmployeeAuditReport: Omit<EmployeeAuditReport, 'capacityChanges' | 'efficiencyChanges' | 'employee' | 'statusChanges' | 'timeline'> & { capacityChanges: Array<ResolversParentTypes['EmployeeHistory']>, efficiencyChanges: Array<ResolversParentTypes['EmployeeHistory']>, employee: ResolversParentTypes['Employee'], statusChanges: Array<ResolversParentTypes['EmployeeHistory']>, timeline: Array<ResolversParentTypes['EmployeeTimelineEntry']> };
   EmployeeConnection: Omit<EmployeeConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Employee']> };
   EmployeeFilterInput: EmployeeFilterInput;
-  EmployeeHistory: EmployeeHistory;
+  EmployeeHistory: EmployeeHistoryModel;
   EmployeeHistoryConnection: Omit<EmployeeHistoryConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['EmployeeHistory']> };
   EmployeeHistoryFilterInput: EmployeeHistoryFilterInput;
   EmployeeHistoryPaginationInput: EmployeeHistoryPaginationInput;
@@ -3223,7 +3345,7 @@ export type ResolversParentTypes = {
   GapCriticalityAssessment: Omit<GapCriticalityAssessment, 'criticalDepartments'> & { criticalDepartments: Array<ResolversParentTypes['DepartmentGapComparison']> };
   GapThresholdEvent: Omit<GapThresholdEvent, 'analysis'> & { analysis: ResolversParentTypes['GapAnalysis'] };
   GapTrend: GapTrend;
-  Grade: Grade;
+  Grade: GradeModel;
   GradeStats: Omit<GradeStats, 'grade'> & { grade: ResolversParentTypes['Grade'] };
   HiringForecast: Omit<HiringForecast, 'gapAnalysis'> & { gapAnalysis: ResolversParentTypes['GapAnalysis'] };
   HiringPhase: HiringPhase;
@@ -3233,7 +3355,7 @@ export type ResolversParentTypes = {
   JSON: Scalars['JSON']['output'];
   LoadAnalysisMetrics: LoadAnalysisMetrics;
   LoadRecommendation: LoadRecommendation;
-  LoadSnapshot: LoadSnapshot;
+  LoadSnapshot: LoadSnapshotModel;
   LoadSnapshotConnection: Omit<LoadSnapshotConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['LoadSnapshot']> };
   LoadSnapshotFilterInput: LoadSnapshotFilterInput;
   LoadSnapshotPaginationInput: LoadSnapshotPaginationInput;
@@ -3245,7 +3367,7 @@ export type ResolversParentTypes = {
   Node: ResolversInterfaceTypes<ResolversParentTypes>['Node'];
   PageInfo: PageInfo;
   PaginationInput: PaginationInput;
-  Process: Process;
+  Process: ProcessModel;
   ProcessConnection: Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Process']> };
   ProcessFilterInput: ProcessFilterInput;
   ProcessMetrics: Omit<ProcessMetrics, 'process'> & { process: ResolversParentTypes['Process'] };
@@ -3262,7 +3384,7 @@ export type ResolversParentTypes = {
   String: Scalars['String']['output'];
   Subscription: Record<PropertyKey, never>;
   TalentCategory: Omit<TalentCategory, 'grade'> & { grade: ResolversParentTypes['Grade'] };
-  TaskAssignment: TaskAssignment;
+  TaskAssignment: TaskAssignmentModel;
   TaskAssignmentConnection: Omit<TaskAssignmentConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['TaskAssignment']> };
   TaskAssignmentFilterInput: TaskAssignmentFilterInput;
   TaskAssignmentMetrics: Omit<TaskAssignmentMetrics, 'assignment'> & { assignment: ResolversParentTypes['TaskAssignment'] };
@@ -3279,19 +3401,21 @@ export type ResolversParentTypes = {
   UpdateProcessInput: UpdateProcessInput;
   UpdateTaskAssignmentInput: UpdateTaskAssignmentInput;
   Upload: Scalars['Upload']['output'];
-  User: User;
+  User: UserModel;
   UserAccessSummary: Omit<UserAccessSummary, 'user'> & { user: ResolversParentTypes['User'] };
   UserActivitySummary: Omit<UserActivitySummary, 'recentActions' | 'user'> & { recentActions: Array<ResolversParentTypes['AuditLog']>, user: ResolversParentTypes['User'] };
+  UsersInput: UsersInput;
+  UsersResult: Omit<UsersResult, 'users'> & { users: Array<ResolversParentTypes['User']> };
 };
 
-export type ActionTypeSummaryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ActionTypeSummary'] = ResolversParentTypes['ActionTypeSummary']> = {
+export type ActionTypeSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ActionTypeSummary'] = ResolversParentTypes['ActionTypeSummary']> = {
   actionType: Resolver<ResolversTypes['AuditActionType'], ParentType, ContextType>;
   count: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   failureCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type AuditLogResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['AuditLog'] = ResolversParentTypes['AuditLog']> = {
+export type AuditLogResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuditLog'] = ResolversParentTypes['AuditLog']> = {
   actionType: Resolver<ResolversTypes['AuditActionType'], ParentType, ContextType>;
   companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -3313,7 +3437,7 @@ export type AuditLogResolvers<ContextType = ServiceContext, ParentType extends R
   userId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
-export type AuditLogConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['AuditLogConnection'] = ResolversParentTypes['AuditLogConnection']> = {
+export type AuditLogConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuditLogConnection'] = ResolversParentTypes['AuditLogConnection']> = {
   nodes: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3323,34 +3447,34 @@ export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
   name: 'BigInt';
 }
 
-export type ChangeByUserResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ChangeByUser'] = ResolversParentTypes['ChangeByUser']> = {
+export type ChangeByUserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ChangeByUser'] = ResolversParentTypes['ChangeByUser']> = {
   changeCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   user: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 };
 
-export type ChangeTypeSummaryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ChangeTypeSummary'] = ResolversParentTypes['ChangeTypeSummary']> = {
+export type ChangeTypeSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ChangeTypeSummary'] = ResolversParentTypes['ChangeTypeSummary']> = {
   changeType: Resolver<ResolversTypes['EmployeeChangeType'], ParentType, ContextType>;
   count: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   lastChanged: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
 };
 
-export type CompanyResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
+export type CompanyResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  departments: Resolver<Array<ResolversTypes['Department']>, ParentType, ContextType>;
-  employees: Resolver<Array<ResolversTypes['Employee']>, ParentType, ContextType>;
+  departments: Resolver<Maybe<Array<Maybe<ResolversTypes['Department']>>>, ParentType, ContextType>;
+  employees: Resolver<Maybe<Array<Maybe<ResolversTypes['Employee']>>>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  loadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType>;
+  loadSnapshots: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  processes: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType>;
-  taskAssignments: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType>;
+  processes: Resolver<Maybe<Array<Maybe<ResolversTypes['Process']>>>, ParentType, ContextType>;
+  taskAssignments: Resolver<Maybe<Array<Maybe<ResolversTypes['TaskAssignment']>>>, ParentType, ContextType>;
   timezone: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   workingDaysPerMonth: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   workingHoursDay: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type CompanyLoadAnalysisResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['CompanyLoadAnalysis'] = ResolversParentTypes['CompanyLoadAnalysis']> = {
+export type CompanyLoadAnalysisResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CompanyLoadAnalysis'] = ResolversParentTypes['CompanyLoadAnalysis']> = {
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   departmentMetrics: Resolver<Array<ResolversTypes['DepartmentLoadOverview']>, ParentType, ContextType>;
   metrics: Resolver<ResolversTypes['LoadAnalysisMetrics'], ParentType, ContextType>;
@@ -3359,7 +3483,7 @@ export type CompanyLoadAnalysisResolvers<ContextType = ServiceContext, ParentTyp
   totalEmployees: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type ComplianceReportResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ComplianceReport'] = ResolversParentTypes['ComplianceReport']> = {
+export type ComplianceReportResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ComplianceReport'] = ResolversParentTypes['ComplianceReport']> = {
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   complianceRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   dataExportCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3373,7 +3497,7 @@ export type ComplianceReportResolvers<ContextType = ServiceContext, ParentType e
   userAccessSummary: Resolver<Array<ResolversTypes['UserAccessSummary']>, ParentType, ContextType>;
 };
 
-export type DateRangeResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DateRange'] = ResolversParentTypes['DateRange']> = {
+export type DateRangeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DateRange'] = ResolversParentTypes['DateRange']> = {
   from: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   to: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
@@ -3382,7 +3506,7 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
-export type DepartmentResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Department'] = ResolversParentTypes['Department']> = {
+export type DepartmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Department'] = ResolversParentTypes['Department']> = {
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -3397,7 +3521,7 @@ export type DepartmentResolvers<ContextType = ServiceContext, ParentType extends
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type DepartmentEmployeeHistoryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DepartmentEmployeeHistory'] = ResolversParentTypes['DepartmentEmployeeHistory']> = {
+export type DepartmentEmployeeHistoryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentEmployeeHistory'] = ResolversParentTypes['DepartmentEmployeeHistory']> = {
   capacityAdded: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   capacityLost: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   demotions: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3411,7 +3535,7 @@ export type DepartmentEmployeeHistoryResolvers<ContextType = ServiceContext, Par
   transfers: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type DepartmentGapComparisonResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DepartmentGapComparison'] = ResolversParentTypes['DepartmentGapComparison']> = {
+export type DepartmentGapComparisonResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentGapComparison'] = ResolversParentTypes['DepartmentGapComparison']> = {
   capacityGap: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   comparedToCompanyAverage: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   department: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
@@ -3421,12 +3545,12 @@ export type DepartmentGapComparisonResolvers<ContextType = ServiceContext, Paren
   riskLevel: Resolver<ResolversTypes['GapAnalysisRiskLevel'], ParentType, ContextType>;
 };
 
-export type DepartmentListResponseResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DepartmentListResponse'] = ResolversParentTypes['DepartmentListResponse']> = {
+export type DepartmentListResponseResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentListResponse'] = ResolversParentTypes['DepartmentListResponse']> = {
   items: Resolver<Array<ResolversTypes['Department']>, ParentType, ContextType>;
   total: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type DepartmentLoadOverviewResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DepartmentLoadOverview'] = ResolversParentTypes['DepartmentLoadOverview']> = {
+export type DepartmentLoadOverviewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentLoadOverview'] = ResolversParentTypes['DepartmentLoadOverview']> = {
   averageLoadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   averageUtilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   department: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
@@ -3436,7 +3560,7 @@ export type DepartmentLoadOverviewResolvers<ContextType = ServiceContext, Parent
   totalEmployees: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type DepartmentMetricsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['DepartmentMetrics'] = ResolversParentTypes['DepartmentMetrics']> = {
+export type DepartmentMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentMetrics'] = ResolversParentTypes['DepartmentMetrics']> = {
   activeEmployees: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   department: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
   loadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -3446,7 +3570,7 @@ export type DepartmentMetricsResolvers<ContextType = ServiceContext, ParentType 
   totalLoad: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type EmployeeResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Employee'] = ResolversParentTypes['Employee']> = {
+export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Employee'] = ResolversParentTypes['Employee']> = {
   birthDate: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -3459,18 +3583,18 @@ export type EmployeeResolvers<ContextType = ServiceContext, ParentType extends R
   grade: Resolver<ResolversTypes['Grade'], ParentType, ContextType>;
   gradeId: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   hireDate: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  history: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType>;
+  history: Resolver<Maybe<Array<Maybe<ResolversTypes['EmployeeHistory']>>>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   kEfficiency: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  loadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType>;
+  loadSnapshots: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   metadata: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   status: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  taskAssignments: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType>;
+  taskAssignments: Resolver<Maybe<Array<Maybe<ResolversTypes['TaskAssignment']>>>, ParentType, ContextType>;
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   workingHoursPerDay: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type EmployeeAuditReportResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeAuditReport'] = ResolversParentTypes['EmployeeAuditReport']> = {
+export type EmployeeAuditReportResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeAuditReport'] = ResolversParentTypes['EmployeeAuditReport']> = {
   capacityChanges: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType>;
   changesByType: Resolver<Array<ResolversTypes['ChangeTypeSummary']>, ParentType, ContextType>;
   efficiencyChanges: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType>;
@@ -3482,13 +3606,13 @@ export type EmployeeAuditReportResolvers<ContextType = ServiceContext, ParentTyp
   totalChanges: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type EmployeeConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeConnection'] = ResolversParentTypes['EmployeeConnection']> = {
+export type EmployeeConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeConnection'] = ResolversParentTypes['EmployeeConnection']> = {
   nodes: Resolver<Array<ResolversTypes['Employee']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type EmployeeHistoryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeHistory'] = ResolversParentTypes['EmployeeHistory']> = {
+export type EmployeeHistoryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeHistory'] = ResolversParentTypes['EmployeeHistory']> = {
   approvedAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   approvedBy: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   capacityImpact: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -3509,20 +3633,20 @@ export type EmployeeHistoryResolvers<ContextType = ServiceContext, ParentType ex
   toStatus: Resolver<Maybe<ResolversTypes['EmploymentStatus']>, ParentType, ContextType>;
 };
 
-export type EmployeeHistoryConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeHistoryConnection'] = ResolversParentTypes['EmployeeHistoryConnection']> = {
+export type EmployeeHistoryConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeHistoryConnection'] = ResolversParentTypes['EmployeeHistoryConnection']> = {
   nodes: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type EmployeeLoadBreakdownResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeLoadBreakdown'] = ResolversParentTypes['EmployeeLoadBreakdown']> = {
+export type EmployeeLoadBreakdownResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeLoadBreakdown'] = ResolversParentTypes['EmployeeLoadBreakdown']> = {
   allocatedCapacity: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   employee: Resolver<ResolversTypes['Employee'], ParentType, ContextType>;
   loadStatus: Resolver<ResolversTypes['LoadStatus'], ParentType, ContextType>;
   utilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type EmployeeLoadHistoryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeLoadHistory'] = ResolversParentTypes['EmployeeLoadHistory']> = {
+export type EmployeeLoadHistoryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeLoadHistory'] = ResolversParentTypes['EmployeeLoadHistory']> = {
   averageLoadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   averageUtilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   employee: Resolver<ResolversTypes['Employee'], ParentType, ContextType>;
@@ -3532,13 +3656,13 @@ export type EmployeeLoadHistoryResolvers<ContextType = ServiceContext, ParentTyp
   trendDirection: Resolver<ResolversTypes['TrendDirection'], ParentType, ContextType>;
 };
 
-export type EmployeeStatusChangeEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeStatusChangeEvent'] = ResolversParentTypes['EmployeeStatusChangeEvent']> = {
+export type EmployeeStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeStatusChangeEvent'] = ResolversParentTypes['EmployeeStatusChangeEvent']> = {
   employeeName: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   history: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType>;
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type EmployeeTaskStatsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeTaskStats'] = ResolversParentTypes['EmployeeTaskStats']> = {
+export type EmployeeTaskStatsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeTaskStats'] = ResolversParentTypes['EmployeeTaskStats']> = {
   activeAssignments: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   averagePriority: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   blockedAssignments: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3550,14 +3674,14 @@ export type EmployeeTaskStatsResolvers<ContextType = ServiceContext, ParentType 
   totalAssignments: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type EmployeeTimelineEntryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EmployeeTimelineEntry'] = ResolversParentTypes['EmployeeTimelineEntry']> = {
+export type EmployeeTimelineEntryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeTimelineEntry'] = ResolversParentTypes['EmployeeTimelineEntry']> = {
   color: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   event: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType>;
   icon: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   summary: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
-export type EntityAuditTrailResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['EntityAuditTrail'] = ResolversParentTypes['EntityAuditTrail']> = {
+export type EntityAuditTrailResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EntityAuditTrail'] = ResolversParentTypes['EntityAuditTrail']> = {
   changesByUser: Resolver<Array<ResolversTypes['ChangeByUser']>, ParentType, ContextType>;
   currentState: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   entityId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3567,13 +3691,13 @@ export type EntityAuditTrailResolvers<ContextType = ServiceContext, ParentType e
   totalChanges: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type ErrorResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = {
+export type ErrorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = {
   code: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   extensions: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   message: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
-export type GapAnalysisResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapAnalysis'] = ResolversParentTypes['GapAnalysis']> = {
+export type GapAnalysisResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapAnalysis'] = ResolversParentTypes['GapAnalysis']> = {
   analysisDate: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   capacityGap: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
@@ -3601,13 +3725,13 @@ export type GapAnalysisResolvers<ContextType = ServiceContext, ParentType extend
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type GapAnalysisConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapAnalysisConnection'] = ResolversParentTypes['GapAnalysisConnection']> = {
+export type GapAnalysisConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapAnalysisConnection'] = ResolversParentTypes['GapAnalysisConnection']> = {
   nodes: Resolver<Array<ResolversTypes['GapAnalysis']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type GapAnalysisRecommendationResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapAnalysisRecommendation'] = ResolversParentTypes['GapAnalysisRecommendation']> = {
+export type GapAnalysisRecommendationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapAnalysisRecommendation'] = ResolversParentTypes['GapAnalysisRecommendation']> = {
   description: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   estimatedCost: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   estimatedTimeframe: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3618,7 +3742,7 @@ export type GapAnalysisRecommendationResolvers<ContextType = ServiceContext, Par
   type: Resolver<ResolversTypes['RecommendationType'], ParentType, ContextType>;
 };
 
-export type GapCriticalityAssessmentResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapCriticalityAssessment'] = ResolversParentTypes['GapCriticalityAssessment']> = {
+export type GapCriticalityAssessmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapCriticalityAssessment'] = ResolversParentTypes['GapCriticalityAssessment']> = {
   criticalDepartments: Resolver<Array<ResolversTypes['DepartmentGapComparison']>, ParentType, ContextType>;
   estimatedTimeToFillGap: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   recommendedImmediateActions: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
@@ -3626,7 +3750,7 @@ export type GapCriticalityAssessmentResolvers<ContextType = ServiceContext, Pare
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type GapThresholdEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapThresholdEvent'] = ResolversParentTypes['GapThresholdEvent']> = {
+export type GapThresholdEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapThresholdEvent'] = ResolversParentTypes['GapThresholdEvent']> = {
   analysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType>;
   newStatus: Resolver<ResolversTypes['GapStatus'], ParentType, ContextType>;
   previousStatus: Resolver<ResolversTypes['GapStatus'], ParentType, ContextType>;
@@ -3634,7 +3758,7 @@ export type GapThresholdEventResolvers<ContextType = ServiceContext, ParentType 
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type GapTrendResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GapTrend'] = ResolversParentTypes['GapTrend']> = {
+export type GapTrendResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapTrend'] = ResolversParentTypes['GapTrend']> = {
   analysisDate: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   capacityGap: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   gapStatus: Resolver<ResolversTypes['GapStatus'], ParentType, ContextType>;
@@ -3642,7 +3766,7 @@ export type GapTrendResolvers<ContextType = ServiceContext, ParentType extends R
   riskLevel: Resolver<ResolversTypes['GapAnalysisRiskLevel'], ParentType, ContextType>;
 };
 
-export type GradeResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Grade'] = ResolversParentTypes['Grade']> = {
+export type GradeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Grade'] = ResolversParentTypes['Grade']> = {
   description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   employees: Resolver<Array<ResolversTypes['Employee']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3651,14 +3775,14 @@ export type GradeResolvers<ContextType = ServiceContext, ParentType extends Reso
   processes: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType>;
 };
 
-export type GradeStatsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['GradeStats'] = ResolversParentTypes['GradeStats']> = {
+export type GradeStatsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GradeStats'] = ResolversParentTypes['GradeStats']> = {
   averageEfficiency: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   employeeCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   grade: Resolver<ResolversTypes['Grade'], ParentType, ContextType>;
   overloadedCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type HiringForecastResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['HiringForecast'] = ResolversParentTypes['HiringForecast']> = {
+export type HiringForecastResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['HiringForecast'] = ResolversParentTypes['HiringForecast']> = {
   averageMonthlyHiringRate: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   gapAnalysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType>;
   quarterlyProjections: Resolver<Array<ResolversTypes['QuarterlyProjection']>, ParentType, ContextType>;
@@ -3666,7 +3790,7 @@ export type HiringForecastResolvers<ContextType = ServiceContext, ParentType ext
   totalEstimatedHires: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type HiringPhaseResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['HiringPhase'] = ResolversParentTypes['HiringPhase']> = {
+export type HiringPhaseResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['HiringPhase'] = ResolversParentTypes['HiringPhase']> = {
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   phase: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   startDate: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -3676,7 +3800,7 @@ export type HiringPhaseResolvers<ContextType = ServiceContext, ParentType extend
   targetHeadcount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type HiringPlanResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['HiringPlan'] = ResolversParentTypes['HiringPlan']> = {
+export type HiringPlanResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['HiringPlan'] = ResolversParentTypes['HiringPlan']> = {
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   estimatedCostPerHire: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   gapAnalysisId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3696,7 +3820,7 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'JSON';
 }
 
-export type LoadAnalysisMetricsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadAnalysisMetrics'] = ResolversParentTypes['LoadAnalysisMetrics']> = {
+export type LoadAnalysisMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadAnalysisMetrics'] = ResolversParentTypes['LoadAnalysisMetrics']> = {
   averageUtilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   employeesOptimal: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   employeesOverloaded: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3709,7 +3833,7 @@ export type LoadAnalysisMetricsResolvers<ContextType = ServiceContext, ParentTyp
   standardDeviation: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type LoadRecommendationResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadRecommendation'] = ResolversParentTypes['LoadRecommendation']> = {
+export type LoadRecommendationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadRecommendation'] = ResolversParentTypes['LoadRecommendation']> = {
   affectedEmployees: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   description: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   estimatedImpact: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3718,7 +3842,7 @@ export type LoadRecommendationResolvers<ContextType = ServiceContext, ParentType
   type: Resolver<ResolversTypes['RecommendationType'], ParentType, ContextType>;
 };
 
-export type LoadSnapshotResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadSnapshot'] = ResolversParentTypes['LoadSnapshot']> = {
+export type LoadSnapshotResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadSnapshot'] = ResolversParentTypes['LoadSnapshot']> = {
   allocatedCapacityUnits: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   availableCapacityUnits: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   calculatedLoad: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -3726,9 +3850,9 @@ export type LoadSnapshotResolvers<ContextType = ServiceContext, ParentType exten
   companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   companyLoadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  department: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
+  department: Resolver<Maybe<ResolversTypes['Department']>, ParentType, ContextType>;
   departmentLoadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  employee: Resolver<ResolversTypes['Employee'], ParentType, ContextType>;
+  employee: Resolver<Maybe<ResolversTypes['Employee']>, ParentType, ContextType>;
   employeeId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   kGrade: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -3744,20 +3868,20 @@ export type LoadSnapshotResolvers<ContextType = ServiceContext, ParentType exten
   utilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type LoadSnapshotConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadSnapshotConnection'] = ResolversParentTypes['LoadSnapshotConnection']> = {
+export type LoadSnapshotConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadSnapshotConnection'] = ResolversParentTypes['LoadSnapshotConnection']> = {
   nodes: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type LoadThresholdEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadThresholdEvent'] = ResolversParentTypes['LoadThresholdEvent']> = {
+export type LoadThresholdEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadThresholdEvent'] = ResolversParentTypes['LoadThresholdEvent']> = {
   crossedDirection: Resolver<ResolversTypes['CrossDirection'], ParentType, ContextType>;
   snapshot: Resolver<ResolversTypes['LoadSnapshot'], ParentType, ContextType>;
   threshold: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type LoadTrendPointResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['LoadTrendPoint'] = ResolversParentTypes['LoadTrendPoint']> = {
+export type LoadTrendPointResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['LoadTrendPoint'] = ResolversParentTypes['LoadTrendPoint']> = {
   allocatedCapacityUnits: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   loadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   loadStatus: Resolver<ResolversTypes['LoadStatus'], ParentType, ContextType>;
@@ -3765,7 +3889,7 @@ export type LoadTrendPointResolvers<ContextType = ServiceContext, ParentType ext
   utilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type MutationResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   _placeholder: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   approveEmployeeHistory: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType, RequireFields<MutationApproveEmployeeHistoryArgs, 'id'>>;
   approveHiringPlan: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationApproveHiringPlanArgs, 'approvedBy' | 'id'>>;
@@ -3777,7 +3901,7 @@ export type MutationResolvers<ContextType = ServiceContext, ParentType extends R
   cancelProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCancelProcessArgs, 'id'>>;
   completeProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCompleteProcessArgs, 'id'>>;
   completeTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationCompleteTaskAssignmentArgs, 'id'>>;
-  createCompany: Resolver<ResolversTypes['Company'], ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'input'>>;
+  createCompany: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'input'>>;
   createCompanyLoadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType, RequireFields<MutationCreateCompanyLoadSnapshotsArgs, 'companyId'>>;
   createDepartment: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationCreateDepartmentArgs, 'input'>>;
   createEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationCreateEmployeeArgs, 'input'>>;
@@ -3798,7 +3922,7 @@ export type MutationResolvers<ContextType = ServiceContext, ParentType extends R
   startProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationStartProcessArgs, 'id'>>;
   startTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationStartTaskAssignmentArgs, 'id'>>;
   unblockTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUnblockTaskAssignmentArgs, 'id'>>;
-  updateCompany: Resolver<ResolversTypes['Company'], ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'id' | 'input'>>;
+  updateCompany: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'id' | 'input'>>;
   updateDepartment: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationUpdateDepartmentArgs, 'id' | 'input'>>;
   updateEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationUpdateEmployeeArgs, 'id' | 'input'>>;
   updateEmployeeEfficiency: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationUpdateEmployeeEfficiencyArgs, 'id' | 'kEfficiency'>>;
@@ -3810,18 +3934,18 @@ export type MutationResolvers<ContextType = ServiceContext, ParentType extends R
   updateTaskProgress: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUpdateTaskProgressArgs, 'completionPercentage' | 'id'>>;
 };
 
-export type NodeResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
-  __resolveType: TypeResolveFn<null, ParentType, ContextType>;
+export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
+  __resolveType: TypeResolveFn<'User', ParentType, ContextType>;
 };
 
-export type PageInfoResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
+export type PageInfoResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
   hasMore: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   limit: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   offset: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   total: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type ProcessResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Process'] = ResolversParentTypes['Process']> = {
+export type ProcessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Process'] = ResolversParentTypes['Process']> = {
   capacityUnits: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -3834,24 +3958,24 @@ export type ProcessResolvers<ContextType = ServiceContext, ParentType extends Re
   estimatedDurationDays: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   kMultiplier: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  loadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType>;
+  loadSnapshots: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   priority: Resolver<ResolversTypes['ProcessPriority'], ParentType, ContextType>;
   processType: Resolver<ResolversTypes['ProcessType'], ParentType, ContextType>;
   startedAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   status: Resolver<ResolversTypes['ProcessStatus'], ParentType, ContextType>;
-  taskAssignments: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType>;
+  taskAssignments: Resolver<Maybe<Array<Maybe<ResolversTypes['TaskAssignment']>>>, ParentType, ContextType>;
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   updatedBy: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type ProcessConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ProcessConnection'] = ResolversParentTypes['ProcessConnection']> = {
+export type ProcessConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessConnection'] = ResolversParentTypes['ProcessConnection']> = {
   nodes: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type ProcessMetricsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ProcessMetrics'] = ResolversParentTypes['ProcessMetrics']> = {
+export type ProcessMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessMetrics'] = ResolversParentTypes['ProcessMetrics']> = {
   activeTaskCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   averageResourcesAllocated: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   completionRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
@@ -3861,7 +3985,7 @@ export type ProcessMetricsResolvers<ContextType = ServiceContext, ParentType ext
   utilizationRate: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type ProcessStatusChangeEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['ProcessStatusChangeEvent'] = ResolversParentTypes['ProcessStatusChangeEvent']> = {
+export type ProcessStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessStatusChangeEvent'] = ResolversParentTypes['ProcessStatusChangeEvent']> = {
   changedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   changedBy: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   newStatus: Resolver<ResolversTypes['ProcessStatus'], ParentType, ContextType>;
@@ -3870,19 +3994,19 @@ export type ProcessStatusChangeEventResolvers<ContextType = ServiceContext, Pare
   reason: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type QuarterlyProjectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['QuarterlyProjection'] = ResolversParentTypes['QuarterlyProjection']> = {
+export type QuarterlyProjectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['QuarterlyProjection'] = ResolversParentTypes['QuarterlyProjection']> = {
   estimatedCost: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   projectedHires: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   quarter: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   targetTalentGrades: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type QueryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   auditLog: Resolver<Maybe<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<QueryAuditLogArgs, 'id'>>;
   auditLogs: Resolver<ResolversTypes['AuditLogConnection'], ParentType, ContextType, RequireFields<QueryAuditLogsArgs, 'filter'>>;
   blockedTasks: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, QueryBlockedTasksArgs>;
   changesBy: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, RequireFields<QueryChangesByArgs, 'userId'>>;
-  companies: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType>;
+  companies: Resolver<Maybe<Array<Maybe<ResolversTypes['Company']>>>, ParentType, ContextType>;
   company: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<QueryCompanyArgs, 'id'>>;
   companyLoadAnalysis: Resolver<ResolversTypes['CompanyLoadAnalysis'], ParentType, ContextType, RequireFields<QueryCompanyLoadAnalysisArgs, 'companyId'>>;
   companyProcessMetrics: Resolver<Array<ResolversTypes['ProcessMetrics']>, ParentType, ContextType, RequireFields<QueryCompanyProcessMetricsArgs, 'companyId'>>;
@@ -3900,8 +4024,11 @@ export type QueryResolvers<ContextType = ServiceContext, ParentType extends Reso
   employee: Resolver<Maybe<ResolversTypes['Employee']>, ParentType, ContextType, RequireFields<QueryEmployeeArgs, 'id'>>;
   employeeAuditReport: Resolver<ResolversTypes['EmployeeAuditReport'], ParentType, ContextType, RequireFields<QueryEmployeeAuditReportArgs, 'dateRange' | 'employeeId'>>;
   employeeCapacity: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<QueryEmployeeCapacityArgs, 'id'>>;
-  employeeHistory: Resolver<ResolversTypes['EmployeeHistoryConnection'], ParentType, ContextType, RequireFields<QueryEmployeeHistoryArgs, 'employeeId'>>;
+  employeeChangeHistory: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, RequireFields<QueryEmployeeChangeHistoryArgs, 'employeeId'>>;
+  employeeHistories: Resolver<ResolversTypes['EmployeeHistoryConnection'], ParentType, ContextType, QueryEmployeeHistoriesArgs>;
+  employeeHistory: Resolver<Maybe<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, RequireFields<QueryEmployeeHistoryArgs, 'id'>>;
   employeeHistoryEntry: Resolver<Maybe<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, RequireFields<QueryEmployeeHistoryEntryArgs, 'id'>>;
+  employeeHistoryList: Resolver<ResolversTypes['EmployeeHistoryConnection'], ParentType, ContextType, RequireFields<QueryEmployeeHistoryListArgs, 'employeeId'>>;
   employeeLoadIndex: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<QueryEmployeeLoadIndexArgs, 'id' | 'periodEnd' | 'periodStart'>>;
   employeeLoadTrend: Resolver<ResolversTypes['EmployeeLoadHistory'], ParentType, ContextType, RequireFields<QueryEmployeeLoadTrendArgs, 'dateRange' | 'employeeId'>>;
   employeeTaskStats: Resolver<ResolversTypes['EmployeeTaskStats'], ParentType, ContextType, RequireFields<QueryEmployeeTaskStatsArgs, 'employeeId'>>;
@@ -3939,16 +4066,17 @@ export type QueryResolvers<ContextType = ServiceContext, ParentType extends Reso
   taskWithMetrics: Resolver<Maybe<ResolversTypes['TaskAssignmentMetrics']>, ParentType, ContextType, RequireFields<QueryTaskWithMetricsArgs, 'id'>>;
   unapprovedChanges: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, QueryUnapprovedChangesArgs>;
   userActivitySummary: Resolver<ResolversTypes['UserActivitySummary'], ParentType, ContextType, RequireFields<QueryUserActivitySummaryArgs, 'dateRange' | 'userId'>>;
+  users: Resolver<ResolversTypes['UsersResult'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
 };
 
-export type RiskActivityEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['RiskActivityEvent'] = ResolversParentTypes['RiskActivityEvent']> = {
+export type RiskActivityEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['RiskActivityEvent'] = ResolversParentTypes['RiskActivityEvent']> = {
   log: Resolver<ResolversTypes['AuditLog'], ParentType, ContextType>;
   reason: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   riskScore: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
-export type SecurityIncidentResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['SecurityIncident'] = ResolversParentTypes['SecurityIncident']> = {
+export type SecurityIncidentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['SecurityIncident'] = ResolversParentTypes['SecurityIncident']> = {
   affectedUsers: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   description: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   detectedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -3958,13 +4086,13 @@ export type SecurityIncidentResolvers<ContextType = ServiceContext, ParentType e
   type: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
-export type SecurityIncidentEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['SecurityIncidentEvent'] = ResolversParentTypes['SecurityIncidentEvent']> = {
+export type SecurityIncidentEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['SecurityIncidentEvent'] = ResolversParentTypes['SecurityIncidentEvent']> = {
   detectedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   incident: Resolver<ResolversTypes['SecurityIncident'], ParentType, ContextType>;
   requiresImmediateAction: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
 };
 
-export type SecurityIncidentReportResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['SecurityIncidentReport'] = ResolversParentTypes['SecurityIncidentReport']> = {
+export type SecurityIncidentReportResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['SecurityIncidentReport'] = ResolversParentTypes['SecurityIncidentReport']> = {
   blockedAttempts: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   failedAuthAttempts: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3975,14 +4103,16 @@ export type SecurityIncidentReportResolvers<ContextType = ServiceContext, Parent
   totalIncidents: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type SubscriptionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+export type SubscriptionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   _placeholder: SubscriptionResolver<Maybe<ResolversTypes['String']>, "_placeholder", ParentType, ContextType>;
   auditLogCreated: SubscriptionResolver<ResolversTypes['AuditLog'], "auditLogCreated", ParentType, ContextType, RequireFields<SubscriptionAuditLogCreatedArgs, 'companyId'>>;
   departmentCreated: SubscriptionResolver<ResolversTypes['Department'], "departmentCreated", ParentType, ContextType, RequireFields<SubscriptionDepartmentCreatedArgs, 'companyId'>>;
   departmentUpdated: SubscriptionResolver<ResolversTypes['Department'], "departmentUpdated", ParentType, ContextType, RequireFields<SubscriptionDepartmentUpdatedArgs, 'companyId'>>;
+  employeeCapacityChanged: SubscriptionResolver<ResolversTypes['Employee'], "employeeCapacityChanged", ParentType, ContextType, RequireFields<SubscriptionEmployeeCapacityChangedArgs, 'employeeId'>>;
   employeeChanged: SubscriptionResolver<ResolversTypes['EmployeeHistory'], "employeeChanged", ParentType, ContextType, SubscriptionEmployeeChangedArgs>;
   employeeCreated: SubscriptionResolver<ResolversTypes['Employee'], "employeeCreated", ParentType, ContextType, SubscriptionEmployeeCreatedArgs>;
   employeeDismissed: SubscriptionResolver<ResolversTypes['Employee'], "employeeDismissed", ParentType, ContextType, SubscriptionEmployeeDismissedArgs>;
+  employeeLoadThresholdCrossed: SubscriptionResolver<ResolversTypes['Employee'], "employeeLoadThresholdCrossed", ParentType, ContextType, RequireFields<SubscriptionEmployeeLoadThresholdCrossedArgs, 'employeeId'>>;
   employeeStatusChanged: SubscriptionResolver<ResolversTypes['EmployeeStatusChangeEvent'], "employeeStatusChanged", ParentType, ContextType>;
   employeeUpdated: SubscriptionResolver<ResolversTypes['Employee'], "employeeUpdated", ParentType, ContextType, SubscriptionEmployeeUpdatedArgs>;
   gapAnalysisUpdated: SubscriptionResolver<ResolversTypes['GapAnalysis'], "gapAnalysisUpdated", ParentType, ContextType, RequireFields<SubscriptionGapAnalysisUpdatedArgs, 'companyId'>>;
@@ -3998,7 +4128,7 @@ export type SubscriptionResolvers<ContextType = ServiceContext, ParentType exten
   taskStatusChanged: SubscriptionResolver<ResolversTypes['TaskStatusChangeEvent'], "taskStatusChanged", ParentType, ContextType, RequireFields<SubscriptionTaskStatusChangedArgs, 'taskId'>>;
 };
 
-export type TalentCategoryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TalentCategory'] = ResolversParentTypes['TalentCategory']> = {
+export type TalentCategoryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TalentCategory'] = ResolversParentTypes['TalentCategory']> = {
   estimatedMonthlyCapacity: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   estimatedRecruitmentTimeWeeks: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   experienceRequired: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4008,7 +4138,7 @@ export type TalentCategoryResolvers<ContextType = ServiceContext, ParentType ext
   targetCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type TaskAssignmentResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskAssignment'] = ResolversParentTypes['TaskAssignment']> = {
+export type TaskAssignmentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskAssignment'] = ResolversParentTypes['TaskAssignment']> = {
   actualDaysSpent: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   allocatedCapacityUnits: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   completedAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
@@ -4024,7 +4154,7 @@ export type TaskAssignmentResolvers<ContextType = ServiceContext, ParentType ext
   employeeId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   estimatedDaysToComplete: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  loadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType>;
+  loadSnapshots: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   priority: Resolver<ResolversTypes['TaskPriority'], ParentType, ContextType>;
   process: Resolver<ResolversTypes['Process'], ParentType, ContextType>;
@@ -4036,13 +4166,13 @@ export type TaskAssignmentResolvers<ContextType = ServiceContext, ParentType ext
   updatedBy: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type TaskAssignmentConnectionResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskAssignmentConnection'] = ResolversParentTypes['TaskAssignmentConnection']> = {
+export type TaskAssignmentConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskAssignmentConnection'] = ResolversParentTypes['TaskAssignmentConnection']> = {
   nodes: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType>;
   pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
-export type TaskAssignmentMetricsResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskAssignmentMetrics'] = ResolversParentTypes['TaskAssignmentMetrics']> = {
+export type TaskAssignmentMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskAssignmentMetrics'] = ResolversParentTypes['TaskAssignmentMetrics']> = {
   assignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType>;
   daysUntilDue: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   estimatedCompletionDate: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
@@ -4051,7 +4181,7 @@ export type TaskAssignmentMetricsResolvers<ContextType = ServiceContext, ParentT
   workloadContribution: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
-export type TaskStatusChangeEventResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskStatusChangeEvent'] = ResolversParentTypes['TaskStatusChangeEvent']> = {
+export type TaskStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskStatusChangeEvent'] = ResolversParentTypes['TaskStatusChangeEvent']> = {
   assignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType>;
   changedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   changedBy: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4060,12 +4190,12 @@ export type TaskStatusChangeEventResolvers<ContextType = ServiceContext, ParentT
   reason: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
-export type TaskStatusCountResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskStatusCount'] = ResolversParentTypes['TaskStatusCount']> = {
+export type TaskStatusCountResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskStatusCount'] = ResolversParentTypes['TaskStatusCount']> = {
   count: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   status: Resolver<ResolversTypes['TaskStatus'], ParentType, ContextType>;
 };
 
-export type TaskTypeCountResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['TaskTypeCount'] = ResolversParentTypes['TaskTypeCount']> = {
+export type TaskTypeCountResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['TaskTypeCount'] = ResolversParentTypes['TaskTypeCount']> = {
   count: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   taskType: Resolver<ResolversTypes['TaskType'], ParentType, ContextType>;
 };
@@ -4074,14 +4204,20 @@ export interface UploadScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
   name: 'Upload';
 }
 
-export type UserResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+export type UserResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   email: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  image: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  phone: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  role: Resolver<Maybe<ResolversTypes['UserRole']>, ParentType, ContextType>;
+  status: Resolver<ResolversTypes['UserStatus'], ParentType, ContextType>;
+  updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type UserAccessSummaryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['UserAccessSummary'] = ResolversParentTypes['UserAccessSummary']> = {
+export type UserAccessSummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserAccessSummary'] = ResolversParentTypes['UserAccessSummary']> = {
   activeMinutesThisPeriod: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   criticalActionsCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   dataAccessCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -4090,7 +4226,7 @@ export type UserAccessSummaryResolvers<ContextType = ServiceContext, ParentType 
   user: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 };
 
-export type UserActivitySummaryResolvers<ContextType = ServiceContext, ParentType extends ResolversParentTypes['UserActivitySummary'] = ResolversParentTypes['UserActivitySummary']> = {
+export type UserActivitySummaryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UserActivitySummary'] = ResolversParentTypes['UserActivitySummary']> = {
   actionsByType: Resolver<Array<ResolversTypes['ActionTypeSummary']>, ParentType, ContextType>;
   activePeriod: Resolver<ResolversTypes['DateRange'], ParentType, ContextType>;
   failureCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -4103,7 +4239,12 @@ export type UserActivitySummaryResolvers<ContextType = ServiceContext, ParentTyp
   user: Resolver<ResolversTypes['User'], ParentType, ContextType>;
 };
 
-export type Resolvers<ContextType = ServiceContext> = {
+export type UsersResultResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['UsersResult'] = ResolversParentTypes['UsersResult']> = {
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  users: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+};
+
+export type Resolvers<ContextType = GraphQLContext> = {
   ActionTypeSummary: ActionTypeSummaryResolvers<ContextType>;
   AuditLog: AuditLogResolvers<ContextType>;
   AuditLogConnection: AuditLogConnectionResolvers<ContextType>;
@@ -4176,5 +4317,6 @@ export type Resolvers<ContextType = ServiceContext> = {
   User: UserResolvers<ContextType>;
   UserAccessSummary: UserAccessSummaryResolvers<ContextType>;
   UserActivitySummary: UserActivitySummaryResolvers<ContextType>;
+  UsersResult: UsersResultResolvers<ContextType>;
 };
 

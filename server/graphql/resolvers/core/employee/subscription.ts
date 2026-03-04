@@ -9,10 +9,9 @@
  * Currently commented out as eventEmitter is not yet implemented in context
  */
 
-import { SubscriptionResolvers } from "@/server/graphql/generated";
 // import { withMiddleware } from "@/server/graphql/middleware";
 
-export const employeeSubscriptions: SubscriptionResolvers = {};
+export const employeeSubscriptions = {};
 
 // TODO: Uncomment subscriptions once eventEmitter is available
 

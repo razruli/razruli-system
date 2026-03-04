@@ -31,9 +31,9 @@ import { typeResolvers } from "./_typeResolvers";
  */
 export const resolvers: Resolvers = {
   // ========== ROOT OPERATIONS ==========
-  ...queryResolver,
-  ...mutationResolver,
-  // ...subscriptionResolver,
+  Query: queryResolver,
+  Mutation: mutationResolver,
+  // Subscription: subscriptionResolver,
   ...typeResolvers,
 };
 

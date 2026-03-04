@@ -5,10 +5,17 @@
  * Handles all employee-related queries with middleware orchestration
  */
 
-import { QueryResolvers } from "@/server/graphql/generated";
 import { withMiddleware } from "@/server/graphql/middleware";
+import { QueryResolvers } from "@/server/graphql/types/generated";
 
-export const employeeQueries: QueryResolvers = {
+export const employeeQueries: Pick<
+  QueryResolvers,
+  | "employee"
+  | "employees"
+  | "departmentEmployees"
+  | "employeeCapacity"
+  | "employeeLoadIndex"
+> = {
   /**
    * Get a single employee by ID
    * Requires authentication to read employee data

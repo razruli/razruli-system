@@ -5,10 +5,16 @@
  * Handles all employee modification operations with middleware orchestration
  */
 
-import { MutationResolvers } from "@/server/graphql/generated";
 import { withMiddleware } from "@/server/graphql/middleware";
+import { MutationResolvers } from "@/server/graphql/types/generated";
 
-export const employeeMutations: MutationResolvers = {
+export const employeeMutations: Pick<
+  MutationResolvers,
+  | "createEmployee"
+  | "updateEmployee"
+  | "dismissEmployee"
+  | "updateEmployeeEfficiency"
+> = {
   /**
    * Create a new employee
    * Requires manager permissions and company management
@@ -65,7 +71,6 @@ export const employeeMutations: MutationResolvers = {
     {
       requireAuth: true,
       requiredPermissions: ["employee:create"],
-      requireRole: "MANAGER",
     },
   ),
 
@@ -162,7 +167,6 @@ export const employeeMutations: MutationResolvers = {
     {
       requireAuth: true,
       requiredPermissions: ["employee:update"],
-      requireRole: "MANAGER",
     },
   ),
 
@@ -214,7 +218,6 @@ export const employeeMutations: MutationResolvers = {
     {
       requireAuth: true,
       requiredPermissions: ["employee:delete"],
-      requireRole: "MANAGER",
     },
   ),
 
@@ -265,7 +268,6 @@ export const employeeMutations: MutationResolvers = {
     {
       requireAuth: true,
       requiredPermissions: ["employee:update"],
-      requireRole: "MANAGER",
     },
   ),
 };

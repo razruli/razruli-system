@@ -24,9 +24,7 @@ import { operationsResolvers } from "./operations";
  */
 export const queryResolver: QueryResolvers = {
   // Health check
-  health: async () => {
-    return "ok";
-  },
+  health: () => "OK",
 
   // Core domain queries
   ...coreResolvers.Query,

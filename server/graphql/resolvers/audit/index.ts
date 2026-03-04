@@ -1,0 +1,47 @@
+/**
+ * ============================================================================
+ * AUDIT DOMAIN - Resolver Index
+ * ============================================================================
+ * Unified resolver composition for audit and compliance:
+ * - AuditLog: System-wide audit log of all actions
+ * - EmployeeHistory: Historical records of employee data changes
+ *
+ * Exports all resolvers for use in main resolver composition layer
+ */
+
+import { auditLogResolvers } from "./auditLog";
+import { employeeHistoryResolvers } from "./employeeHistory";
+
+/**
+ * Complete resolver set for Audit domain
+ * Merges all entity resolvers together
+ */
+export const auditResolvers = {
+  // Query resolvers from all entities
+  Query: {
+    ...auditLogResolvers.Query,
+    ...employeeHistoryResolvers.Query,
+  },
+
+  // Mutation resolvers from all entities
+  Mutation: {
+    ...auditLogResolvers.Mutation,
+    ...employeeHistoryResolvers.Mutation,
+  },
+
+  // Subscription resolvers from all entities
+  Subscription: {
+    ...auditLogResolvers.Subscription,
+    ...employeeHistoryResolvers.Subscription,
+  },
+
+  // Type field resolvers
+  AuditLog: auditLogResolvers.AuditLog,
+  EmployeeHistory: employeeHistoryResolvers.EmployeeHistory,
+};
+
+// Export individual entities for selective imports
+export { auditLogResolvers } from "./auditLog";
+export { employeeHistoryResolvers } from "./employeeHistory";
+
+export default auditResolvers;

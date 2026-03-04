@@ -6,8 +6,6 @@
  * Used by the main resolver composition layer
  */
 
-import { Resolvers } from "@/server/graphql/generated";
-
 import employeeFieldResolvers from "./fields";
 import employeeMutations from "./mutation";
 import employeeQueries from "./query";
@@ -17,7 +15,7 @@ import employeeSubscriptions from "./subscription";
  * Complete resolver set for Employee domain
  * Combines and exports all resolver types
  */
-export const employeeResolvers: Resolvers = {
+export const employeeResolvers = {
   Query: {
     employee: employeeQueries.employee,
     employees: employeeQueries.employees,
@@ -34,12 +32,12 @@ export const employeeResolvers: Resolvers = {
   },
 
   Subscription: {
-    employeeUpdated: employeeSubscriptions.employeeUpdated,
-    employeeCreated: employeeSubscriptions.employeeCreated,
-    employeeDismissed: employeeSubscriptions.employeeDismissed,
-    employeeCapacityChanged: employeeSubscriptions.employeeCapacityChanged,
-    employeeLoadThresholdCrossed:
-      employeeSubscriptions.employeeLoadThresholdCrossed,
+    // Subscriptions commented out until event emitter is implemented
+    // employeeUpdated: employeeSubscriptions.employeeUpdated,
+    // employeeCreated: employeeSubscriptions.employeeCreated,
+    // employeeDismissed: employeeSubscriptions.employeeDismissed,
+    // employeeCapacityChanged: employeeSubscriptions.employeeCapacityChanged,
+    // employeeLoadThresholdCrossed: employeeSubscriptions.employeeLoadThresholdCrossed,
   },
 
   Employee: employeeFieldResolvers,
