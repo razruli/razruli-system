@@ -113,7 +113,7 @@ export async function buildGraphQLContext(
     loaders,
 
     // Services (built from factory)
-    services: services as any,
+    services,
 
     // Request metadata
     requestId,

@@ -11,8 +11,8 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next";
 
 import { logger } from "../utils/logger/logger";
 
-import { createContext } from "./context";
 import { GraphQLContext } from "./context";
+import { createContext } from "./context/context";
 import {
   ErrorBoundaryPlugin,
   AuthPlugin,

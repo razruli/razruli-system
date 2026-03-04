@@ -42,6 +42,8 @@ async function executeMiddleware(
  * When middleware validation fails, it throws a GraphQL-formatted error
  * before the resolver is ever executed.
  *
+ * @template TResult - The return type of the resolver
+ *
  * @example
  * ```typescript
  * // Simple: Require authentication
@@ -50,21 +52,6 @@ async function executeMiddleware(
  *     return context.services.user.findById(id);
  *   },
  *   { requireAuth: true }
- * )
- *
- * // Complex: Auth + Permissions + Validation
- * updateEmployee: withMiddleware(
- *   async (_parent, { id, data }, context) => {
- *     return context.services.employee.update(id, data);
- *   },
- *   {
- *     requireAuth: true,
- *     requiredPermissions: ["employee:update"],
- *     validate: (args) => {
- *       return args.id && args.id.length > 0;
- *     },
- *     validationMessage: "Employee ID is required"
- *   }
  * )
  *
  * // Public: Skip all middleware
@@ -76,22 +63,24 @@ async function executeMiddleware(
  * )
  * ```
  */
-export function withMiddleware<
-  TArgs extends Record<string, any> = { any: any },
-  TResult = any,
->(
+export function withMiddleware<TResult>(
   resolver: (
     parent: any,
-    args: TArgs,
-    context: GraphQLContext,
+    args: any,
+    context: any,
     info: GraphQLResolveInfo,
   ) => Promise<TResult> | TResult,
   options: MiddlewareOptions = {},
-) {
+): (
+  parent: any,
+  args: any,
+  context: any,
+  info: GraphQLResolveInfo,
+) => Promise<TResult> {
   return async (
     parent: any,
-    args: TArgs,
-    context: GraphQLContext,
+    args: any,
+    context: any,
     info: GraphQLResolveInfo,
   ): Promise<TResult> => {
     // Skip all middleware for public resolvers
@@ -100,7 +89,7 @@ export function withMiddleware<
     }
 
     const middlewareContext: MiddlewareContext = {
-      context,
+      context: context as GraphQLContext,
       args,
       info,
     };
