@@ -4,7 +4,7 @@ import {
   JSONResolver,
 } from "graphql-scalars";
 
-import { Resolvers } from "../generated";
+import { Resolvers } from "../types/generated";
 
 export const scalarResolvers: Partial<Resolvers> = {
   DateTime: DateTimeResolver,
