@@ -1,0 +1,61 @@
+"""
+Grade type - Seniority levels/grades
+Reference data that doesn't change often
+"""
+type Grade {
+  """
+  Grade ID (0-5: Intern to C-level)
+  """
+  id: Int!
+
+  """
+  Human readable name
+  """
+  name: String!
+
+  """
+  Grade coefficient for capacity calculation
+  """
+  kGrade: Float!
+
+  """
+  Description
+  """
+  description: String
+
+  """
+  Employees with this grade
+  """
+  employees: [Employee!]! # Field resolver
+  """
+  Processes targeting this grade
+  """
+  processes: [Process!]! # Field resolver
+}
+
+extend type Query {
+  """
+  Get grade by ID
+  """
+  grade(id: Int!): Grade
+
+  """
+  Get all grades
+  """
+  grades: [Grade!]!
+
+  """
+  Get grade with employee count
+  """
+  gradeWithStats(id: Int!): GradeStats
+}
+
+"""
+Grade with statistics
+"""
+type GradeStats {
+  grade: Grade!
+  employeeCount: Int!
+  averageEfficiency: Float!
+  overloadedCount: Int!
+}

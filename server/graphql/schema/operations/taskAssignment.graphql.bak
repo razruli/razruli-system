@@ -44,7 +44,7 @@ type TaskAssignment {
   process: Process!
   employee: Employee!
   department: Department!
-  loadSnapshots: [LoadSnapshot]
+  loadSnapshots: [LoadSnapshot!]!
 
   """
   Timestamps

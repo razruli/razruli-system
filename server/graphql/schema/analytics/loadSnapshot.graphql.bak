@@ -44,8 +44,8 @@ type LoadSnapshot {
   Associated entities
   """
   company: Company!
-  employee: Employee
-  department: Department
+  employee: Employee!
+  department: Department!
   process: Process
   taskAssignment: TaskAssignment
 

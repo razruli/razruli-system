@@ -71,15 +71,15 @@ type Employee {
   """
   Task assignments
   """
-  taskAssignments: [TaskAssignment] # Field resolver
+  taskAssignments: [TaskAssignment!]! # Field resolver
   """
   Load snapshots
   """
-  loadSnapshots: [LoadSnapshot] # Field resolver
+  loadSnapshots: [LoadSnapshot!]! # Field resolver
   """
   Change history
   """
-  history: [EmployeeHistory] # Field resolver
+  history: [EmployeeHistory!]! # Field resolver
   """
   Metadata (JSON)
   """

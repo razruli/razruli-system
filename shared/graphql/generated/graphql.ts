@@ -20,588 +20,640 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
-export type AuditFilterInput = {
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  eventType?: InputMaybe<EventType>;
-  freightId?: InputMaybe<Scalars['ID']['input']>;
-  shipmentId?: InputMaybe<Scalars['ID']['input']>;
+/** Access risk level */
+export enum AccessRiskLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
+/** Action type summary */
+export type ActionTypeSummary = {
+  __typename?: 'ActionTypeSummary';
+  actionType: AuditActionType;
+  count: Scalars['Int']['output'];
+  failureCount: Scalars['Int']['output'];
+  successCount: Scalars['Int']['output'];
+};
+
+/** Audit action type */
+export enum AuditActionType {
+  Approval = 'APPROVAL',
+  BulkOperation = 'BULK_OPERATION',
+  ConfigurationChange = 'CONFIGURATION_CHANGE',
+  Create = 'CREATE',
+  Delete = 'DELETE',
+  Export = 'EXPORT',
+  Import = 'IMPORT',
+  Login = 'LOGIN',
+  Logout = 'LOGOUT',
+  Other = 'OTHER',
+  PermissionChange = 'PERMISSION_CHANGE',
+  Publish = 'PUBLISH',
+  Read = 'READ',
+  Rejection = 'REJECTION',
+  Unpublish = 'UNPUBLISH',
+  Update = 'UPDATE'
+}
+
+/** AuditLog type tracking system activities for compliance and debugging */
+export type AuditLog = {
+  __typename?: 'AuditLog';
+  actionType: AuditActionType;
+  /** Context */
+  companyId: Scalars['String']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  departmentId?: Maybe<Scalars['String']['output']>;
+  /** Action details */
+  description: Scalars['String']['output'];
+  /** Performance metrics */
+  durationMs?: Maybe<Scalars['Int']['output']>;
+  entityId: Scalars['String']['output'];
+  /** Log metadata */
+  entityType: Scalars['String']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  newValues?: Maybe<Scalars['JSON']['output']>;
+  oldValues?: Maybe<Scalars['JSON']['output']>;
+  result: AuditResult;
+  status: AuditStatus;
+  timestamp: Scalars['DateTime']['output'];
+  userAgent?: Maybe<Scalars['String']['output']>;
+  userEmail: Scalars['String']['output'];
+  /** Actor information */
+  userId: Scalars['String']['output'];
+};
+
+/** Audit log response wrapper */
+export type AuditLogConnection = {
+  __typename?: 'AuditLogConnection';
+  nodes: Array<AuditLog>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Audit log filter input */
+export type AuditLogFilterInput = {
+  actionType?: InputMaybe<AuditActionType>;
+  companyId: Scalars['String']['input'];
+  dateRange?: InputMaybe<DateRangeInput>;
+  entityId?: InputMaybe<Scalars['String']['input']>;
+  entityType?: InputMaybe<Scalars['String']['input']>;
+  result?: InputMaybe<AuditResult>;
+  status?: InputMaybe<AuditStatus>;
+  userId?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Pagination input for audit logs */
+export type AuditLogPaginationInput = {
+  orderBy?: InputMaybe<AuditLogSortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Audit log sort fields */
+export enum AuditLogSortField {
+  ActionType = 'ACTION_TYPE',
+  CreatedAt = 'CREATED_AT',
+  EntityType = 'ENTITY_TYPE',
+  Timestamp = 'TIMESTAMP'
+}
+
+/** Audit log sort input */
+export type AuditLogSortInput = {
+  field: AuditLogSortField;
+  order: SortOrder;
+};
+
+/** Audit result */
+export enum AuditResult {
+  Conflict = 'CONFLICT',
+  Failed = 'FAILED',
+  Forbidden = 'FORBIDDEN',
+  Success = 'SUCCESS',
+  Timeout = 'TIMEOUT',
+  Unauthorized = 'UNAUTHORIZED',
+  UnknownError = 'UNKNOWN_ERROR',
+  ValidationError = 'VALIDATION_ERROR'
+}
+
+/** Audit status */
+export enum AuditStatus {
+  Failure = 'FAILURE',
+  PartialSuccess = 'PARTIAL_SUCCESS',
+  PendingApproval = 'PENDING_APPROVAL',
+  Success = 'SUCCESS'
+}
+
+/** Changes by specific user */
+export type ChangeByUser = {
+  __typename?: 'ChangeByUser';
+  changeCount: Scalars['Int']['output'];
+  timestamp: Scalars['DateTime']['output'];
+  user: User;
+};
+
+/** Change type summary */
+export type ChangeTypeSummary = {
+  __typename?: 'ChangeTypeSummary';
+  changeType: EmployeeChangeType;
+  count: Scalars['Int']['output'];
+  lastChanged?: Maybe<Scalars['DateTime']['output']>;
+};
+
+/** Company type - Root entity for multi-tenant support */
+export type Company = {
+  __typename?: 'Company';
+  /** Created at */
+  createdAt: Scalars['DateTime']['output'];
+  /** All departments */
+  departments?: Maybe<Array<Maybe<Department>>>;
+  /** All employees */
+  employees?: Maybe<Array<Maybe<Employee>>>;
+  /** Unique identifier */
+  id: Scalars['String']['output'];
+  /** All load snapshots */
+  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
+  /** Company name */
+  name: Scalars['String']['output'];
+  /** All processes */
+  processes?: Maybe<Array<Maybe<Process>>>;
+  /** All task assignments */
+  taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
+  /** Timezone (default UTC+3) */
+  timezone: Scalars['String']['output'];
+  /** Updated at */
+  updatedAt: Scalars['DateTime']['output'];
+  /** Working days per month (default 21) */
+  workingDaysPerMonth: Scalars['Int']['output'];
+  /** Working hours per day (default 8) */
+  workingHoursDay: Scalars['Int']['output'];
+};
+
+/** Company load analysis */
+export type CompanyLoadAnalysis = {
+  __typename?: 'CompanyLoadAnalysis';
+  company: Company;
+  departmentMetrics: Array<DepartmentLoadOverview>;
+  metrics: LoadAnalysisMetrics;
+  recommendations: Array<LoadRecommendation>;
+  snapshotDate: Scalars['DateTime']['output'];
+  totalEmployees: Scalars['Int']['output'];
+};
+
+/** Compliance report */
+export type ComplianceReport = {
+  __typename?: 'ComplianceReport';
+  company: Company;
+  complianceRate: Scalars['Float']['output'];
+  dataExportCount: Scalars['Int']['output'];
+  generatedAt: Scalars['DateTime']['output'];
+  /** Risk assessment */
+  highRiskActivities: Array<AuditLog>;
+  reportPeriod: DateRange;
+  /** Data protection metrics */
+  sensitiveDataAccess: Scalars['Int']['output'];
+  suspiciousPatterns: Array<Scalars['String']['output']>;
+  /** Compliance metrics */
+  totalAuditedActions: Scalars['Int']['output'];
+  unauthorizedAccessAttempts: Scalars['Int']['output'];
+  /** User access review */
+  userAccessSummary: Array<UserAccessSummary>;
+};
+
+/** Input for creating a company */
+export type CreateCompanyInput = {
+  name: Scalars['String']['input'];
+  timezone?: InputMaybe<Scalars['String']['input']>;
+  workingDaysPerMonth?: InputMaybe<Scalars['Int']['input']>;
+  workingHoursDay?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Input for creating a department */
+export type CreateDepartmentInput = {
+  companyId: Scalars['String']['input'];
+  headId?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
+/** Required fields for creating an employee */
+export type CreateEmployeeInput = {
+  birthDate?: InputMaybe<Scalars['DateTime']['input']>;
+  companyId: Scalars['String']['input'];
+  departmentId: Scalars['String']['input'];
+  employmentType?: InputMaybe<Scalars['String']['input']>;
+  fio: Scalars['String']['input'];
+  gender: Scalars['String']['input'];
+  gradeId: Scalars['Int']['input'];
+  hireDate: Scalars['DateTime']['input'];
+  kEfficiency?: InputMaybe<Scalars['Float']['input']>;
+  workingHoursPerDay?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Create gap analysis input */
+export type CreateGapAnalysisInput = {
+  companyId: Scalars['String']['input'];
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  forecastPeriodMonths: Scalars['Int']['input'];
+  forecastedWorkloadUnits: Scalars['Int']['input'];
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type AuditLogConnection = {
-  __typename?: 'AuditLogConnection';
-  items: Array<ShipmentLog>;
-  pageInfo: PageInfo;
-};
-
-export type AuditTrailConnection = {
-  __typename?: 'AuditTrailConnection';
-  items: Array<ShipmentEvent>;
-  pageInfo: PageInfo;
-};
-
-export type BidAcceptedEvent = {
-  __typename?: 'BidAcceptedEvent';
-  bidId: Scalars['ID']['output'];
-  carrierId: Scalars['String']['output'];
-  shipmentId: Scalars['ID']['output'];
-  timestamp: Scalars['DateTime']['output'];
-};
-
-export type BidConnection = {
-  __typename?: 'BidConnection';
-  items: Array<ShipmentBid>;
-  pageInfo: PageInfo;
-};
-
-export type BidInput = {
-  estimatedDeliveryDate?: InputMaybe<Scalars['DateTime']['input']>;
-  insuranceAmount?: InputMaybe<Scalars['BigInt']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-  rate: Scalars['BigInt']['input'];
-};
-
-export type BidReceivedEvent = {
-  __typename?: 'BidReceivedEvent';
-  bid: ShipmentBid;
-  shipmentId: Scalars['ID']['output'];
-  timestamp: Scalars['DateTime']['output'];
-};
-
-/** Result of bid rule validation */
-export type BidRequirement = Node & {
-  __typename?: 'BidRequirement';
-  bidId: Scalars['ID']['output'];
-  id: Scalars['ID']['output'];
-  passed: Scalars['Boolean']['output'];
-  reason?: Maybe<Scalars['String']['output']>;
-  ruleId: Scalars['ID']['output'];
-};
-
-/**
- * Rule #4: Bid rule for shipment
- * AUTO-VALIDATED before bid visibility
- */
-export type BidRule = Node & {
-  __typename?: 'BidRule';
-  createdAt: Scalars['DateTime']['output'];
-  enforced: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  requirementValue: Scalars['String']['output'];
-  ruleType: RuleType;
-  shipmentId: Scalars['ID']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type BidRuleInput = {
-  enforced?: InputMaybe<Scalars['Boolean']['input']>;
-  requirementValue: Scalars['String']['input'];
-  ruleType: RuleType;
-};
-
-export enum BidStatus {
-  Accepted = 'ACCEPTED',
-  Expired = 'EXPIRED',
-  Pending = 'PENDING',
-  Rejected = 'REJECTED',
-  RuleCompliant = 'RULE_COMPLIANT',
-  RuleNonCompliant = 'RULE_NON_COMPLIANT'
-}
-
-/**
- * Freight broker - coordinates shipment movement
- * Phase 2-11: Creates shipments, opens bidding, selects carriers
- */
-export type Broker = Node & {
-  __typename?: 'Broker';
-  address: Scalars['String']['output'];
-  city: Scalars['String']['output'];
-  companyName: Scalars['String']['output'];
-  country: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  isActive: Scalars['Boolean']['output'];
-  phone: Scalars['String']['output'];
-  rating: Scalars['Float']['output'];
-  reviewCount: Scalars['Int']['output'];
-  shipments: Array<Shipment>;
-  state: Scalars['String']['output'];
-  totalShipments: Scalars['Int']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  verificationStatus: VerificationStatus;
-  zipCode: Scalars['String']['output'];
-};
-
-export type BrokerCarrierContract = Node & {
-  __typename?: 'BrokerCarrierContract';
-  baselineFuel: Scalars['Float']['output'];
-  broker: Broker;
-  carrier: Carrier;
-  contractNumber: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  defaultRate: Scalars['BigInt']['output'];
-  endDate?: Maybe<Scalars['DateTime']['output']>;
-  fuelSurchargeFormula: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  maxRate: Scalars['BigInt']['output'];
-  minRate: Scalars['BigInt']['output'];
-  notes?: Maybe<Scalars['String']['output']>;
-  paymentTerms: Scalars['String']['output'];
-  rates: Array<BrokerRate>;
-  startDate: Scalars['DateTime']['output'];
-  status: Scalars['String']['output'];
-  termsDays: Scalars['Int']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  volumeDiscount: Scalars['Float']['output'];
-  volumeThreshold?: Maybe<Scalars['Int']['output']>;
-};
-
-export type BrokerCarrierContractConnection = {
-  __typename?: 'BrokerCarrierContractConnection';
-  items: Array<BrokerCarrierContract>;
-  pageInfo: PageInfo;
-};
-
-export type BrokerConnection = {
-  __typename?: 'BrokerConnection';
-  items: Array<Broker>;
-  pageInfo: PageInfo;
-};
-
-export type BrokerRate = Node & {
-  __typename?: 'BrokerRate';
-  brokerRateId: Scalars['String']['output'];
-  contract: BrokerCarrierContract;
-  createdAt: Scalars['DateTime']['output'];
-  destCity?: Maybe<Scalars['String']['output']>;
-  destState?: Maybe<Scalars['String']['output']>;
-  effectiveDate: Scalars['DateTime']['output'];
-  expiryDate?: Maybe<Scalars['DateTime']['output']>;
-  freightClassMax?: Maybe<Scalars['Int']['output']>;
-  freightClassMin?: Maybe<Scalars['Int']['output']>;
-  id: Scalars['ID']['output'];
-  laneDescription?: Maybe<Scalars['String']['output']>;
-  minimumCharge: Scalars['BigInt']['output'];
-  originCity?: Maybe<Scalars['String']['output']>;
-  originState?: Maybe<Scalars['String']['output']>;
-  rate: Scalars['BigInt']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  weightMax?: Maybe<Scalars['Float']['output']>;
-  weightMin?: Maybe<Scalars['Float']['output']>;
-};
-
-export type BrokerRateConnection = {
-  __typename?: 'BrokerRateConnection';
-  items: Array<BrokerRate>;
-  pageInfo: PageInfo;
-};
-
-/**
- * Rule #7: Cancellation Penalties (Protect Bidders)
- * 5% fee if cancelled after BIDDING_OPEN
- * 10% fee if cancelled after BID_SELECTED (10% to selected, 5% to others)
- */
-export type CancellationFee = Node & {
-  __typename?: 'CancellationFee';
-  calculatedAt: Scalars['DateTime']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  distributedAt?: Maybe<Scalars['DateTime']['output']>;
-  feePercentage: Scalars['Float']['output'];
-  id: Scalars['ID']['output'];
-  paidBidderIds: Array<Scalars['String']['output']>;
-  shipmentId: Scalars['ID']['output'];
-  totalFeeAmount: Scalars['BigInt']['output'];
-};
-
-export type CancellationFeeConnection = {
-  __typename?: 'CancellationFeeConnection';
-  items: Array<CancellationFee>;
-  pageInfo: PageInfo;
-};
-
-/**
- * Transportation company that owns fleet and manages drivers
- * Phase 4-6: Submits bids on shipments + confirms paperwork
- * Rule #10: Visible Assignment - rating visible to all
- */
-export type Carrier = Node & {
-  __typename?: 'Carrier';
-  address: Scalars['String']['output'];
-  averageFleetAge?: Maybe<Scalars['Int']['output']>;
-  cargoInsurance: Scalars['Boolean']['output'];
-  city: Scalars['String']['output'];
-  companyName: Scalars['String']['output'];
-  country: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  damageRate: Scalars['Float']['output'];
-  dotNumber: Scalars['String']['output'];
-  drivers: Array<Driver>;
-  email: Scalars['String']['output'];
-  fleetTypes: Array<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  insuranceExpiryDate: Scalars['DateTime']['output'];
-  insurancePolicyId: Scalars['String']['output'];
-  insuranceProvider: Scalars['String']['output'];
-  isActive: Scalars['Boolean']['output'];
-  liabilityLimit: Scalars['BigInt']['output'];
-  licenseExpiryDate: Scalars['DateTime']['output'];
-  licenseNumber: Scalars['String']['output'];
-  mcNumber: Scalars['String']['output'];
-  onTimeDelivery: Scalars['Float']['output'];
-  operatingAuthority: CarrierAuthorityType;
-  phone: Scalars['String']['output'];
-  rating: Scalars['Float']['output'];
-  reviewCount: Scalars['Int']['output'];
-  safetyScore: Scalars['Float']['output'];
-  shipments: Array<Shipment>;
-  specializations: Array<Scalars['String']['output']>;
-  state: Scalars['String']['output'];
-  totalDrivers: Scalars['Int']['output'];
-  totalShipments: Scalars['Int']['output'];
-  totalTrucks: Scalars['Int']['output'];
-  trucks: Array<Vehicle>;
-  updatedAt: Scalars['DateTime']['output'];
-  verificationStatus: VerificationStatus;
-  zipCode: Scalars['String']['output'];
-};
-
-export type CarrierAccessorial = Node & {
-  __typename?: 'CarrierAccessorial';
-  availableRegions: Array<Scalars['String']['output']>;
-  carrier: Carrier;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  isApproved: Scalars['Boolean']['output'];
-  maxRate: Scalars['BigInt']['output'];
-  minRate: Scalars['BigInt']['output'];
-  serviceCode: Scalars['String']['output'];
-  serviceDescription?: Maybe<Scalars['String']['output']>;
-  serviceName: Scalars['String']['output'];
-  unitRate: Scalars['BigInt']['output'];
-  unitType: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type CarrierAccessorialConnection = {
-  __typename?: 'CarrierAccessorialConnection';
-  items: Array<CarrierAccessorial>;
-  pageInfo: PageInfo;
-};
-
-export enum CarrierAuthorityType {
-  CommonCarrier = 'COMMON_CARRIER',
-  ContractCarrier = 'CONTRACT_CARRIER',
-  PrivateCarrier = 'PRIVATE_CARRIER'
-}
-
-export type CarrierConnection = {
-  __typename?: 'CarrierConnection';
-  items: Array<Carrier>;
-  pageInfo: PageInfo;
-};
-
-export type CarrierRate = Node & {
-  __typename?: 'CarrierRate';
-  baseRate: Scalars['BigInt']['output'];
-  carrier: Carrier;
-  carrierRateId: Scalars['String']['output'];
-  costPerMile?: Maybe<Scalars['Float']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  deadheadCost?: Maybe<Scalars['BigInt']['output']>;
-  destCity?: Maybe<Scalars['String']['output']>;
-  destState?: Maybe<Scalars['String']['output']>;
-  effectiveDate: Scalars['DateTime']['output'];
-  expiryDate?: Maybe<Scalars['DateTime']['output']>;
-  freightClassMax?: Maybe<Scalars['Int']['output']>;
-  freightClassMin?: Maybe<Scalars['Int']['output']>;
-  id: Scalars['ID']['output'];
-  laneDescription?: Maybe<Scalars['String']['output']>;
-  maxRate: Scalars['BigInt']['output'];
-  minRate: Scalars['BigInt']['output'];
-  originCity?: Maybe<Scalars['String']['output']>;
-  originState?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-  weightMax?: Maybe<Scalars['Float']['output']>;
-  weightMin?: Maybe<Scalars['Float']['output']>;
-};
-
-export type CarrierRateConnection = {
-  __typename?: 'CarrierRateConnection';
-  items: Array<CarrierRate>;
-  pageInfo: PageInfo;
-};
-
-export type CarrierRating = {
-  __typename?: 'CarrierRating';
-  averageRating: Scalars['Float']['output'];
-  carrierId: Scalars['ID']['output'];
-  reviewCount: Scalars['Int']['output'];
-};
-
-export type ComplianceFilterInput = {
-  carrierId: Scalars['String']['input'];
-  severity?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type ComplianceIssue = Node & {
-  __typename?: 'ComplianceIssue';
-  carrierId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  description: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  issueType: Scalars['String']['output'];
-  resolvedAt?: Maybe<Scalars['DateTime']['output']>;
-  severity: Scalars['String']['output'];
-};
-
-export type ComplianceIssueConnection = {
-  __typename?: 'ComplianceIssueConnection';
-  items: Array<ComplianceIssue>;
-  pageInfo: PageInfo;
-};
-
-export type ComplianceStatus = Node & {
-  __typename?: 'ComplianceStatus';
-  carrier: Carrier;
-  carrierId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  hazmatCertified: Scalars['Boolean']['output'];
-  hosCompliant: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  insuranceCurrent: Scalars['Boolean']['output'];
-  temperatureControlEquipped: Scalars['Boolean']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  vehicleAgeMet: Scalars['Boolean']['output'];
-};
-
-export type CreateBrokerCarrierContractInput = {
-  brokerId: Scalars['ID']['input'];
-  carrierId: Scalars['ID']['input'];
-  contractNumber: Scalars['String']['input'];
-  defaultRate: Scalars['BigInt']['input'];
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  maxRate: Scalars['BigInt']['input'];
-  minRate: Scalars['BigInt']['input'];
-  startDate: Scalars['DateTime']['input'];
-  termsDays?: InputMaybe<Scalars['Int']['input']>;
-  volumeDiscount?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type CreateBrokerInput = {
-  address: Scalars['String']['input'];
-  city: Scalars['String']['input'];
-  companyName: Scalars['String']['input'];
-  country?: InputMaybe<Scalars['String']['input']>;
-  email: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
-  state: Scalars['String']['input'];
-  zipCode: Scalars['String']['input'];
-};
-
-export type CreateBrokerRateInput = {
-  contractId: Scalars['ID']['input'];
-  destState?: InputMaybe<Scalars['String']['input']>;
-  effectiveDate: Scalars['DateTime']['input'];
-  expiryDate?: InputMaybe<Scalars['DateTime']['input']>;
-  laneDescription: Scalars['String']['input'];
-  minimumCharge: Scalars['BigInt']['input'];
-  originState?: InputMaybe<Scalars['String']['input']>;
-  rate: Scalars['BigInt']['input'];
-};
-
-export type CreateCarrierAccessorialInput = {
-  availableRegions: Array<Scalars['String']['input']>;
-  carrierId: Scalars['ID']['input'];
-  serviceCode: Scalars['String']['input'];
-  serviceName: Scalars['String']['input'];
-  unitRate: Scalars['BigInt']['input'];
-  unitType: Scalars['String']['input'];
-};
-
-export type CreateCarrierInput = {
-  address: Scalars['String']['input'];
-  city: Scalars['String']['input'];
-  companyName: Scalars['String']['input'];
-  country?: InputMaybe<Scalars['String']['input']>;
-  dotNumber: Scalars['String']['input'];
-  email: Scalars['String']['input'];
-  fleetTypes?: InputMaybe<Array<Scalars['String']['input']>>;
-  insuranceExpiryDate: Scalars['DateTime']['input'];
-  insurancePolicyId: Scalars['String']['input'];
-  insuranceProvider: Scalars['String']['input'];
-  liabilityLimit: Scalars['BigInt']['input'];
-  licenseExpiryDate: Scalars['DateTime']['input'];
-  licenseNumber: Scalars['String']['input'];
-  mcNumber: Scalars['String']['input'];
-  operatingAuthority: CarrierAuthorityType;
-  phone: Scalars['String']['input'];
-  specializations?: InputMaybe<Array<Scalars['String']['input']>>;
-  state: Scalars['String']['input'];
-  zipCode: Scalars['String']['input'];
-};
-
-export type CreateCarrierRateInput = {
-  baseRate: Scalars['BigInt']['input'];
-  carrierId: Scalars['ID']['input'];
-  destState?: InputMaybe<Scalars['String']['input']>;
-  effectiveDate: Scalars['DateTime']['input'];
-  laneDescription: Scalars['String']['input'];
-  maxRate: Scalars['BigInt']['input'];
-  minRate: Scalars['BigInt']['input'];
-  originState?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type CreateDriverInput = {
-  email: Scalars['String']['input'];
-  firstName: Scalars['String']['input'];
-  lastName: Scalars['String']['input'];
-  licenseExpiryDate: Scalars['DateTime']['input'];
-  licenseNumber: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
-};
-
-export type CreateFreightInput = {
-  declaredValue?: InputMaybe<Scalars['BigInt']['input']>;
-  hazmatClass?: InputMaybe<Scalars['String']['input']>;
-  hazmatDescription?: InputMaybe<Scalars['String']['input']>;
-  hazmatUNNumber?: InputMaybe<Scalars['String']['input']>;
-  height?: InputMaybe<Scalars['Float']['input']>;
-  hsCode?: InputMaybe<Scalars['String']['input']>;
-  isFragile?: InputMaybe<Scalars['Boolean']['input']>;
-  isHazmat?: InputMaybe<Scalars['Boolean']['input']>;
-  isPerishable?: InputMaybe<Scalars['Boolean']['input']>;
-  isValueable?: InputMaybe<Scalars['Boolean']['input']>;
-  length?: InputMaybe<Scalars['Float']['input']>;
-  productDescription?: InputMaybe<Scalars['String']['input']>;
-  productName: Scalars['String']['input'];
-  productType: Scalars['String']['input'];
-  quantity: Scalars['Int']['input'];
-  requiresHandling?: InputMaybe<Array<Scalars['String']['input']>>;
-  temperatureMax?: InputMaybe<Scalars['Float']['input']>;
-  temperatureMin?: InputMaybe<Scalars['Float']['input']>;
-  totalWeight: Scalars['Float']['input'];
-  unitType?: InputMaybe<Scalars['String']['input']>;
-  unitWeight: Scalars['Float']['input'];
-  volume: Scalars['Float']['input'];
-  width?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type CreateFreightOwnerInput = {
-  address: Scalars['String']['input'];
-  city: Scalars['String']['input'];
-  companyName: Scalars['String']['input'];
-  country?: InputMaybe<Scalars['String']['input']>;
-  email: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
-  state: Scalars['String']['input'];
-  zipCode: Scalars['String']['input'];
-};
-
-export type CreateShipmentDocumentInput = {
-  documentNumber?: InputMaybe<Scalars['String']['input']>;
-  documentType: Scalars['String']['input'];
-  expiryDate?: InputMaybe<Scalars['DateTime']['input']>;
-  fileName: Scalars['String']['input'];
-  fileUrl: Scalars['String']['input'];
-  issueDate?: InputMaybe<Scalars['DateTime']['input']>;
-  shipmentId: Scalars['ID']['input'];
-};
-
-export type CreateShipmentEventInput = {
-  eventCode: Scalars['String']['input'];
-  eventDescription: Scalars['String']['input'];
-  requiresAction?: InputMaybe<Scalars['Boolean']['input']>;
-  severity?: InputMaybe<Scalars['String']['input']>;
-  shipmentId: Scalars['ID']['input'];
-};
-
-export type CreateShipmentFreightInput = {
-  freightId: Scalars['ID']['input'];
-  sequenceNumber: Scalars['Int']['input'];
-  shipmentId: Scalars['ID']['input'];
-};
-
-export type CreateShipmentInput = {
-  deliveryScheduled: Scalars['DateTime']['input'];
-  destinationWarehouseId?: InputMaybe<Scalars['String']['input']>;
-  freightId: Scalars['ID']['input'];
-  originWarehouseId: Scalars['String']['input'];
-  ownerBudget?: InputMaybe<Scalars['BigInt']['input']>;
-  pickupScheduled: Scalars['DateTime']['input'];
-  poNumber?: InputMaybe<Scalars['String']['input']>;
-  specialInstructions?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type CreateShipmentLogInput = {
-  deviceId?: InputMaybe<Scalars['String']['input']>;
-  eventType: Scalars['String']['input'];
-  latitude?: InputMaybe<Scalars['Float']['input']>;
-  location?: InputMaybe<Scalars['String']['input']>;
-  longitude?: InputMaybe<Scalars['Float']['input']>;
-  mileage?: InputMaybe<Scalars['Float']['input']>;
-  shipmentId: Scalars['ID']['input'];
-  temperature?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type CreateShipmentStopInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  latitude?: InputMaybe<Scalars['Float']['input']>;
-  longitude?: InputMaybe<Scalars['Float']['input']>;
-  sequenceNumber: Scalars['Int']['input'];
-  shipmentId: Scalars['ID']['input'];
-  stopType: Scalars['String']['input'];
-  warehouseId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-export type CreateVehicleInput = {
-  licensePlate: Scalars['String']['input'];
-  make: Scalars['String']['input'];
-  model: Scalars['String']['input'];
-  vin: Scalars['String']['input'];
-  year: Scalars['Int']['input'];
-};
-
-export type CreateWarehouseInput = {
-  address: Scalars['String']['input'];
-  city: Scalars['String']['input'];
-  country?: InputMaybe<Scalars['String']['input']>;
-  email: Scalars['String']['input'];
+/** Input for creating a process */
+export type CreateProcessInput = {
+  capacityUnits: Scalars['Int']['input'];
+  companyId: Scalars['String']['input'];
+  departmentId: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
+  kMultiplier: Scalars['Float']['input'];
   name: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
-  state: Scalars['String']['input'];
-  totalCapacityKg: Scalars['Float']['input'];
-  zipCode: Scalars['String']['input'];
+  priority?: InputMaybe<ProcessPriority>;
+  processType: ProcessType;
 };
 
-export type Driver = Node & {
-  __typename?: 'Driver';
-  carrier: Carrier;
-  carrierId: Scalars['String']['output'];
+/** Input for creating a task assignment */
+export type CreateTaskAssignmentInput = {
+  allocatedCapacityUnits: Scalars['Int']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate: Scalars['DateTime']['input'];
+  effortHours: Scalars['Float']['input'];
+  employeeId: Scalars['String']['input'];
+  estimatedDaysToComplete?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  priority?: InputMaybe<TaskPriority>;
+  processId: Scalars['String']['input'];
+  taskType: TaskType;
+};
+
+/** Direction of threshold crossing */
+export enum CrossDirection {
+  Above = 'ABOVE',
+  Below = 'BELOW'
+}
+
+export type DateRange = {
+  __typename?: 'DateRange';
+  from: Scalars['DateTime']['output'];
+  to: Scalars['DateTime']['output'];
+};
+
+/** Date range input */
+export type DateRangeInput = {
+  from: Scalars['DateTime']['input'];
+  to: Scalars['DateTime']['input'];
+};
+
+/**
+ * Department type and resolvers
+ * Organizational unit with optional head reference
+ */
+export type Department = {
+  __typename?: 'Department';
+  company: Company;
+  /** Company this department belongs to */
+  companyId: Scalars['String']['output'];
+  /** Created at */
   createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  firstName: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  lastName: Scalars['String']['output'];
-  licenseExpiryDate: Scalars['DateTime']['output'];
-  licenseNumber: Scalars['String']['output'];
-  phone: Scalars['String']['output'];
-  status: DriverStatus;
+  /** All employees in this department */
+  employees: Array<Employee>;
+  head?: Maybe<Employee>;
+  /** Department head (optional) */
+  headId?: Maybe<Scalars['String']['output']>;
+  /** Unique identifier */
+  id: Scalars['String']['output'];
+  /** Load snapshots for this department */
+  loadSnapshots: Array<LoadSnapshot>;
+  /** Department name */
+  name: Scalars['String']['output'];
+  /** All processes assigned to department */
+  processes: Array<Process>;
+  /** All tasks in department */
+  taskAssignments: Array<TaskAssignment>;
+  /** Updated at */
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type DriverConnection = {
-  __typename?: 'DriverConnection';
-  items: Array<Driver>;
-  pageInfo: PageInfo;
+/** Department history summary */
+export type DepartmentEmployeeHistory = {
+  __typename?: 'DepartmentEmployeeHistory';
+  /** Capacity trends */
+  capacityAdded: Scalars['Int']['output'];
+  capacityLost: Scalars['Int']['output'];
+  demotions: Scalars['Int']['output'];
+  department: Department;
+  departures: Scalars['Int']['output'];
+  netCapacityChange: Scalars['Int']['output'];
+  /** Staff movements */
+  newHires: Scalars['Int']['output'];
+  promotions: Scalars['Int']['output'];
+  reportPeriod: DateRange;
+  /** Timeline of changes */
+  timeline: Array<EmployeeTimelineEntry>;
+  transfers: Scalars['Int']['output'];
 };
 
-export enum DriverStatus {
+/** Filter options for departments */
+export type DepartmentFilterInput = {
+  companyId: Scalars['String']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Department gap comparison */
+export type DepartmentGapComparison = {
+  __typename?: 'DepartmentGapComparison';
+  capacityGap: Scalars['Int']['output'];
+  comparedToCompanyAverage: Scalars['Float']['output'];
+  department: Department;
+  gapAnalysis?: Maybe<GapAnalysis>;
+  gapStatus: GapStatus;
+  headcountGap: Scalars['Int']['output'];
+  riskLevel: GapAnalysisRiskLevel;
+};
+
+/** Response with department list */
+export type DepartmentListResponse = {
+  __typename?: 'DepartmentListResponse';
+  items: Array<Department>;
+  total: Scalars['Int']['output'];
+};
+
+/** Department load overview */
+export type DepartmentLoadOverview = {
+  __typename?: 'DepartmentLoadOverview';
+  averageLoadIndex: Scalars['Float']['output'];
+  averageUtilizationRate: Scalars['Float']['output'];
+  department: Department;
+  employeeBreakdown: Array<EmployeeLoadBreakdown>;
+  overloadedEmployees: Scalars['Int']['output'];
+  riskLevel: LoadRiskLevel;
+  totalEmployees: Scalars['Int']['output'];
+};
+
+/** Extended department with metrics */
+export type DepartmentMetrics = {
+  __typename?: 'DepartmentMetrics';
+  activeEmployees: Scalars['Int']['output'];
+  department: Department;
+  loadIndex: Scalars['Float']['output'];
+  overloadedCount: Scalars['Int']['output'];
+  totalCapacity: Scalars['Float']['output'];
+  totalEmployees: Scalars['Int']['output'];
+  totalLoad: Scalars['Float']['output'];
+};
+
+/**
+ * Employee type and resolvers
+ * Represents a team member with capacity coefficients and employment details
+ */
+export type Employee = {
+  __typename?: 'Employee';
+  /** Date of birth */
+  birthDate?: Maybe<Scalars['DateTime']['output']>;
+  /** Company this employee belongs to */
+  companyId: Scalars['String']['output'];
+  /** Created at */
+  createdAt: Scalars['DateTime']['output'];
+  department: Department;
+  /** Department assignment */
+  departmentId: Scalars['String']['output'];
+  /** Employment type (ТД/ГПХ/Самозанятый) */
+  employmentType: Scalars['String']['output'];
+  /** Full name */
+  fio: Scalars['String']['output'];
+  /** Dismissal date (null if active) */
+  fireDate?: Maybe<Scalars['DateTime']['output']>;
+  /** Gender (M/F) */
+  gender: Scalars['String']['output'];
+  grade: Grade;
+  /** Seniority level/Grade */
+  gradeId: Scalars['Int']['output'];
+  /** Hire date */
+  hireDate: Scalars['DateTime']['output'];
+  /** Change history */
+  history?: Maybe<Array<Maybe<EmployeeHistory>>>;
+  /** Unique identifier */
+  id: Scalars['String']['output'];
+  /** Efficiency coefficient (multiplier, default 1.0) */
+  kEfficiency: Scalars['Float']['output'];
+  /** Load snapshots */
+  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
+  /** Metadata (JSON) */
+  metadata?: Maybe<Scalars['JSON']['output']>;
+  /** Current status (active/vacation/sick/dismissed) */
+  status: Scalars['String']['output'];
+  /** Task assignments */
+  taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
+  /** Updated at */
+  updatedAt: Scalars['DateTime']['output'];
+  /** Working hours per day */
+  workingHoursPerDay: Scalars['Int']['output'];
+};
+
+/** Employee audit report */
+export type EmployeeAuditReport = {
+  __typename?: 'EmployeeAuditReport';
+  /** Notable changes */
+  capacityChanges: Array<EmployeeHistory>;
+  changesByType: Array<ChangeTypeSummary>;
+  efficiencyChanges: Array<EmployeeHistory>;
+  employee: Employee;
+  generatedAt: Scalars['DateTime']['output'];
+  reportPeriod: DateRange;
+  statusChanges: Array<EmployeeHistory>;
+  /** Timeline */
+  timeline: Array<EmployeeTimelineEntry>;
+  /** Summary statistics */
+  totalChanges: Scalars['Int']['output'];
+};
+
+/** Employee change type */
+export enum EmployeeChangeType {
+  ContractRenewal = 'CONTRACT_RENEWAL',
+  Demotion = 'DEMOTION',
+  DepartmentTransfer = 'DEPARTMENT_TRANSFER',
+  EfficiencyUpdate = 'EFFICIENCY_UPDATE',
+  GradeChange = 'GRADE_CHANGE',
+  Hire = 'HIRE',
+  LeaveEnd = 'LEAVE_END',
+  LeaveStart = 'LEAVE_START',
+  Other = 'OTHER',
+  Promotion = 'PROMOTION',
+  SalaryAdjustment = 'SALARY_ADJUSTMENT',
+  StatusChange = 'STATUS_CHANGE',
+  Termination = 'TERMINATION'
+}
+
+/** Response with employee list and pagination */
+export type EmployeeConnection = {
+  __typename?: 'EmployeeConnection';
+  nodes: Array<Employee>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter options for employee queries */
+export type EmployeeFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  gradeId?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** EmployeeHistory type tracking changes to employee data and status */
+export type EmployeeHistory = {
+  __typename?: 'EmployeeHistory';
+  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  approvedBy?: Maybe<Scalars['String']['output']>;
+  /** Capacity impact */
+  capacityImpact?: Maybe<Scalars['Int']['output']>;
+  /** Change details */
+  changeType: EmployeeChangeType;
+  /** Timestamps */
+  changedAt: Scalars['DateTime']['output'];
+  /** Audit information */
+  changedBy: Scalars['String']['output'];
+  changedField: Scalars['String']['output'];
+  comment?: Maybe<Scalars['String']['output']>;
+  effectiveDate: Scalars['DateTime']['output'];
+  employee: Employee;
+  /** Employee reference */
+  employeeId: Scalars['String']['output'];
+  /** Status transitions */
+  fromStatus?: Maybe<EmploymentStatus>;
+  id: Scalars['String']['output'];
+  loadImpact?: Maybe<Scalars['Float']['output']>;
+  newValue?: Maybe<Scalars['JSON']['output']>;
+  previousValue?: Maybe<Scalars['JSON']['output']>;
+  /** Context */
+  reason?: Maybe<Scalars['String']['output']>;
+  toStatus?: Maybe<EmploymentStatus>;
+};
+
+/** Employee history response wrapper */
+export type EmployeeHistoryConnection = {
+  __typename?: 'EmployeeHistoryConnection';
+  nodes: Array<EmployeeHistory>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Employee history filter input */
+export type EmployeeHistoryFilterInput = {
+  changeType?: InputMaybe<EmployeeChangeType>;
+  changedBy?: InputMaybe<Scalars['String']['input']>;
+  dateRange?: InputMaybe<DateRangeInput>;
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Pagination input for employee history */
+export type EmployeeHistoryPaginationInput = {
+  orderBy?: InputMaybe<EmployeeHistorySortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Employee history sort fields */
+export enum EmployeeHistorySortField {
+  ChangedAt = 'CHANGED_AT',
+  ChangeType = 'CHANGE_TYPE',
+  EffectiveDate = 'EFFECTIVE_DATE'
+}
+
+/** Employee history sort input */
+export type EmployeeHistorySortInput = {
+  field: EmployeeHistorySortField;
+  order: SortOrder;
+};
+
+/** Employee load breakdown */
+export type EmployeeLoadBreakdown = {
+  __typename?: 'EmployeeLoadBreakdown';
+  allocatedCapacity: Scalars['Int']['output'];
+  employee: Employee;
+  loadStatus: LoadStatus;
+  utilizationRate: Scalars['Float']['output'];
+};
+
+/** Employee load history */
+export type EmployeeLoadHistory = {
+  __typename?: 'EmployeeLoadHistory';
+  averageLoadIndex: Scalars['Float']['output'];
+  averageUtilizationRate: Scalars['Float']['output'];
+  employee: Employee;
+  isIncreasing: Scalars['Boolean']['output'];
+  snapshots: Array<LoadSnapshot>;
+  trend: Array<LoadTrendPoint>;
+  trendDirection: TrendDirection;
+};
+
+/** Pagination and sorting */
+export type EmployeePaginationInput = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<SortOrder>;
+};
+
+/** Employee status change event */
+export type EmployeeStatusChangeEvent = {
+  __typename?: 'EmployeeStatusChangeEvent';
+  employeeName: Scalars['String']['output'];
+  history: EmployeeHistory;
+  timestamp: Scalars['DateTime']['output'];
+};
+
+/** Employee task statistics */
+export type EmployeeTaskStats = {
+  __typename?: 'EmployeeTaskStats';
+  activeAssignments: Scalars['Int']['output'];
+  averagePriority: Scalars['String']['output'];
+  blockedAssignments: Scalars['Int']['output'];
+  completedAssignments: Scalars['Int']['output'];
+  employee: Employee;
+  tasksByStatus: Array<TaskStatusCount>;
+  tasksByType: Array<TaskTypeCount>;
+  totalAllocatedCapacity: Scalars['Int']['output'];
+  totalAssignments: Scalars['Int']['output'];
+};
+
+/** Employee timeline entry */
+export type EmployeeTimelineEntry = {
+  __typename?: 'EmployeeTimelineEntry';
+  color: Scalars['String']['output'];
+  event: EmployeeHistory;
+  icon: Scalars['String']['output'];
+  summary: Scalars['String']['output'];
+};
+
+/** Employment status */
+export enum EmploymentStatus {
   Active = 'ACTIVE',
   Inactive = 'INACTIVE',
+  NoticePeriod = 'NOTICE_PERIOD',
   OnLeave = 'ON_LEAVE',
+  Retired = 'RETIRED',
   Terminated = 'TERMINATED'
 }
+
+/** Entity change audit trail */
+export type EntityAuditTrail = {
+  __typename?: 'EntityAuditTrail';
+  changesByUser: Array<ChangeByUser>;
+  /** Snapshots at key points */
+  currentState?: Maybe<Scalars['JSON']['output']>;
+  entityId: Scalars['String']['output'];
+  entityType: Scalars['String']['output'];
+  previousState?: Maybe<Scalars['JSON']['output']>;
+  /** Full change timeline */
+  timeline: Array<AuditLog>;
+  /** Change analysis */
+  totalChanges: Scalars['Int']['output'];
+};
 
 export type Error = {
   __typename?: 'Error';
@@ -610,559 +662,888 @@ export type Error = {
   message: Scalars['String']['output'];
 };
 
-export enum EventType {
-  BiddingOpened = 'BIDDING_OPENED',
-  BidAccepted = 'BID_ACCEPTED',
-  BidSubmitted = 'BID_SUBMITTED',
-  CancelledWithFee = 'CANCELLED_WITH_FEE',
-  FreightClaimed = 'FREIGHT_CLAIMED',
-  MarginLocked = 'MARGIN_LOCKED',
-  PenaltyDistributed = 'PENALTY_DISTRIBUTED',
-  ShipmentCreated = 'SHIPMENT_CREATED',
-  StatusChanged = 'STATUS_CHANGED'
+/** Export format for audit logs */
+export enum ExportFormat {
+  Csv = 'CSV',
+  Json = 'JSON',
+  Pdf = 'PDF',
+  Xlsx = 'XLSX'
 }
 
-/**
- * Physical cargo awaiting transport
- * Locked to one broker at a time (CLAIMED status)
- * Rule #2: Single Broker Lock - one freight per broker
- */
-export type Freight = Node & {
-  __typename?: 'Freight';
-  broker?: Maybe<Broker>;
-  brokerId?: Maybe<Scalars['String']['output']>;
+/** GapAnalysis type representing workforce planning analysis */
+export type GapAnalysis = {
+  __typename?: 'GapAnalysis';
+  analysisDate: Scalars['DateTime']['output'];
+  /** Gap calculation */
+  capacityGap: Scalars['Int']['output'];
+  /** Related entities */
+  company: Company;
+  /** Analysis metadata */
+  companyId: Scalars['String']['output'];
+  confidenceLevel: Scalars['String']['output'];
+  /** Timestamps */
   createdAt: Scalars['DateTime']['output'];
-  currentWarehouse?: Maybe<Warehouse>;
-  currentWarehouseId?: Maybe<Scalars['String']['output']>;
-  declaredValue?: Maybe<Scalars['BigInt']['output']>;
-  freightNumber: Scalars['String']['output'];
-  hazmatClass?: Maybe<Scalars['String']['output']>;
-  hazmatDescription?: Maybe<Scalars['String']['output']>;
-  hazmatUNNumber?: Maybe<Scalars['String']['output']>;
-  height?: Maybe<Scalars['Float']['output']>;
-  hsCode?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  isFragile: Scalars['Boolean']['output'];
-  isHazmat: Scalars['Boolean']['output'];
-  isPerishable: Scalars['Boolean']['output'];
-  isValueable: Scalars['Boolean']['output'];
-  length?: Maybe<Scalars['Float']['output']>;
-  owner: FreightOwner;
-  ownerId: Scalars['String']['output'];
-  productDescription?: Maybe<Scalars['String']['output']>;
-  productName: Scalars['String']['output'];
-  productType: Scalars['String']['output'];
-  quantity: Scalars['Int']['output'];
-  requiresHandling: Array<Scalars['String']['output']>;
-  shipments: Array<Shipment>;
-  status: FreightStatus;
-  storageEndDate?: Maybe<Scalars['DateTime']['output']>;
-  storageStartDate?: Maybe<Scalars['DateTime']['output']>;
-  temperatureMax?: Maybe<Scalars['Float']['output']>;
-  temperatureMin?: Maybe<Scalars['Float']['output']>;
-  totalWeight: Scalars['Float']['output'];
-  unitType: Scalars['String']['output'];
-  unitWeight: Scalars['Float']['output'];
+  /** Current state */
+  currentEmployeeCount: Scalars['Int']['output'];
+  currentTotalCapacity: Scalars['Int']['output'];
+  currentUtilizationRate: Scalars['Float']['output'];
+  department?: Maybe<Department>;
+  departmentId?: Maybe<Scalars['String']['output']>;
+  endDate: Scalars['DateTime']['output'];
+  /** Confidence metrics */
+  forecastAccuracy: Scalars['Float']['output'];
+  /** Analysis period */
+  forecastPeriodMonths: Scalars['Int']['output'];
+  /** Forecasted state */
+  forecastedWorkloadUnits: Scalars['Int']['output'];
+  gapStatus: GapStatus;
+  headcountGap: Scalars['Int']['output'];
+  /** Hiring plan */
+  hiringPlan?: Maybe<HiringPlan>;
+  id: Scalars['String']['output'];
+  recommendations: Array<GapAnalysisRecommendation>;
+  requiredEmployeeCount: Scalars['Int']['output'];
+  requiredTotalCapacity: Scalars['Int']['output'];
+  riskLevel: GapAnalysisRiskLevel;
+  startDate: Scalars['DateTime']['output'];
   updatedAt: Scalars['DateTime']['output'];
-  volume: Scalars['Float']['output'];
-  width?: Maybe<Scalars['Float']['output']>;
 };
 
-export type FreightConnection = {
-  __typename?: 'FreightConnection';
-  items: Array<Freight>;
+/** Gap analysis response wrapper */
+export type GapAnalysisConnection = {
+  __typename?: 'GapAnalysisConnection';
+  nodes: Array<GapAnalysis>;
   pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
-/**
- * Freight owner - cargo owner/shipper
- * Phase 1: Creates freight and defines specs
- * Rule #1: Real Loads Only
- */
-export type FreightOwner = Node & {
-  __typename?: 'FreightOwner';
-  address: Scalars['String']['output'];
-  city: Scalars['String']['output'];
-  companyName: Scalars['String']['output'];
-  country: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  freights: Array<Freight>;
-  id: Scalars['ID']['output'];
-  isActive: Scalars['Boolean']['output'];
-  phone: Scalars['String']['output'];
-  rating: Scalars['Float']['output'];
-  reviewCount: Scalars['Int']['output'];
-  shipments: Array<Shipment>;
-  state: Scalars['String']['output'];
-  totalShipments: Scalars['Int']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  verificationStatus: VerificationStatus;
-  zipCode: Scalars['String']['output'];
+/** Gap analysis filter input */
+export type GapAnalysisFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  dateRange?: InputMaybe<DateRangeInput>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  gapStatus?: InputMaybe<GapStatus>;
+  riskLevel?: InputMaybe<GapAnalysisRiskLevel>;
 };
 
-export type FreightOwnerConnection = {
-  __typename?: 'FreightOwnerConnection';
-  items: Array<FreightOwner>;
-  pageInfo: PageInfo;
+/** Pagination input for gap analyses */
+export type GapAnalysisPaginationInput = {
+  orderBy?: InputMaybe<GapAnalysisSortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/**
- * Freight status progression
- * DRAFT → AVAILABLE → CLAIMED → ASSIGNED → COMPLETED
- */
-export enum FreightStatus {
-  Archived = 'ARCHIVED',
-  Assigned = 'ASSIGNED',
-  Available = 'AVAILABLE',
-  Claimed = 'CLAIMED',
-  Completed = 'COMPLETED',
-  Draft = 'DRAFT'
-}
-
-export type MaintenanceConnection = {
-  __typename?: 'MaintenanceConnection';
-  items: Array<MaintenanceRecord>;
-  pageInfo: PageInfo;
-};
-
-export type MaintenanceInput = {
-  completedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  cost?: InputMaybe<Scalars['BigInt']['input']>;
-  description: Scalars['String']['input'];
-  maintenanceType: Scalars['String']['input'];
-  nextScheduledDate?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type MaintenanceRecord = Node & {
-  __typename?: 'MaintenanceRecord';
-  completedAt?: Maybe<Scalars['DateTime']['output']>;
-  cost?: Maybe<Scalars['BigInt']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+/** Gap analysis recommendation */
+export type GapAnalysisRecommendation = {
+  __typename?: 'GapAnalysisRecommendation';
   description: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  maintenanceType: Scalars['String']['output'];
-  nextScheduledDate?: Maybe<Scalars['DateTime']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-  vehicle: Vehicle;
-  vehicleId: Scalars['ID']['output'];
+  estimatedCost?: Maybe<Scalars['Int']['output']>;
+  estimatedTimeframe: Scalars['String']['output'];
+  expectedOutcome: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  implementationSteps: Array<Scalars['String']['output']>;
+  priority: RecommendationPriority;
+  type: RecommendationType;
 };
 
+/** Risk level for gap analysis */
+export enum GapAnalysisRiskLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
+/** Gap analysis sort fields */
+export enum GapAnalysisSortField {
+  AnalysisDate = 'ANALYSIS_DATE',
+  CapacityGap = 'CAPACITY_GAP',
+  HeadcountGap = 'HEADCOUNT_GAP',
+  RiskLevel = 'RISK_LEVEL'
+}
+
+/** Gap analysis sort input */
+export type GapAnalysisSortInput = {
+  field: GapAnalysisSortField;
+  order: SortOrder;
+};
+
+/** Gap criticality assessment */
+export type GapCriticalityAssessment = {
+  __typename?: 'GapCriticalityAssessment';
+  criticalDepartments: Array<DepartmentGapComparison>;
+  estimatedTimeToFillGap: Scalars['String']['output'];
+  recommendedImmediateActions: Array<Scalars['String']['output']>;
+  timelinessOfAction: Scalars['String']['output'];
+  timestamp: Scalars['DateTime']['output'];
+};
+
+/** Gap status enumeration */
+export enum GapStatus {
+  Balanced = 'BALANCED',
+  CriticalGap = 'CRITICAL_GAP',
+  MinorGap = 'MINOR_GAP',
+  ModerateGap = 'MODERATE_GAP',
+  Surplus = 'SURPLUS'
+}
+
+/** Gap threshold event */
+export type GapThresholdEvent = {
+  __typename?: 'GapThresholdEvent';
+  analysis: GapAnalysis;
+  newStatus: GapStatus;
+  previousStatus: GapStatus;
+  severity: Scalars['String']['output'];
+  timestamp: Scalars['DateTime']['output'];
+};
+
+/** Historical gap trend */
+export type GapTrend = {
+  __typename?: 'GapTrend';
+  analysisDate: Scalars['DateTime']['output'];
+  capacityGap: Scalars['Int']['output'];
+  gapStatus: GapStatus;
+  headcountGap: Scalars['Int']['output'];
+  riskLevel: GapAnalysisRiskLevel;
+};
+
+/**
+ * Grade type - Seniority levels/grades
+ * Reference data that doesn't change often
+ */
+export type Grade = {
+  __typename?: 'Grade';
+  /** Description */
+  description?: Maybe<Scalars['String']['output']>;
+  /** Employees with this grade */
+  employees: Array<Employee>;
+  /** Grade ID (0-5: Intern to C-level) */
+  id: Scalars['Int']['output'];
+  /** Grade coefficient for capacity calculation */
+  kGrade: Scalars['Float']['output'];
+  /** Human readable name */
+  name: Scalars['String']['output'];
+  /** Processes targeting this grade */
+  processes: Array<Process>;
+};
+
+/** Grade with statistics */
+export type GradeStats = {
+  __typename?: 'GradeStats';
+  averageEfficiency: Scalars['Float']['output'];
+  employeeCount: Scalars['Int']['output'];
+  grade: Grade;
+  overloadedCount: Scalars['Int']['output'];
+};
+
+/** Hiring forecast */
+export type HiringForecast = {
+  __typename?: 'HiringForecast';
+  averageMonthlyHiringRate: Scalars['Int']['output'];
+  gapAnalysis: GapAnalysis;
+  quarterlyProjections: Array<QuarterlyProjection>;
+  riskFactors: Array<Scalars['String']['output']>;
+  totalEstimatedHires: Scalars['Int']['output'];
+};
+
+/** Hiring phase */
+export type HiringPhase = {
+  __typename?: 'HiringPhase';
+  name: Scalars['String']['output'];
+  phase: Scalars['Int']['output'];
+  startDate: Scalars['DateTime']['output'];
+  status: HiringPhaseStatus;
+  talentGrades: Array<Scalars['String']['output']>;
+  targetCompletionDate: Scalars['DateTime']['output'];
+  targetHeadcount: Scalars['Int']['output'];
+};
+
+/** Hiring phase status */
+export enum HiringPhaseStatus {
+  Completed = 'COMPLETED',
+  Delayed = 'DELAYED',
+  InProgress = 'IN_PROGRESS',
+  Planned = 'PLANNED'
+}
+
+/** Hiring plan derived from gap analysis */
+export type HiringPlan = {
+  __typename?: 'HiringPlan';
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  /** Budget impact */
+  estimatedCostPerHire: Scalars['Int']['output'];
+  gapAnalysisId: Scalars['String']['output'];
+  hiringPhases: Array<HiringPhase>;
+  /** Timeline */
+  hiringStartDate: Scalars['DateTime']['output'];
+  id: Scalars['String']['output'];
+  progressPercentage: Scalars['Int']['output'];
+  /** Status */
+  status: HiringPlanStatus;
+  talentCategories: Array<TalentCategory>;
+  targetCompletionDate: Scalars['DateTime']['output'];
+  /** Hiring targets */
+  targetHeadcount: Scalars['Int']['output'];
+  totalEstimatedCost: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Hiring plan status */
+export enum HiringPlanStatus {
+  Approved = 'APPROVED',
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Draft = 'DRAFT',
+  InProgress = 'IN_PROGRESS'
+}
+
+/** Incident severity level */
+export enum IncidentSeverity {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
+/** Load analysis metrics */
+export type LoadAnalysisMetrics = {
+  __typename?: 'LoadAnalysisMetrics';
+  averageUtilizationRate: Scalars['Float']['output'];
+  employeesOptimal: Scalars['Int']['output'];
+  employeesOverloaded: Scalars['Int']['output'];
+  employeesUnderutilized: Scalars['Int']['output'];
+  maximumUtilizationRate: Scalars['Float']['output'];
+  medianUtilizationRate: Scalars['Float']['output'];
+  minimumUtilizationRate: Scalars['Float']['output'];
+  percentileP90: Scalars['Float']['output'];
+  percentileP95: Scalars['Float']['output'];
+  standardDeviation: Scalars['Float']['output'];
+};
+
+/** Load recommendation */
+export type LoadRecommendation = {
+  __typename?: 'LoadRecommendation';
+  affectedEmployees: Scalars['Int']['output'];
+  description: Scalars['String']['output'];
+  estimatedImpact: Scalars['String']['output'];
+  priority: RecommendationPriority;
+  suggestedActions: Array<Scalars['String']['output']>;
+  type: RecommendationType;
+};
+
+/** Load risk level enumeration */
+export enum LoadRiskLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
+/** LoadSnapshot type representing point-in-time capacity measurement */
+export type LoadSnapshot = {
+  __typename?: 'LoadSnapshot';
+  allocatedCapacityUnits: Scalars['Int']['output'];
+  availableCapacityUnits: Scalars['Int']['output'];
+  /** Load measurements */
+  calculatedLoad: Scalars['Float']['output'];
+  /** Associated entities */
+  company: Company;
+  /** Snapshot details */
+  companyId: Scalars['String']['output'];
+  companyLoadIndex: Scalars['Float']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  department?: Maybe<Department>;
+  /** Relative metrics */
+  departmentLoadIndex: Scalars['Float']['output'];
+  employee?: Maybe<Employee>;
+  /** Employee data (at time of snapshot) */
+  employeeId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  kGrade: Scalars['Float']['output'];
+  loadIndex: Scalars['Float']['output'];
+  loadStatus: LoadStatus;
+  process?: Maybe<Process>;
+  snapshotDate: Scalars['DateTime']['output'];
+  /** Source information */
+  snapshotType: SnapshotType;
+  sourceId?: Maybe<Scalars['String']['output']>;
+  sourceType?: Maybe<Scalars['String']['output']>;
+  taskAssignment?: Maybe<TaskAssignment>;
+  /** Capacity measurements */
+  totalCapacityUnits: Scalars['Int']['output'];
+  utilizationRate: Scalars['Float']['output'];
+};
+
+/** Load snapshot response wrapper */
+export type LoadSnapshotConnection = {
+  __typename?: 'LoadSnapshotConnection';
+  nodes: Array<LoadSnapshot>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Load snapshot filter input */
+export type LoadSnapshotFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  dateRange?: InputMaybe<DateRangeInput>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+  loadStatus?: InputMaybe<LoadStatus>;
+  snapshotType?: InputMaybe<SnapshotType>;
+};
+
+/** Pagination input for load snapshots */
+export type LoadSnapshotPaginationInput = {
+  orderBy?: InputMaybe<LoadSnapshotSortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Load snapshot sort fields */
+export enum LoadSnapshotSortField {
+  LoadIndex = 'LOAD_INDEX',
+  SnapshotDate = 'SNAPSHOT_DATE',
+  UtilizationRate = 'UTILIZATION_RATE'
+}
+
+/** Load snapshot sort input */
+export type LoadSnapshotSortInput = {
+  field: LoadSnapshotSortField;
+  order: SortOrder;
+};
+
+/** Load status enumeration */
+export enum LoadStatus {
+  HeavilyLoaded = 'HEAVILY_LOADED',
+  Optimal = 'OPTIMAL',
+  Overloaded = 'OVERLOADED',
+  UnderUtilized = 'UNDER_UTILIZED'
+}
+
+/** Load threshold crossing event */
+export type LoadThresholdEvent = {
+  __typename?: 'LoadThresholdEvent';
+  crossedDirection: CrossDirection;
+  snapshot: LoadSnapshot;
+  threshold: Scalars['Float']['output'];
+  timestamp: Scalars['DateTime']['output'];
+};
+
+/** Load trend data point */
+export type LoadTrendPoint = {
+  __typename?: 'LoadTrendPoint';
+  allocatedCapacityUnits: Scalars['Int']['output'];
+  loadIndex: Scalars['Float']['output'];
+  loadStatus: LoadStatus;
+  snapshotDate: Scalars['DateTime']['output'];
+  utilizationRate: Scalars['Float']['output'];
+};
+
+/** Input for logging audit entry */
+export type LogAuditEntryInput = {
+  actionType: AuditActionType;
+  companyId: Scalars['String']['input'];
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  description: Scalars['String']['input'];
+  durationMs?: InputMaybe<Scalars['Int']['input']>;
+  entityId: Scalars['String']['input'];
+  entityType: Scalars['String']['input'];
+  ipAddress?: InputMaybe<Scalars['String']['input']>;
+  newValues?: InputMaybe<Scalars['JSON']['input']>;
+  oldValues?: InputMaybe<Scalars['JSON']['input']>;
+  result?: InputMaybe<AuditResult>;
+  status?: InputMaybe<AuditStatus>;
+  userAgent?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['String']['input'];
+};
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type Mutation = {
   __typename?: 'Mutation';
-  /** Placeholder for resolver mutations */
-  _empty?: Maybe<Scalars['String']['output']>;
-  /**
-   * Phase 6: Accept bid
-   * Rule #5: Decision Deadline - 24h auto-accept if no decision
-   */
-  acceptBid: Shipment;
-  /** Archive freight (soft delete) */
-  archiveFreight: Freight;
-  /**
-   * Cancel shipment
-   * Rule #7: Cancellation Penalties - 5-10% fee split to bidders
-   */
-  cancelShipment: Shipment;
-  /**
-   * Phase 2: Broker claims freight
-   * Rule #2: Single Broker Lock
-   * Sets status AVAILABLE → CLAIMED, locks brokerId
-   */
-  claimFreight: Freight;
-  /**
-   * Phase 4-5: Carrier submits bid
-   * Rule #4: Bid Rules Auto-Validation - checked immediately
-   */
-  createBid: ShipmentBid;
-  /**
-   * Rule #4: Set bid rule for shipment (before bidding opens)
-   * enforced=true: must pass (bid rejected if fails)
-   * enforced=false: warning only (bid visible with flag)
-   */
-  createBidRule: BidRule;
-  createBroker: Broker;
-  createBrokerCarrierContract: BrokerCarrierContract;
-  createBrokerRate: BrokerRate;
-  /** Create new carrier account */
-  createCarrier: Carrier;
-  createCarrierAccessorial: CarrierAccessorial;
-  createCarrierRate: CarrierRate;
-  createDriver: Driver;
-  /**
-   * Phase 1: Owner creates freight
-   * Rule #1: Real Loads Only - freight must exist before shipment
-   */
-  createFreight: Freight;
-  createFreightOwner: FreightOwner;
-  /** Create maintenance record, update vehicle status if needed */
-  createMaintenanceRecord: MaintenanceRecord;
-  /** Create review, update carrier rating */
-  createReview: Review;
-  /**
-   * Phase 2: Broker creates shipment from freight
-   * Rule #1: Real Loads Only - freight must exist and be AVAILABLE
-   */
-  createShipment: Shipment;
-  createShipmentDocument: ShipmentDocument;
-  createShipmentEvent: ShipmentEvent;
-  createShipmentFreight: ShipmentFreight;
-  createShipmentLog: ShipmentLog;
-  createShipmentStop: ShipmentStop;
-  createVehicle: Vehicle;
-  createWarehouse: Warehouse;
-  /** Delete bid rule (only before bidding opens) */
-  deleteBidRule: Scalars['Boolean']['output'];
-  deleteVehicle: Scalars['Boolean']['output'];
-  /**
-   * Phase 3: Open bidding and lock broker margin
-   * Rule #3: Upfront Margin - margin agreed before bidding, immutable
-   * Rule #5: Decision Deadline - 24h from first bid
-   */
-  openBidding: Shipment;
-  /**
-   * Rule #4: Override non-compliant bid
-   * Broker accepts RULE_NON_COMPLIANT bid
-   * Logged in audit trail
-   */
-  overrideBidRuleCompliance: ShipmentBid;
-  /** Reject bid with reason */
-  rejectBid: ShipmentBid;
-  /**
-   * Release freight claim
-   * Reverts CLAIMED → AVAILABLE
-   */
-  releaseFreightClaim: Freight;
-  /**
-   * Phase 4-5: Carrier submits bid on shipment
-   * Rule #4: Bid Rules Auto-Validation
-   */
-  submitBid: ShipmentBid;
-  /** Update bid (only if status = PENDING) */
-  updateBid: ShipmentBid;
-  /** Update bid rule (only before bidding opens) */
-  updateBidRule: BidRule;
-  updateBroker: Broker;
-  updateBrokerCarrierContract: BrokerCarrierContract;
-  updateBrokerRate: BrokerRate;
-  updateCapacity: Warehouse;
-  /** Update carrier information */
-  updateCarrier: Carrier;
-  updateCarrierAccessorial: CarrierAccessorial;
-  updateCarrierRate: CarrierRate;
-  updateDriver: Driver;
-  updateDriverStatus: Driver;
-  /** Update freight details */
-  updateFreight: Freight;
-  updateFreightOwner: FreightOwner;
-  /** Update review if allowed, recalculate carrier rating */
-  updateReview: Review;
-  /** Update shipment details */
-  updateShipment: Shipment;
-  updateShipmentDocument: ShipmentDocument;
-  updateShipmentFreight: ShipmentFreight;
-  updateShipmentStop: ShipmentStop;
-  updateVehicle: Vehicle;
-  updateVehicleStatus: Vehicle;
-  updateWarehouse: Warehouse;
+  /** Placeholder - replaced by domain mutations */
+  _placeholder?: Maybe<Scalars['String']['output']>;
+  /** Approve employee history change */
+  approveEmployeeHistory: EmployeeHistory;
+  /** Approve hiring plan */
+  approveHiringPlan: HiringPlan;
+  /** Mark audit logs for archival */
+  archiveAuditLogs: Scalars['Int']['output'];
+  /** Assign department head */
+  assignDepartmentHead: Department;
+  /** Assign capacity to process */
+  assignProcessCapacity: Process;
+  /** Block a task with reason */
+  blockTaskAssignment: TaskAssignment;
+  /** Bulk log audit entries */
+  bulkLogAuditEntries: Array<AuditLog>;
+  /** Cancel a process */
+  cancelProcess: Process;
+  /** Complete a process */
+  completeProcess: Process;
+  /** Complete a task assignment */
+  completeTaskAssignment: TaskAssignment;
+  /** Create new company (admin only) */
+  createCompany?: Maybe<Company>;
+  /** Create snapshots for all employees */
+  createCompanyLoadSnapshots: Array<LoadSnapshot>;
+  /** Create new department */
+  createDepartment: Department;
+  /** Create new employee */
+  createEmployee: Employee;
+  /** Create new gap analysis */
+  createGapAnalysis: GapAnalysis;
+  /** Create a load snapshot */
+  createLoadSnapshot: LoadSnapshot;
+  /** Create a new process */
+  createProcess: Process;
+  /** Create a new task assignment */
+  createTaskAssignment: TaskAssignment;
+  /** Delete department */
+  deleteDepartment: Scalars['Boolean']['output'];
+  /** Delete a process */
+  deleteProcess: Scalars['Boolean']['output'];
+  /** Delete a task assignment */
+  deleteTaskAssignment: Scalars['Boolean']['output'];
+  /** Dismiss employee (soft delete) */
+  dismissEmployee: Employee;
+  /** Export audit logs */
+  exportAuditLogs: Scalars['String']['output'];
+  /** Generate hiring plan from gap analysis */
+  generateHiringPlan: HiringPlan;
+  /** Log an audit entry */
+  logAuditEntry: AuditLog;
+  /** Reassign task to different employee */
+  reassignTask: TaskAssignment;
+  /** Record employee history entry */
+  recordEmployeeHistory: EmployeeHistory;
+  /** Reject employee history change */
+  rejectEmployeeHistory: EmployeeHistory;
+  /** Start a process */
+  startProcess: Process;
+  /** Start a task assignment */
+  startTaskAssignment: TaskAssignment;
+  /** Unblock a task */
+  unblockTaskAssignment: TaskAssignment;
+  /** Update company settings */
+  updateCompany?: Maybe<Company>;
+  /** Update department */
+  updateDepartment: Department;
+  /** Update employee */
+  updateEmployee: Employee;
+  /** Update employee efficiency coefficient */
+  updateEmployeeEfficiency: Employee;
+  /** Update existing gap analysis */
+  updateGapAnalysis: GapAnalysis;
+  /** Update hiring plan */
+  updateHiringPlan: HiringPlan;
+  /** Track hiring progress */
+  updateHiringProgress: HiringPlan;
+  /** Update an existing process */
+  updateProcess: Process;
+  /** Update a task assignment */
+  updateTaskAssignment: TaskAssignment;
+  /** Update task progress */
+  updateTaskProgress: TaskAssignment;
 };
 
 
-export type MutationAcceptBidArgs = {
-  bidId: Scalars['ID']['input'];
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationApproveEmployeeHistoryArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationArchiveFreightArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationApproveHiringPlanArgs = {
+  approvedBy: Scalars['String']['input'];
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationCancelShipmentArgs = {
-  reason: Scalars['String']['input'];
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationArchiveAuditLogsArgs = {
+  dateRange: DateRangeInput;
 };
 
 
-export type MutationClaimFreightArgs = {
-  brokerId: Scalars['String']['input'];
-  id: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationAssignDepartmentHeadArgs = {
+  departmentId: Scalars['String']['input'];
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type MutationCreateBidArgs = {
-  input: BidInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationAssignProcessCapacityArgs = {
+  capacityUnits: Scalars['Int']['input'];
+  kMultiplier: Scalars['Float']['input'];
+  processId: Scalars['String']['input'];
 };
 
 
-export type MutationCreateBidRuleArgs = {
-  input: BidRuleInput;
-  shipmentId: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateBrokerArgs = {
-  input: CreateBrokerInput;
-};
-
-
-export type MutationCreateBrokerCarrierContractArgs = {
-  input: CreateBrokerCarrierContractInput;
-};
-
-
-export type MutationCreateBrokerRateArgs = {
-  input: CreateBrokerRateInput;
-};
-
-
-export type MutationCreateCarrierArgs = {
-  input: CreateCarrierInput;
-};
-
-
-export type MutationCreateCarrierAccessorialArgs = {
-  input: CreateCarrierAccessorialInput;
-};
-
-
-export type MutationCreateCarrierRateArgs = {
-  input: CreateCarrierRateInput;
-};
-
-
-export type MutationCreateDriverArgs = {
-  input: CreateDriverInput;
-};
-
-
-export type MutationCreateFreightArgs = {
-  input: CreateFreightInput;
-};
-
-
-export type MutationCreateFreightOwnerArgs = {
-  input: CreateFreightOwnerInput;
-};
-
-
-export type MutationCreateMaintenanceRecordArgs = {
-  input: MaintenanceInput;
-  vehicleId: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateReviewArgs = {
-  carrierId: Scalars['ID']['input'];
-  input: ReviewInput;
-};
-
-
-export type MutationCreateShipmentArgs = {
-  input: CreateShipmentInput;
-};
-
-
-export type MutationCreateShipmentDocumentArgs = {
-  input: CreateShipmentDocumentInput;
-};
-
-
-export type MutationCreateShipmentEventArgs = {
-  input: CreateShipmentEventInput;
-};
-
-
-export type MutationCreateShipmentFreightArgs = {
-  input: CreateShipmentFreightInput;
-};
-
-
-export type MutationCreateShipmentLogArgs = {
-  input: CreateShipmentLogInput;
-};
-
-
-export type MutationCreateShipmentStopArgs = {
-  input: CreateShipmentStopInput;
-};
-
-
-export type MutationCreateVehicleArgs = {
-  input: CreateVehicleInput;
-};
-
-
-export type MutationCreateWarehouseArgs = {
-  input: CreateWarehouseInput;
-};
-
-
-export type MutationDeleteBidRuleArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteVehicleArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationOpenBiddingArgs = {
-  brokerMarginPercent: Scalars['Float']['input'];
-  shipmentId: Scalars['ID']['input'];
-};
-
-
-export type MutationOverrideBidRuleComplianceArgs = {
-  bidId: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationBlockTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
   reason: Scalars['String']['input'];
 };
 
 
-export type MutationRejectBidArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationBulkLogAuditEntriesArgs = {
+  entries: Array<LogAuditEntryInput>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCancelProcessArgs = {
+  id: Scalars['String']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationReleaseFreightClaimArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCompleteProcessArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationSubmitBidArgs = {
-  input: BidInput;
-  rate: Scalars['BigInt']['input'];
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCompleteTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateBidArgs = {
-  id: Scalars['ID']['input'];
-  input: BidInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateCompanyArgs = {
+  input: CreateCompanyInput;
 };
 
 
-export type MutationUpdateBidRuleArgs = {
-  id: Scalars['ID']['input'];
-  input: BidRuleInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateCompanyLoadSnapshotsArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateBrokerArgs = {
-  id: Scalars['ID']['input'];
-  input: CreateBrokerInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateDepartmentArgs = {
+  input: CreateDepartmentInput;
 };
 
 
-export type MutationUpdateBrokerCarrierContractArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateBrokerCarrierContractInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateEmployeeArgs = {
+  input: CreateEmployeeInput;
 };
 
 
-export type MutationUpdateBrokerRateArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateBrokerRateInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateGapAnalysisArgs = {
+  input: CreateGapAnalysisInput;
 };
 
 
-export type MutationUpdateCapacityArgs = {
-  capacityKg: Scalars['Float']['input'];
-  id: Scalars['ID']['input'];
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateLoadSnapshotArgs = {
+  employeeId: Scalars['String']['input'];
+  snapshotType: SnapshotType;
+  sourceId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationUpdateCarrierArgs = {
-  id: Scalars['ID']['input'];
-  input: CreateCarrierInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateProcessArgs = {
+  input: CreateProcessInput;
 };
 
 
-export type MutationUpdateCarrierAccessorialArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateCarrierAccessorialInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateTaskAssignmentArgs = {
+  input: CreateTaskAssignmentInput;
 };
 
 
-export type MutationUpdateCarrierRateArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateCarrierRateInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeleteDepartmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateDriverArgs = {
-  id: Scalars['ID']['input'];
-  input: CreateDriverInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeleteProcessArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateDriverStatusArgs = {
-  id: Scalars['ID']['input'];
-  status: DriverStatus;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeleteTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateFreightArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateFreightInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDismissEmployeeArgs = {
+  id: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type MutationUpdateFreightOwnerArgs = {
-  id: Scalars['ID']['input'];
-  input: CreateFreightOwnerInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationExportAuditLogsArgs = {
+  filter: AuditLogFilterInput;
+  format: ExportFormat;
 };
 
 
-export type MutationUpdateReviewArgs = {
-  id: Scalars['ID']['input'];
-  input: ReviewInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationGenerateHiringPlanArgs = {
+  gapAnalysisId: Scalars['String']['input'];
+  phases?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type MutationUpdateShipmentArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateShipmentInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationLogAuditEntryArgs = {
+  input: LogAuditEntryInput;
 };
 
 
-export type MutationUpdateShipmentDocumentArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateShipmentDocumentInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationReassignTaskArgs = {
+  newEmployeeId: Scalars['String']['input'];
+  taskId: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateShipmentFreightArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateShipmentFreightInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRecordEmployeeHistoryArgs = {
+  input: RecordEmployeeHistoryInput;
 };
 
 
-export type MutationUpdateShipmentStopArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateShipmentStopInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRejectEmployeeHistoryArgs = {
+  id: Scalars['String']['input'];
+  rejectionReason: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateVehicleArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateVehicleInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationStartProcessArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateVehicleStatusArgs = {
-  id: Scalars['ID']['input'];
-  status: TruckStatus;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationStartTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type MutationUpdateWarehouseArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateWarehouseInput;
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUnblockTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
+  resolution?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateCompanyArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateCompanyInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateDepartmentArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateDepartmentInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateEmployeeArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateEmployeeInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateEmployeeEfficiencyArgs = {
+  id: Scalars['String']['input'];
+  kEfficiency: Scalars['Float']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateGapAnalysisArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateGapAnalysisInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateHiringPlanArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateHiringPlanInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateHiringProgressArgs = {
+  actualHires: Scalars['Int']['input'];
+  completedPhase?: InputMaybe<Scalars['Int']['input']>;
+  hiringPlanId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateProcessArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateProcessInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateTaskAssignmentInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateTaskProgressArgs = {
+  actualDaysSpent?: InputMaybe<Scalars['Int']['input']>;
+  completionPercentage: Scalars['Int']['input'];
+  id: Scalars['String']['input'];
 };
 
 export type Node = {
@@ -1182,888 +1563,1420 @@ export type PaginationInput = {
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type PenaltyFilterInput = {
-  shipmentId: Scalars['ID']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
-};
-
-/** Penalty payment to bidder */
-export type PenaltyPayment = Node & {
-  __typename?: 'PenaltyPayment';
-  amount: Scalars['BigInt']['output'];
-  bidId: Scalars['ID']['output'];
-  carrierId: Scalars['String']['output'];
+/** Process type representing business processes */
+export type Process = {
+  __typename?: 'Process';
+  /** Capacity configuration */
+  capacityUnits: Scalars['Int']['output'];
+  /** Relations */
+  company: Company;
+  /** Process details */
+  companyId: Scalars['String']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Timestamps */
   createdAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  status: Scalars['String']['output'];
+  /** Audit trail */
+  createdBy: Scalars['String']['output'];
+  department: Department;
+  departmentId: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  estimatedDurationDays?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['String']['output'];
+  kMultiplier: Scalars['Float']['output'];
+  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
+  name: Scalars['String']['output'];
+  priority: ProcessPriority;
+  processType: ProcessType;
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Status tracking */
+  status: ProcessStatus;
+  taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
+  updatedAt: Scalars['DateTime']['output'];
+  updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+/** Process response wrapper with pagination */
+export type ProcessConnection = {
+  __typename?: 'ProcessConnection';
+  nodes: Array<Process>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Process filter input */
+export type ProcessFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<ProcessPriority>;
+  processType?: InputMaybe<ProcessType>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<ProcessStatus>;
+};
+
+/** Process metrics for analytics */
+export type ProcessMetrics = {
+  __typename?: 'ProcessMetrics';
+  activeTaskCount: Scalars['Int']['output'];
+  averageResourcesAllocated: Scalars['Int']['output'];
+  completionRate: Scalars['Float']['output'];
+  process: Process;
+  taskCount: Scalars['Int']['output'];
+  totalCapacityRequired: Scalars['Int']['output'];
+  utilizationRate: Scalars['Float']['output'];
+};
+
+/** Pagination input for processes */
+export type ProcessPaginationInput = {
+  orderBy?: InputMaybe<ProcessSortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Process priority enumeration */
+export enum ProcessPriority {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Normal = 'NORMAL'
+}
+
+/** Process sort fields */
+export enum ProcessSortField {
+  CapacityUnits = 'CAPACITY_UNITS',
+  CreatedAt = 'CREATED_AT',
+  Name = 'NAME',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+/** Process sort input */
+export type ProcessSortInput = {
+  field: ProcessSortField;
+  order: SortOrder;
+};
+
+/** Process status enumeration */
+export enum ProcessStatus {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Draft = 'DRAFT',
+  InProgress = 'IN_PROGRESS',
+  OnHold = 'ON_HOLD',
+  Planned = 'PLANNED'
+}
+
+/** Event type for process status changes */
+export type ProcessStatusChangeEvent = {
+  __typename?: 'ProcessStatusChangeEvent';
+  changedAt: Scalars['DateTime']['output'];
+  changedBy: Scalars['String']['output'];
+  newStatus: ProcessStatus;
+  previousStatus: ProcessStatus;
+  process: Process;
+  reason?: Maybe<Scalars['String']['output']>;
+};
+
+/** Process type enumeration */
+export enum ProcessType {
+  Audit = 'AUDIT',
+  Compliance = 'COMPLIANCE',
+  Maintenance = 'MAINTENANCE',
+  Offboarding = 'OFFBOARDING',
+  Onboarding = 'ONBOARDING',
+  Other = 'OTHER',
+  PerformanceReview = 'PERFORMANCE_REVIEW',
+  ProjectDelivery = 'PROJECT_DELIVERY',
+  Recruitment = 'RECRUITMENT',
+  Training = 'TRAINING'
+}
+
+/** Quarterly hiring projection */
+export type QuarterlyProjection = {
+  __typename?: 'QuarterlyProjection';
+  estimatedCost: Scalars['Int']['output'];
+  projectedHires: Scalars['Int']['output'];
+  quarter: Scalars['String']['output'];
+  targetTalentGrades: Array<Scalars['String']['output']>;
+};
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type Query = {
   __typename?: 'Query';
-  /** Placeholder for resolver queries */
-  _empty?: Maybe<Scalars['String']['output']>;
-  /** Get single audit log entry */
-  getAuditLog?: Maybe<ShipmentLog>;
-  /** Get bid by ID */
-  getBid?: Maybe<ShipmentBid>;
-  /** Get bid rules for shipment */
-  getBidRules: Array<BidRule>;
-  getBroker?: Maybe<Broker>;
-  getBrokerCarrierContract?: Maybe<BrokerCarrierContract>;
-  getBrokerRate?: Maybe<BrokerRate>;
-  /**
-   * Rule #7: Get cancellation fee for shipment
-   * POSTED: $0
-   * BIDDING_OPEN: 5% fee
-   * BID_SELECTED: 10% fee
-   */
-  getCancellationFee?: Maybe<CancellationFee>;
-  /**
-   * Get carrier by ID
-   * Rule #10: Visible Assignment - broker/owner can see carrier details
-   */
-  getCarrier?: Maybe<Carrier>;
-  getCarrierAccessorial?: Maybe<CarrierAccessorial>;
-  /** Rule #10: Visible Assignment - get carrier average rating */
-  getCarrierAverageRating: CarrierRating;
-  getCarrierRate?: Maybe<CarrierRate>;
-  /** Get compliance status for carrier */
-  getComplianceStatus?: Maybe<ComplianceStatus>;
-  getDriver?: Maybe<Driver>;
-  /** Get freight by ID */
-  getFreight?: Maybe<Freight>;
-  /** Get freight audit trail */
-  getFreightAuditTrail: AuditTrailConnection;
-  /** Get freight by freight number */
-  getFreightByNumber?: Maybe<Freight>;
-  getFreightOwner?: Maybe<FreightOwner>;
-  /** Get maintenance record by ID */
-  getMaintenanceRecord?: Maybe<MaintenanceRecord>;
-  /**
-   * Get penalty distribution breakdown
-   * Shows each bidder's compensation if cancelled
-   */
-  getPenaltyDistribution: Array<PenaltyPayment>;
-  /** Get review by ID */
-  getReview?: Maybe<Review>;
-  /** Get shipment by ID */
-  getShipment?: Maybe<Shipment>;
-  /** Rule #9: Get complete audit trail for shipment (immutable, append-only) */
-  getShipmentAuditTrail: AuditTrailConnection;
-  /** Get shipment by shipment number */
-  getShipmentByNumber?: Maybe<Shipment>;
-  getShipmentDocument?: Maybe<ShipmentDocument>;
-  getShipmentEvent?: Maybe<ShipmentEvent>;
-  getShipmentFreight?: Maybe<ShipmentFreight>;
-  getShipmentLog?: Maybe<ShipmentLog>;
-  getShipmentStop?: Maybe<ShipmentStop>;
-  getVehicle?: Maybe<Vehicle>;
-  getWarehouse?: Maybe<Warehouse>;
-  /** List all audit logs with pagination */
-  listAuditLogs: AuditLogConnection;
-  /**
-   * List available freights (status = AVAILABLE)
-   * Rule #1: Used by brokers to find cargo to claim
-   */
-  listAvailableFreights: FreightConnection;
-  /** List all bids */
-  listBids: BidConnection;
-  /** List bids submitted by carrier */
-  listBidsForCarrier: BidConnection;
-  /** Rule #4: List bids for shipment (all visible with compliance status) */
-  listBidsForShipment: BidConnection;
-  listBrokerCarrierContracts: BrokerCarrierContractConnection;
-  listBrokerRates: BrokerRateConnection;
-  listBrokers: BrokerConnection;
-  /** List all cancellation fees */
-  listCancellationFees: CancellationFeeConnection;
-  listCarrierAccessorials: CarrierAccessorialConnection;
-  listCarrierRates: CarrierRateConnection;
-  /** List all carriers with pagination */
-  listCarriers: CarrierConnection;
-  /** List carriers by minimum rating */
-  listCarriersByRating: CarrierConnection;
-  /** List all compliance issues */
-  listComplianceIssues: ComplianceIssueConnection;
-  listDrivers: DriverConnection;
-  listDriversByCarrier: DriverConnection;
-  listFreightOwners: FreightOwnerConnection;
-  /** List all freights with pagination */
-  listFreights: FreightConnection;
-  /** List maintenance history for vehicle */
-  listMaintenanceHistory: MaintenanceConnection;
-  /** List all reviews */
-  listReviews: ReviewConnection;
-  /** List reviews for carrier */
-  listReviewsForCarrier: ReviewConnection;
-  listShipmentDocuments: ShipmentDocumentConnection;
-  listShipmentEvents: ShipmentEventConnection;
-  listShipmentFreights: ShipmentFreightConnection;
-  listShipmentLogs: ShipmentLogConnection;
-  listShipmentStops: ShipmentStopConnection;
-  /** List all shipments with pagination */
-  listShipments: ShipmentConnection;
-  /** List shipments by broker (owner's perspective) */
-  listShipmentsByBroker: ShipmentConnection;
-  /** List shipments by carrier (bidding/assigned) */
-  listShipmentsByCarrier: ShipmentConnection;
-  listVehicles: VehicleConnection;
-  listVehiclesByCarrier: VehicleConnection;
-  listWarehouses: WarehouseConnection;
+  /** Get audit log entry by ID */
+  auditLog?: Maybe<AuditLog>;
+  /** List audit logs with filtering */
+  auditLogs: AuditLogConnection;
+  /** Get blocked tasks */
+  blockedTasks: Array<TaskAssignment>;
+  /** Get all changes by a specific user */
+  changesBy: Array<EmployeeHistory>;
+  /** Get all companies (admin only) */
+  companies?: Maybe<Array<Maybe<Company>>>;
+  /** Get company by ID */
+  company?: Maybe<Company>;
+  /** Get company-wide load analysis */
+  companyLoadAnalysis: CompanyLoadAnalysis;
+  /** Get processes by company with metrics */
+  companyProcessMetrics: Array<ProcessMetrics>;
+  /** Get compliance report */
+  complianceReport: ComplianceReport;
+  /** Get data access audit */
+  dataAccessAudit: Array<AuditLog>;
+  /** Get department by ID */
+  department?: Maybe<Department>;
+  /** Get department employee history summary */
+  departmentEmployeeHistory: DepartmentEmployeeHistory;
+  /** Get employees in specific department */
+  departmentEmployees: Array<Employee>;
+  /** Compare gaps across departments */
+  departmentGapComparison: Array<DepartmentGapComparison>;
+  /** Get department load overview */
+  departmentLoadOverview: DepartmentLoadOverview;
+  /** List processes by department */
+  departmentProcesses: Array<Process>;
+  /** Get load snapshots by department */
+  departmentSnapshots: Array<LoadSnapshot>;
+  /** Get department with all employees and load metrics */
+  departmentWithMetrics?: Maybe<DepartmentMetrics>;
+  /** Get all departments for company */
+  departments: DepartmentListResponse;
+  /** Get employee by ID */
+  employee?: Maybe<Employee>;
+  /** Get audit report for employee */
+  employeeAuditReport: EmployeeAuditReport;
+  /** Get employee capacity metrics */
+  employeeCapacity: Scalars['Float']['output'];
+  /** Get history for a specific employee */
+  employeeChangeHistory: Array<EmployeeHistory>;
+  /** List employee history records with filtering and pagination */
+  employeeHistories: EmployeeHistoryConnection;
+  /** Get single employee history record by ID */
+  employeeHistory?: Maybe<EmployeeHistory>;
+  /** Get employee history entry by ID */
+  employeeHistoryEntry?: Maybe<EmployeeHistory>;
+  /** Get full history for an employee (alternative) */
+  employeeHistoryList: EmployeeHistoryConnection;
+  /** Get employee load index */
+  employeeLoadIndex: Scalars['Float']['output'];
+  /** Get employee load trend */
+  employeeLoadTrend: EmployeeLoadHistory;
+  /** Get employee task statistics */
+  employeeTaskStats: EmployeeTaskStats;
+  /** Get tasks assigned to an employee */
+  employeeTasks: Array<TaskAssignment>;
+  /** Get employee timeline */
+  employeeTimeline: Array<EmployeeTimelineEntry>;
+  /** Get employees with optional filters */
+  employees: EmployeeConnection;
+  /** Get entity audit trail */
+  entityAuditTrail: EntityAuditTrail;
+  /** Check failed login attempts */
+  failedLoginAttempts: Array<AuditLog>;
+  /** List gap analyses with filtering */
+  gapAnalyses: GapAnalysisConnection;
+  /** Get gap analysis by ID */
+  gapAnalysis?: Maybe<GapAnalysis>;
+  /** Get gap trend over time */
+  gapAnalysisTrend: Array<GapTrend>;
+  /** Get criticality assessment */
+  gapCriticalityAssessment: GapCriticalityAssessment;
+  /** Get grade by ID */
+  grade?: Maybe<Grade>;
+  /** Get grade with employee count */
+  gradeWithStats?: Maybe<GradeStats>;
+  /** Get all grades */
+  grades: Array<Grade>;
+  /** Health check endpoint */
+  health: Scalars['String']['output'];
+  /** Get hiring forecast from latest gap analysis */
+  hiringForecast?: Maybe<HiringForecast>;
+  /** Get latest gap analysis for company */
+  latestCompanyGapAnalysis?: Maybe<GapAnalysis>;
+  /** Get latest gap analysis for department */
+  latestDepartmentGapAnalysis?: Maybe<GapAnalysis>;
+  /** Get latest load snapshot for employee */
+  latestEmployeeSnapshot?: Maybe<LoadSnapshot>;
+  /** Find employees requiring load adjustment */
+  loadAnomalies: Array<LoadSnapshot>;
+  /** Get load snapshot by ID */
+  loadSnapshot?: Maybe<LoadSnapshot>;
+  /** List load snapshots with filtering */
+  loadSnapshots: LoadSnapshotConnection;
   me?: Maybe<User>;
-  searchBrokers: BrokerConnection;
-  /**
-   * Search carriers by specializations, capacity, rating
-   * Rule #10: Visible Assignment - show rating to all
-   */
-  searchCarriers: CarrierConnection;
-  searchWarehouses: WarehouseConnection;
+  /** Get authenticated user's company */
+  myCompany?: Maybe<Company>;
+  /** Get overdue tasks */
+  overdueTasks: Array<TaskAssignment>;
+  /** Get process by ID */
+  process?: Maybe<Process>;
+  /** Get tasks in a process */
+  processTasks: Array<TaskAssignment>;
+  /** Get process with metrics for analytics */
+  processWithMetrics?: Maybe<ProcessMetrics>;
+  /** List all processes with filtering and pagination */
+  processes: ProcessConnection;
+  /** Get security incident report */
+  securityIncidentReport: SecurityIncidentReport;
+  /** Find suspicious activities */
+  suspiciousActivities: Array<AuditLog>;
+  /** Get task assignment by ID */
+  taskAssignment?: Maybe<TaskAssignment>;
+  /** List all task assignments with filtering and pagination */
+  taskAssignments: TaskAssignmentConnection;
+  /** Get task with detailed metrics */
+  taskWithMetrics?: Maybe<TaskAssignmentMetrics>;
+  /** Find unapproved changes */
+  unapprovedChanges: Array<EmployeeHistory>;
+  /** Get user activity summary */
+  userActivitySummary: UserActivitySummary;
   users: UsersResult;
 };
 
 
-export type QueryGetAuditLogArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryAuditLogArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetBidArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryAuditLogsArgs = {
+  filter: AuditLogFilterInput;
+  pagination?: InputMaybe<AuditLogPaginationInput>;
 };
 
 
-export type QueryGetBidRulesArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryBlockedTasksArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryGetBrokerArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryChangesByArgs = {
+  dateRange?: InputMaybe<DateRangeInput>;
+  userId: Scalars['String']['input'];
 };
 
 
-export type QueryGetBrokerCarrierContractArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryCompanyArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetBrokerRateArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryCompanyLoadAnalysisArgs = {
+  companyId: Scalars['String']['input'];
+  dateRange?: InputMaybe<DateRangeInput>;
 };
 
 
-export type QueryGetCancellationFeeArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryCompanyProcessMetricsArgs = {
+  companyId: Scalars['String']['input'];
+  filter?: InputMaybe<ProcessFilterInput>;
 };
 
 
-export type QueryGetCarrierArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryComplianceReportArgs = {
+  companyId: Scalars['String']['input'];
+  dateRange: DateRangeInput;
 };
 
 
-export type QueryGetCarrierAccessorialArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDataAccessAuditArgs = {
+  companyId: Scalars['String']['input'];
+  dateRange?: InputMaybe<DateRangeInput>;
 };
 
 
-export type QueryGetCarrierAverageRatingArgs = {
-  carrierId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetCarrierRateArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentEmployeeHistoryArgs = {
+  dateRange: DateRangeInput;
+  departmentId: Scalars['String']['input'];
 };
 
 
-export type QueryGetComplianceStatusArgs = {
-  carrierId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentEmployeesArgs = {
+  departmentId: Scalars['String']['input'];
 };
 
 
-export type QueryGetDriverArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentGapComparisonArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type QueryGetFreightArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentLoadOverviewArgs = {
+  departmentId: Scalars['String']['input'];
+  snapshotDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
-export type QueryGetFreightAuditTrailArgs = {
-  freightId: Scalars['ID']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentProcessesArgs = {
+  departmentId: Scalars['String']['input'];
+  status?: InputMaybe<ProcessStatus>;
 };
 
 
-export type QueryGetFreightByNumberArgs = {
-  number: Scalars['String']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentSnapshotsArgs = {
+  departmentId: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type QueryGetFreightOwnerArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentWithMetricsArgs = {
+  id: Scalars['String']['input'];
+  periodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  periodStart?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
-export type QueryGetMaintenanceRecordArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentsArgs = {
+  filter: DepartmentFilterInput;
 };
 
 
-export type QueryGetPenaltyDistributionArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetReviewArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeAuditReportArgs = {
+  dateRange: DateRangeInput;
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type QueryGetShipmentArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeCapacityArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetShipmentAuditTrailArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeChangeHistoryArgs = {
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type QueryGetShipmentByNumberArgs = {
-  number: Scalars['String']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoriesArgs = {
+  filter?: InputMaybe<EmployeeHistoryFilterInput>;
+  pagination?: InputMaybe<EmployeeHistoryPaginationInput>;
 };
 
 
-export type QueryGetShipmentDocumentArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoryArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetShipmentEventArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoryEntryArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryGetShipmentFreightArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeHistoryListArgs = {
+  employeeId: Scalars['String']['input'];
+  filter?: InputMaybe<EmployeeHistoryFilterInput>;
+  pagination?: InputMaybe<EmployeeHistoryPaginationInput>;
 };
 
 
-export type QueryGetShipmentLogArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeLoadIndexArgs = {
+  id: Scalars['String']['input'];
+  periodEnd: Scalars['DateTime']['input'];
+  periodStart: Scalars['DateTime']['input'];
 };
 
 
-export type QueryGetShipmentStopArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeLoadTrendArgs = {
+  dateRange: DateRangeInput;
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type QueryGetVehicleArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeTaskStatsArgs = {
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type QueryGetWarehouseArgs = {
-  id: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeTasksArgs = {
+  employeeId: Scalars['String']['input'];
+  status?: InputMaybe<TaskStatus>;
 };
 
 
-export type QueryListAuditLogsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeeTimelineArgs = {
+  employeeId: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type QueryListAvailableFreightsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEmployeesArgs = {
+  filter?: InputMaybe<EmployeeFilterInput>;
+  pagination?: InputMaybe<EmployeePaginationInput>;
 };
 
 
-export type QueryListBidsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryEntityAuditTrailArgs = {
+  entityId: Scalars['String']['input'];
+  entityType: Scalars['String']['input'];
 };
 
 
-export type QueryListBidsForCarrierArgs = {
-  carrierId: Scalars['String']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFailedLoginAttemptsArgs = {
+  dateRange?: InputMaybe<DateRangeInput>;
 };
 
 
-export type QueryListBidsForShipmentArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGapAnalysesArgs = {
+  filter?: InputMaybe<GapAnalysisFilterInput>;
+  pagination?: InputMaybe<GapAnalysisPaginationInput>;
 };
 
 
-export type QueryListBrokerCarrierContractsArgs = {
-  brokerId?: InputMaybe<Scalars['ID']['input']>;
-  carrierId?: InputMaybe<Scalars['ID']['input']>;
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGapAnalysisArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListBrokerRatesArgs = {
-  contractId: Scalars['ID']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGapAnalysisTrendArgs = {
+  companyId: Scalars['String']['input'];
+  dateRange: DateRangeInput;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryListBrokersArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGapCriticalityAssessmentArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type QueryListCancellationFeesArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGradeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
-export type QueryListCarrierAccessorialsArgs = {
-  carrierId: Scalars['ID']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryGradeWithStatsArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
-export type QueryListCarrierRatesArgs = {
-  carrierId: Scalars['ID']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryHiringForecastArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type QueryListCarriersArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLatestCompanyGapAnalysisArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type QueryListCarriersByRatingArgs = {
-  input: PaginationInput;
-  minRating: Scalars['Float']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLatestDepartmentGapAnalysisArgs = {
+  departmentId: Scalars['String']['input'];
 };
 
 
-export type QueryListComplianceIssuesArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLatestEmployeeSnapshotArgs = {
+  employeeId: Scalars['String']['input'];
 };
 
 
-export type QueryListDriversArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLoadAnomaliesArgs = {
+  companyId: Scalars['String']['input'];
+  threshold?: InputMaybe<Scalars['Float']['input']>;
 };
 
 
-export type QueryListDriversByCarrierArgs = {
-  carrierId: Scalars['String']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLoadSnapshotArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListFreightOwnersArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryLoadSnapshotsArgs = {
+  filter: LoadSnapshotFilterInput;
+  pagination?: InputMaybe<LoadSnapshotPaginationInput>;
 };
 
 
-export type QueryListFreightsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryOverdueTasksArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryListMaintenanceHistoryArgs = {
-  input: PaginationInput;
-  vehicleId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryProcessArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListReviewsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryProcessTasksArgs = {
+  processId: Scalars['String']['input'];
+  status?: InputMaybe<TaskStatus>;
 };
 
 
-export type QueryListReviewsForCarrierArgs = {
-  carrierId: Scalars['String']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryProcessWithMetricsArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListShipmentDocumentsArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryProcessesArgs = {
+  filter?: InputMaybe<ProcessFilterInput>;
+  pagination?: InputMaybe<ProcessPaginationInput>;
 };
 
 
-export type QueryListShipmentEventsArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QuerySecurityIncidentReportArgs = {
+  companyId: Scalars['String']['input'];
+  dateRange: DateRangeInput;
 };
 
 
-export type QueryListShipmentFreightsArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QuerySuspiciousActivitiesArgs = {
+  companyId: Scalars['String']['input'];
+  threshold?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type QueryListShipmentLogsArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryTaskAssignmentArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListShipmentStopsArgs = {
-  input: PaginationInput;
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryTaskAssignmentsArgs = {
+  filter?: InputMaybe<TaskAssignmentFilterInput>;
+  pagination?: InputMaybe<TaskAssignmentPaginationInput>;
 };
 
 
-export type QueryListShipmentsArgs = {
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryTaskWithMetricsArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryListShipmentsByBrokerArgs = {
-  brokerId: Scalars['String']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryUnapprovedChangesArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QueryListShipmentsByCarrierArgs = {
-  carrierId: Scalars['String']['input'];
-  input: PaginationInput;
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryUserActivitySummaryArgs = {
+  dateRange: DateRangeInput;
+  userId: Scalars['String']['input'];
 };
 
 
-export type QueryListVehiclesArgs = {
-  input: PaginationInput;
-};
-
-
-export type QueryListVehiclesByCarrierArgs = {
-  carrierId: Scalars['String']['input'];
-  input: PaginationInput;
-};
-
-
-export type QueryListWarehousesArgs = {
-  input: PaginationInput;
-};
-
-
-export type QuerySearchBrokersArgs = {
-  input: PaginationInput;
-  rating?: InputMaybe<Scalars['Float']['input']>;
-  specializations?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-
-export type QuerySearchCarriersArgs = {
-  capacity?: InputMaybe<Scalars['Int']['input']>;
-  input: PaginationInput;
-  rating?: InputMaybe<Scalars['Float']['input']>;
-  specializations?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-
-export type QuerySearchWarehousesArgs = {
-  capacity?: InputMaybe<Scalars['Float']['input']>;
-  input: PaginationInput;
-  location?: InputMaybe<Scalars['String']['input']>;
-};
-
-
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryUsersArgs = {
   input: UsersInput;
 };
 
-export type Review = Node & {
-  __typename?: 'Review';
-  carrier: Carrier;
-  carrierId: Scalars['String']['output'];
-  comment: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  rating: Scalars['Float']['output'];
-  shippmentId?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type ReviewConnection = {
-  __typename?: 'ReviewConnection';
-  items: Array<Review>;
-  pageInfo: PageInfo;
-};
-
-export type ReviewInput = {
-  comment: Scalars['String']['input'];
-  rating: Scalars['Float']['input'];
-};
-
-export enum RuleType {
-  AccessHours = 'ACCESS_HOURS',
-  CapacityMatch = 'CAPACITY_MATCH',
-  EarlyConfirm = 'EARLY_CONFIRM',
-  HazmatCertified = 'HAZMAT_CERTIFIED',
-  HosClean = 'HOS_CLEAN',
-  InsuranceAmount = 'INSURANCE_AMOUNT',
-  LocationProximity = 'LOCATION_PROXIMITY',
-  TemperatureControl = 'TEMPERATURE_CONTROL',
-  VehicleAge = 'VEHICLE_AGE'
+/** Recommendation priority */
+export enum RecommendationPriority {
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM',
+  Urgent = 'URGENT'
 }
 
-/**
- * Main orchestrator coordinating freight movement and bidding
- * Phases 2-11: Broker creates, opens bidding, selects carrier/warehouse, executes
- */
-export type Shipment = Node & {
-  __typename?: 'Shipment';
-  acceptedBidId?: Maybe<Scalars['String']['output']>;
-  actualCost?: Maybe<Scalars['BigInt']['output']>;
-  actualMargin?: Maybe<Scalars['BigInt']['output']>;
-  actualOD?: Maybe<Scalars['Float']['output']>;
-  actualRevenue?: Maybe<Scalars['BigInt']['output']>;
-  baseRate?: Maybe<Scalars['BigInt']['output']>;
-  biddingOpenUntil?: Maybe<Scalars['DateTime']['output']>;
-  biddingOpenedAt?: Maybe<Scalars['DateTime']['output']>;
-  bids: Array<ShipmentBid>;
-  broker: Broker;
-  brokerId: Scalars['String']['output'];
-  brokerMarginAmount?: Maybe<Scalars['BigInt']['output']>;
-  brokerMarginPercent: Scalars['Float']['output'];
-  cancelledAt?: Maybe<Scalars['DateTime']['output']>;
-  carrier?: Maybe<Carrier>;
-  carrierId?: Maybe<Scalars['String']['output']>;
-  carrierRate?: Maybe<Scalars['BigInt']['output']>;
-  confirmedAt?: Maybe<Scalars['DateTime']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  customerRate?: Maybe<Scalars['BigInt']['output']>;
-  deliveredAt?: Maybe<Scalars['DateTime']['output']>;
-  deliveryActual?: Maybe<Scalars['DateTime']['output']>;
-  deliveryScheduled: Scalars['DateTime']['output'];
-  destinationWarehouse?: Maybe<Warehouse>;
-  destinationWarehouseId?: Maybe<Scalars['String']['output']>;
-  distance?: Maybe<Scalars['Float']['output']>;
-  driver?: Maybe<Driver>;
-  driverId?: Maybe<Scalars['String']['output']>;
-  estimatedCost?: Maybe<Scalars['BigInt']['output']>;
-  estimatedMargin?: Maybe<Scalars['BigInt']['output']>;
-  estimatedOD?: Maybe<Scalars['Float']['output']>;
-  estimatedRevenue?: Maybe<Scalars['BigInt']['output']>;
-  events: Array<ShipmentEvent>;
-  freights: Array<Freight>;
-  fuelSurcharge: Scalars['Float']['output'];
-  fuelSurchargeAmount: Scalars['BigInt']['output'];
-  id: Scalars['ID']['output'];
-  marketAdjustment: Scalars['BigInt']['output'];
-  originWarehouse: Warehouse;
-  originWarehouseId: Scalars['String']['output'];
-  owner: FreightOwner;
-  ownerBudget?: Maybe<Scalars['BigInt']['output']>;
-  ownerId: Scalars['String']['output'];
-  pickedUpAt?: Maybe<Scalars['DateTime']['output']>;
-  pickupActual?: Maybe<Scalars['DateTime']['output']>;
-  pickupScheduled: Scalars['DateTime']['output'];
-  poNumber?: Maybe<Scalars['String']['output']>;
-  referenceNumbers: Array<Scalars['String']['output']>;
-  shipmentNumber: Scalars['String']['output'];
-  specialInstructions?: Maybe<Scalars['String']['output']>;
-  status: ShipmentStatus;
-  surchargeRate: Scalars['BigInt']['output'];
-  truck?: Maybe<Vehicle>;
-  truckId?: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-/**
- * Shipment bid from carrier
- * Rule #4: Bid Rules Auto-Validation - auto-checked against requirements
- */
-export type ShipmentBid = Node & {
-  __typename?: 'ShipmentBid';
-  carrier: Carrier;
-  carrierId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  estimatedDeliveryDate?: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['ID']['output'];
-  insuranceAmount?: Maybe<Scalars['BigInt']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  rate: Scalars['BigInt']['output'];
-  remarks?: Maybe<Scalars['String']['output']>;
-  ruleComplianceStatus: BidStatus;
-  shipment: Shipment;
-  shipmentId: Scalars['ID']['output'];
-  status: BidStatus;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type ShipmentConnection = {
-  __typename?: 'ShipmentConnection';
-  items: Array<Shipment>;
-  pageInfo: PageInfo;
-};
-
-export type ShipmentDocument = Node & {
-  __typename?: 'ShipmentDocument';
-  createdAt: Scalars['DateTime']['output'];
-  documentNumber?: Maybe<Scalars['String']['output']>;
-  documentType: Scalars['String']['output'];
-  expiresAt?: Maybe<Scalars['DateTime']['output']>;
-  expiryDate?: Maybe<Scalars['DateTime']['output']>;
-  fileName: Scalars['String']['output'];
-  fileSize?: Maybe<Scalars['Int']['output']>;
-  fileUrl: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  issueDate?: Maybe<Scalars['DateTime']['output']>;
-  shipment: Shipment;
-  uploadedAt: Scalars['DateTime']['output'];
-  verified: Scalars['Boolean']['output'];
-  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
-  verifiedBy?: Maybe<Scalars['String']['output']>;
-};
-
-export type ShipmentDocumentConnection = {
-  __typename?: 'ShipmentDocumentConnection';
-  items: Array<ShipmentDocument>;
-  pageInfo: PageInfo;
-};
-
-export type ShipmentEvent = Node & {
-  __typename?: 'ShipmentEvent';
-  actionDate?: Maybe<Scalars['DateTime']['output']>;
-  actionTaken?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  eventCode: Scalars['String']['output'];
-  eventDescription: Scalars['String']['output'];
-  eventTime: Scalars['DateTime']['output'];
-  id: Scalars['ID']['output'];
-  requiresAction: Scalars['Boolean']['output'];
-  severity: Scalars['String']['output'];
-  shipment: Shipment;
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-export type ShipmentEventConnection = {
-  __typename?: 'ShipmentEventConnection';
-  items: Array<ShipmentEvent>;
-  pageInfo: PageInfo;
-};
-
-export type ShipmentFreight = Node & {
-  __typename?: 'ShipmentFreight';
-  createdAt: Scalars['DateTime']['output'];
-  deliveredAt?: Maybe<Scalars['DateTime']['output']>;
-  freight: Freight;
-  id: Scalars['ID']['output'];
-  pickedUpAt?: Maybe<Scalars['DateTime']['output']>;
-  sequenceNumber: Scalars['Int']['output'];
-  shipment: Shipment;
-};
-
-export type ShipmentFreightConnection = {
-  __typename?: 'ShipmentFreightConnection';
-  items: Array<ShipmentFreight>;
-  pageInfo: PageInfo;
-};
-
-export type ShipmentLog = Node & {
-  __typename?: 'ShipmentLog';
-  createdAt: Scalars['DateTime']['output'];
-  deviceId?: Maybe<Scalars['String']['output']>;
-  eventTime: Scalars['DateTime']['output'];
-  eventType: Scalars['String']['output'];
-  fuelLevel?: Maybe<Scalars['String']['output']>;
-  humidity?: Maybe<Scalars['Float']['output']>;
-  id: Scalars['ID']['output'];
-  latitude?: Maybe<Scalars['Float']['output']>;
-  location?: Maybe<Scalars['String']['output']>;
-  longitude?: Maybe<Scalars['Float']['output']>;
-  mileage?: Maybe<Scalars['Float']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  shipment: Shipment;
-  temperature?: Maybe<Scalars['Float']['output']>;
-};
-
-export type ShipmentLogConnection = {
-  __typename?: 'ShipmentLogConnection';
-  items: Array<ShipmentLog>;
-  pageInfo: PageInfo;
-};
-
-/**
- * Shipment status progression
- * DRAFT → POSTED → BIDDING_OPEN → BIDS_RECEIVED → BID_SELECTED → ASSIGNED → IN_TRANSIT → DELIVERED → COMPLETED
- */
-export enum ShipmentStatus {
-  Assigned = 'ASSIGNED',
-  BiddingOpen = 'BIDDING_OPEN',
-  BidsReceived = 'BIDS_RECEIVED',
-  BidSelected = 'BID_SELECTED',
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Delivered = 'DELIVERED',
-  Disputed = 'DISPUTED',
-  Draft = 'DRAFT',
-  InTransit = 'IN_TRANSIT',
-  Posted = 'POSTED'
+/** Recommendation type */
+export enum RecommendationType {
+  AccelerateHiring = 'ACCELERATE_HIRING',
+  ExtendTimeline = 'EXTEND_TIMELINE',
+  OptimizeAllocation = 'OPTIMIZE_ALLOCATION',
+  RedistributeWorkload = 'REDISTRIBUTE_WORKLOAD',
+  ReduceScope = 'REDUCE_SCOPE'
 }
 
-export type ShipmentStatusEvent = {
-  __typename?: 'ShipmentStatusEvent';
-  newStatus: ShipmentStatus;
-  oldStatus: ShipmentStatus;
-  shipmentId: Scalars['ID']['output'];
+/** Input for recording employee history */
+export type RecordEmployeeHistoryInput = {
+  changeType: EmployeeChangeType;
+  changedField?: InputMaybe<Scalars['String']['input']>;
+  comment?: InputMaybe<Scalars['String']['input']>;
+  effectiveDate?: InputMaybe<Scalars['DateTime']['input']>;
+  employeeId: Scalars['String']['input'];
+  fromStatus?: InputMaybe<EmploymentStatus>;
+  newValue?: InputMaybe<Scalars['JSON']['input']>;
+  previousValue?: InputMaybe<Scalars['JSON']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
+  toStatus?: InputMaybe<EmploymentStatus>;
+};
+
+/** Risk activity event */
+export type RiskActivityEvent = {
+  __typename?: 'RiskActivityEvent';
+  log: AuditLog;
+  reason: Scalars['String']['output'];
+  riskScore: Scalars['Int']['output'];
   timestamp: Scalars['DateTime']['output'];
 };
 
-export type ShipmentStop = Node & {
-  __typename?: 'ShipmentStop';
-  address?: Maybe<Scalars['String']['output']>;
-  arrivedAt?: Maybe<Scalars['DateTime']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  departedAt?: Maybe<Scalars['DateTime']['output']>;
-  duration?: Maybe<Scalars['Int']['output']>;
-  id: Scalars['ID']['output'];
-  latitude?: Maybe<Scalars['Float']['output']>;
-  longitude?: Maybe<Scalars['Float']['output']>;
-  notes?: Maybe<Scalars['String']['output']>;
-  sequenceNumber: Scalars['Int']['output'];
-  shipment: Shipment;
-  stopType: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  warehouse?: Maybe<Warehouse>;
+/** Security incident */
+export type SecurityIncident = {
+  __typename?: 'SecurityIncident';
+  affectedUsers: Scalars['Int']['output'];
+  description: Scalars['String']['output'];
+  detectedAt: Scalars['DateTime']['output'];
+  involvedLogs: Array<AuditLog>;
+  resolution?: Maybe<Scalars['String']['output']>;
+  severity: IncidentSeverity;
+  type: Scalars['String']['output'];
 };
 
-export type ShipmentStopConnection = {
-  __typename?: 'ShipmentStopConnection';
-  items: Array<ShipmentStop>;
-  pageInfo: PageInfo;
+/** Security incident event */
+export type SecurityIncidentEvent = {
+  __typename?: 'SecurityIncidentEvent';
+  detectedAt: Scalars['DateTime']['output'];
+  incident: SecurityIncident;
+  requiresImmediateAction: Scalars['Boolean']['output'];
 };
+
+/** Security incident report */
+export type SecurityIncidentReport = {
+  __typename?: 'SecurityIncidentReport';
+  /** Prevention metrics */
+  blockedAttempts: Scalars['Int']['output'];
+  company: Company;
+  failedAuthAttempts: Scalars['Int']['output'];
+  generatedAt: Scalars['DateTime']['output'];
+  incidents: Array<SecurityIncident>;
+  period: DateRange;
+  suspiciousBehavior: Scalars['Int']['output'];
+  /** Incidents */
+  totalIncidents: Scalars['Int']['output'];
+};
+
+/** Snapshot type enumeration */
+export enum SnapshotType {
+  EmployeeUpdate = 'EMPLOYEE_UPDATE',
+  OnDemand = 'ON_DEMAND',
+  ProcessCompletion = 'PROCESS_COMPLETION',
+  ProcessStart = 'PROCESS_START',
+  Scheduled = 'SCHEDULED',
+  TaskAllocation = 'TASK_ALLOCATION',
+  TaskCompletion = 'TASK_COMPLETION'
+}
 
 export enum SortOrder {
   Asc = 'ASC',
   Desc = 'DESC'
 }
 
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
 export type Subscription = {
   __typename?: 'Subscription';
-  /** Placeholder for resolver subscriptions */
-  _empty?: Maybe<Scalars['String']['output']>;
-  /** Real-time: Bid accepted */
-  bidAccepted: BidAcceptedEvent;
+  /** Placeholder - replaced by domain subscriptions */
+  _placeholder?: Maybe<Scalars['String']['output']>;
+  /** Subscribe to audit log entries */
+  auditLogCreated: AuditLog;
+  /** Subscribe to new departments */
+  departmentCreated: Department;
+  /** Subscribe to department changes */
+  departmentUpdated: Department;
   /**
-   * Real-time: New bid received
-   * Rule #4: Bid Rules Auto-Validation - bid visible with compliance status
+   * Subscribe to employee capacity changes
+   * Fires when capacity allocation changes for a specific employee
    */
-  bidReceived: BidReceivedEvent;
+  employeeCapacityChanged: Employee;
+  /** Subscribe to employee changes */
+  employeeChanged: EmployeeHistory;
   /**
-   * Real-time: New bid received on shipment
-   * Rule #4: Compliance status included
+   * Subscribe to new employee creation
+   * Can subscribe to department-specific or company-wide
    */
-  newBidReceived: ShipmentBid;
-  /** Real-time: Shipment status changes */
-  shipmentStatusChanged: ShipmentStatusEvent;
+  employeeCreated: Employee;
+  /**
+   * Subscribe to employee dismissals
+   * Can subscribe to department-specific or company-wide
+   */
+  employeeDismissed: Employee;
+  /**
+   * Subscribe to employee load threshold events
+   * Fires when employee load crosses a specified threshold
+   */
+  employeeLoadThresholdCrossed: Employee;
+  /** Subscribe to status changes */
+  employeeStatusChanged: EmployeeStatusChangeEvent;
+  /**
+   * Subscribe to employee changes (updates)
+   * Can subscribe to all updates if no departmentId provided
+   */
+  employeeUpdated: Employee;
+  /** Subscribe to gap analysis updates */
+  gapAnalysisUpdated: GapAnalysis;
+  /** Subscribe to gap threshold events */
+  gapThresholdCrossed: GapThresholdEvent;
+  /** Subscribe to load threshold events */
+  loadThresholdCrossed: LoadThresholdEvent;
+  /** Subscribe to new process creation */
+  processCreated: Process;
+  /** Subscribe to process status changes */
+  processStatusChanged: ProcessStatusChangeEvent;
+  /** Subscribe to process updates */
+  processUpdated: Process;
+  /** Subscribe to high-risk activities */
+  riskActivityDetected: RiskActivityEvent;
+  /** Subscribe to security incidents */
+  securityIncidentDetected: SecurityIncidentEvent;
+  /** Subscribe to task assignment updates */
+  taskAssignmentUpdated: TaskAssignment;
+  /** Subscribe to new task creation */
+  taskCreated: TaskAssignment;
+  /** Subscribe to task status changes */
+  taskStatusChanged: TaskStatusChangeEvent;
 };
 
 
-export type SubscriptionBidAcceptedArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionAuditLogCreatedArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type SubscriptionBidReceivedArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionDepartmentCreatedArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type SubscriptionNewBidReceivedArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionDepartmentUpdatedArgs = {
+  companyId: Scalars['String']['input'];
 };
 
 
-export type SubscriptionShipmentStatusChangedArgs = {
-  shipmentId: Scalars['ID']['input'];
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeCapacityChangedArgs = {
+  employeeId: Scalars['String']['input'];
 };
 
-export enum TruckStatus {
-  Available = 'AVAILABLE',
-  InMaintenance = 'IN_MAINTENANCE',
-  InTransit = 'IN_TRANSIT',
-  OutOfService = 'OUT_OF_SERVICE'
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeChangedArgs = {
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeCreatedArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeDismissedArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeLoadThresholdCrossedArgs = {
+  employeeId: Scalars['String']['input'];
+  threshold?: InputMaybe<Scalars['Float']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionEmployeeUpdatedArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionGapAnalysisUpdatedArgs = {
+  companyId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionGapThresholdCrossedArgs = {
+  companyId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionLoadThresholdCrossedArgs = {
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionProcessCreatedArgs = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionProcessStatusChangedArgs = {
+  processId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionProcessUpdatedArgs = {
+  processId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionRiskActivityDetectedArgs = {
+  companyId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionSecurityIncidentDetectedArgs = {
+  companyId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionTaskAssignmentUpdatedArgs = {
+  taskId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionTaskCreatedArgs = {
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Subscription type
+ * Extended by each domain module
+ */
+export type SubscriptionTaskStatusChangedArgs = {
+  taskId: Scalars['String']['input'];
+};
+
+/** Talent category for hiring */
+export type TalentCategory = {
+  __typename?: 'TalentCategory';
+  estimatedMonthlyCapacity: Scalars['Int']['output'];
+  estimatedRecruitmentTimeWeeks: Scalars['Int']['output'];
+  experienceRequired: Scalars['String']['output'];
+  grade: Grade;
+  gradeId: Scalars['String']['output'];
+  skills: Array<Scalars['String']['output']>;
+  targetCount: Scalars['Int']['output'];
+};
+
+/** TaskAssignment type representing work assignments */
+export type TaskAssignment = {
+  __typename?: 'TaskAssignment';
+  actualDaysSpent?: Maybe<Scalars['Int']['output']>;
+  /** Capacity and effort */
+  allocatedCapacityUnits: Scalars['Int']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Progress tracking */
+  completionPercentage: Scalars['Int']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  /** Audit trail */
+  createdBy: Scalars['String']['output'];
+  department: Department;
+  departmentId: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  dueDate: Scalars['DateTime']['output'];
+  effortHours: Scalars['Float']['output'];
+  employee: Employee;
+  employeeId: Scalars['String']['output'];
+  estimatedDaysToComplete?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['String']['output'];
+  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
+  name: Scalars['String']['output'];
+  priority: TaskPriority;
+  /** Relations */
+  process: Process;
+  /** Assignment details */
+  processId: Scalars['String']['output'];
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Status tracking */
+  status: TaskStatus;
+  taskType: TaskType;
+  updatedAt: Scalars['DateTime']['output'];
+  updatedBy?: Maybe<Scalars['String']['output']>;
+};
+
+/** Task assignment response wrapper with pagination */
+export type TaskAssignmentConnection = {
+  __typename?: 'TaskAssignmentConnection';
+  nodes: Array<TaskAssignment>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Task assignment filter input */
+export type TaskAssignmentFilterInput = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  employeeId?: InputMaybe<Scalars['String']['input']>;
+  isBlocked?: InputMaybe<Scalars['Boolean']['input']>;
+  isOverdue?: InputMaybe<Scalars['Boolean']['input']>;
+  priority?: InputMaybe<TaskPriority>;
+  processId?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
+  taskType?: InputMaybe<TaskType>;
+};
+
+/** Task assignment metrics */
+export type TaskAssignmentMetrics = {
+  __typename?: 'TaskAssignmentMetrics';
+  assignment: TaskAssignment;
+  daysUntilDue: Scalars['Int']['output'];
+  estimatedCompletionDate?: Maybe<Scalars['DateTime']['output']>;
+  onTrack: Scalars['Boolean']['output'];
+  utilizationRate: Scalars['Float']['output'];
+  workloadContribution: Scalars['Float']['output'];
+};
+
+/** Pagination input for task assignments */
+export type TaskAssignmentPaginationInput = {
+  orderBy?: InputMaybe<TaskAssignmentSortInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Task assignment sort fields */
+export enum TaskAssignmentSortField {
+  CompletionPercentage = 'COMPLETION_PERCENTAGE',
+  CreatedAt = 'CREATED_AT',
+  DueDate = 'DUE_DATE',
+  EffortHours = 'EFFORT_HOURS',
+  Priority = 'PRIORITY'
 }
 
-export type UpdateBrokerCarrierContractInput = {
-  defaultRate?: InputMaybe<Scalars['BigInt']['input']>;
-  maxRate?: InputMaybe<Scalars['BigInt']['input']>;
-  minRate?: InputMaybe<Scalars['BigInt']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
+/** Task assignment sort input */
+export type TaskAssignmentSortInput = {
+  field: TaskAssignmentSortField;
+  order: SortOrder;
+};
+
+/** Task priority enumeration */
+export enum TaskPriority {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Normal = 'NORMAL'
+}
+
+/** Task status enumeration */
+export enum TaskStatus {
+  Assigned = 'ASSIGNED',
+  Blocked = 'BLOCKED',
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Created = 'CREATED',
+  InProgress = 'IN_PROGRESS',
+  OnHold = 'ON_HOLD'
+}
+
+/** Event type for task status changes */
+export type TaskStatusChangeEvent = {
+  __typename?: 'TaskStatusChangeEvent';
+  assignment: TaskAssignment;
+  changedAt: Scalars['DateTime']['output'];
+  changedBy: Scalars['String']['output'];
+  newStatus: TaskStatus;
+  previousStatus: TaskStatus;
+  reason?: Maybe<Scalars['String']['output']>;
+};
+
+/** Count of tasks by status */
+export type TaskStatusCount = {
+  __typename?: 'TaskStatusCount';
+  count: Scalars['Int']['output'];
+  status: TaskStatus;
+};
+
+/** Task type enumeration */
+export enum TaskType {
+  Administrative = 'ADMINISTRATIVE',
+  Development = 'DEVELOPMENT',
+  Documentation = 'DOCUMENTATION',
+  Meeting = 'MEETING',
+  Other = 'OTHER',
+  Research = 'RESEARCH',
+  Review = 'REVIEW',
+  Support = 'SUPPORT',
+  Testing = 'TESTING',
+  Training = 'TRAINING'
+}
+
+/** Count of tasks by type */
+export type TaskTypeCount = {
+  __typename?: 'TaskTypeCount';
+  count: Scalars['Int']['output'];
+  taskType: TaskType;
+};
+
+/** Trend direction enumeration */
+export enum TrendDirection {
+  Decreasing = 'DECREASING',
+  Increasing = 'INCREASING',
+  Stable = 'STABLE'
+}
+
+/** Input for updating a company */
+export type UpdateCompanyInput = {
+  name?: InputMaybe<Scalars['String']['input']>;
+  timezone?: InputMaybe<Scalars['String']['input']>;
+  workingDaysPerMonth?: InputMaybe<Scalars['Int']['input']>;
+  workingHoursDay?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Input for updating a department */
+export type UpdateDepartmentInput = {
+  headId?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Fields that can be updated */
+export type UpdateEmployeeInput = {
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  fio?: InputMaybe<Scalars['String']['input']>;
+  gender?: InputMaybe<Scalars['String']['input']>;
+  gradeId?: InputMaybe<Scalars['Int']['input']>;
+  kEfficiency?: InputMaybe<Scalars['Float']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
-  volumeDiscount?: InputMaybe<Scalars['Float']['input']>;
+  workingHoursPerDay?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type UpdateBrokerRateInput = {
-  expiryDate?: InputMaybe<Scalars['DateTime']['input']>;
-  minimumCharge?: InputMaybe<Scalars['BigInt']['input']>;
-  rate?: InputMaybe<Scalars['BigInt']['input']>;
+/** Update gap analysis input */
+export type UpdateGapAnalysisInput = {
+  confidenceLevel?: InputMaybe<Scalars['String']['input']>;
+  forecastAccuracy?: InputMaybe<Scalars['Float']['input']>;
+  forecastedWorkloadUnits?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type UpdateCarrierAccessorialInput = {
-  availableRegions?: InputMaybe<Array<Scalars['String']['input']>>;
-  isApproved?: InputMaybe<Scalars['Boolean']['input']>;
-  serviceName?: InputMaybe<Scalars['String']['input']>;
-  unitRate?: InputMaybe<Scalars['BigInt']['input']>;
+/** Update hiring plan input */
+export type UpdateHiringPlanInput = {
+  hiringStartDate?: InputMaybe<Scalars['DateTime']['input']>;
+  progressPercentage?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<HiringPlanStatus>;
+  targetCompletionDate?: InputMaybe<Scalars['DateTime']['input']>;
+  targetHeadcount?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type UpdateCarrierRateInput = {
-  baseRate?: InputMaybe<Scalars['BigInt']['input']>;
-  expiryDate?: InputMaybe<Scalars['DateTime']['input']>;
-  maxRate?: InputMaybe<Scalars['BigInt']['input']>;
-  minRate?: InputMaybe<Scalars['BigInt']['input']>;
+/** Input for updating a process */
+export type UpdateProcessInput = {
+  capacityUnits?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
+  kMultiplier?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<ProcessPriority>;
+  status?: InputMaybe<ProcessStatus>;
 };
 
-export type UpdateFreightInput = {
-  declaredValue?: InputMaybe<Scalars['BigInt']['input']>;
-  productDescription?: InputMaybe<Scalars['String']['input']>;
-  productName?: InputMaybe<Scalars['String']['input']>;
-  quantity?: InputMaybe<Scalars['Int']['input']>;
-  temperatureMax?: InputMaybe<Scalars['Float']['input']>;
-  temperatureMin?: InputMaybe<Scalars['Float']['input']>;
-};
-
-export type UpdateShipmentDocumentInput = {
-  verified?: InputMaybe<Scalars['Boolean']['input']>;
-  verifiedBy?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateShipmentFreightInput = {
-  deliveredAt?: InputMaybe<Scalars['DateTime']['input']>;
-  pickedUpAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type UpdateShipmentInput = {
-  deliveryScheduled?: InputMaybe<Scalars['DateTime']['input']>;
-  pickupScheduled?: InputMaybe<Scalars['DateTime']['input']>;
-  specialInstructions?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateShipmentStopInput = {
-  arrivedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  departedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  notes?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateVehicleInput = {
-  licensePlate?: InputMaybe<Scalars['String']['input']>;
-  make?: InputMaybe<Scalars['String']['input']>;
-  model?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateWarehouseInput = {
-  address?: InputMaybe<Scalars['String']['input']>;
-  email?: InputMaybe<Scalars['String']['input']>;
-  phone?: InputMaybe<Scalars['String']['input']>;
+/** Input for updating a task assignment */
+export type UpdateTaskAssignmentInput = {
+  allocatedCapacityUnits?: InputMaybe<Scalars['Int']['input']>;
+  completionPercentage?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  effortHours?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<TaskPriority>;
+  status?: InputMaybe<TaskStatus>;
 };
 
 export type User = Node & {
@@ -2077,6 +2990,35 @@ export type User = Node & {
   role?: Maybe<UserRole>;
   status: UserStatus;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+/** User access summary for compliance */
+export type UserAccessSummary = {
+  __typename?: 'UserAccessSummary';
+  activeMinutesThisPeriod: Scalars['Int']['output'];
+  criticalActionsCount: Scalars['Int']['output'];
+  dataAccessCount: Scalars['Int']['output'];
+  lastLogin: Scalars['DateTime']['output'];
+  riskLevel: AccessRiskLevel;
+  user: User;
+};
+
+/** User activity summary */
+export type UserActivitySummary = {
+  __typename?: 'UserActivitySummary';
+  actionsByType: Array<ActionTypeSummary>;
+  activePeriod: DateRange;
+  failureCount: Scalars['Int']['output'];
+  generatedAt: Scalars['DateTime']['output'];
+  /** Recent activity */
+  recentActions: Array<AuditLog>;
+  riskScore: Scalars['Int']['output'];
+  successRate: Scalars['Float']['output'];
+  /** Activity statistics */
+  totalActions: Scalars['Int']['output'];
+  /** Risk indicators */
+  unusualActivities: Scalars['String']['output'];
+  user: User;
 };
 
 export enum UserRole {
@@ -2110,66 +3052,6 @@ export type UsersResult = {
   __typename?: 'UsersResult';
   pageInfo: PageInfo;
   users: Array<User>;
-};
-
-export type Vehicle = Node & {
-  __typename?: 'Vehicle';
-  carrier: Carrier;
-  carrierId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  currentDriver?: Maybe<Driver>;
-  driverId?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  licensePlate: Scalars['String']['output'];
-  make: Scalars['String']['output'];
-  model: Scalars['String']['output'];
-  status: TruckStatus;
-  updatedAt: Scalars['DateTime']['output'];
-  vin: Scalars['String']['output'];
-  year: Scalars['Int']['output'];
-};
-
-export type VehicleConnection = {
-  __typename?: 'VehicleConnection';
-  items: Array<Vehicle>;
-  pageInfo: PageInfo;
-};
-
-export enum VerificationStatus {
-  Pending = 'PENDING',
-  Rejected = 'REJECTED',
-  Suspended = 'SUSPENDED',
-  Verified = 'VERIFIED'
-}
-
-export type Warehouse = Node & {
-  __typename?: 'Warehouse';
-  address: Scalars['String']['output'];
-  availableCapacityKg: Scalars['Float']['output'];
-  capacityUtilization: Scalars['Float']['output'];
-  city: Scalars['String']['output'];
-  country: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  isActive: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
-  phone: Scalars['String']['output'];
-  rating: Scalars['Float']['output'];
-  reviewCount: Scalars['Int']['output'];
-  state: Scalars['String']['output'];
-  totalCapacityKg: Scalars['Float']['output'];
-  totalShipments: Scalars['Int']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  usedCapacityKg: Scalars['Float']['output'];
-  verificationStatus: VerificationStatus;
-  zipCode: Scalars['String']['output'];
-};
-
-export type WarehouseConnection = {
-  __typename?: 'WarehouseConnection';
-  items: Array<Warehouse>;
-  pageInfo: PageInfo;
 };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;

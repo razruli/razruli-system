@@ -1,0 +1,9 @@
+# Custom Scalar Types
+
+scalar DateTime
+
+scalar BigInt
+
+scalar JSON
+
+scalar Upload

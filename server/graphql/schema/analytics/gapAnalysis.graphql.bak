@@ -1,0 +1,445 @@
+# ============================================================================
+# GAP ANALYSIS DOMAIN - Capacity Planning & Hiring Schema
+# ============================================================================
+
+"""
+GapAnalysis type representing workforce planning analysis
+"""
+type GapAnalysis {
+  id: String!
+
+  """
+  Analysis metadata
+  """
+  companyId: String!
+  departmentId: String
+  analysisDate: DateTime!
+
+  """
+  Analysis period
+  """
+  forecastPeriodMonths: Int!
+  startDate: DateTime!
+  endDate: DateTime!
+
+  """
+  Current state
+  """
+  currentEmployeeCount: Int!
+  currentTotalCapacity: Int!
+  currentUtilizationRate: Float!
+
+  """
+  Forecasted state
+  """
+  forecastedWorkloadUnits: Int!
+  requiredEmployeeCount: Int!
+  requiredTotalCapacity: Int!
+
+  """
+  Gap calculation
+  """
+  capacityGap: Int! # required - current
+  headcountGap: Int! # required employees - current
+  gapStatus: GapStatus!
+  riskLevel: GapAnalysisRiskLevel!
+
+  """
+  Related entities
+  """
+  company: Company!
+  department: Department
+
+  """
+  Hiring plan
+  """
+  hiringPlan: HiringPlan
+  recommendations: [GapAnalysisRecommendation!]!
+
+  """
+  Confidence metrics
+  """
+  forecastAccuracy: Float! # percentage
+  confidenceLevel: String!
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Gap status enumeration
+"""
+enum GapStatus {
+  SURPLUS # more capacity than needed
+  BALANCED # capacity matches demand
+  MINOR_GAP # 1-20% capacity shortage
+  MODERATE_GAP # 21-50% capacity shortage
+  CRITICAL_GAP # 51%+ capacity shortage
+}
+
+"""
+Risk level for gap analysis
+"""
+enum GapAnalysisRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Hiring plan derived from gap analysis
+"""
+type HiringPlan {
+  id: String!
+  gapAnalysisId: String!
+
+  """
+  Hiring targets
+  """
+  targetHeadcount: Int!
+  talentCategories: [TalentCategory!]!
+
+  """
+  Timeline
+  """
+  hiringStartDate: DateTime!
+  targetCompletionDate: DateTime!
+  hiringPhases: [HiringPhase!]!
+
+  """
+  Budget impact
+  """
+  estimatedCostPerHire: Int!
+  totalEstimatedCost: Int!
+
+  """
+  Status
+  """
+  status: HiringPlanStatus!
+  progressPercentage: Int!
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Hiring plan status
+"""
+enum HiringPlanStatus {
+  DRAFT
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+"""
+Hiring phase
+"""
+type HiringPhase {
+  phase: Int!
+  name: String!
+  targetHeadcount: Int!
+  startDate: DateTime!
+  targetCompletionDate: DateTime!
+  status: HiringPhaseStatus!
+  talentGrades: [String!]!
+}
+
+"""
+Hiring phase status
+"""
+enum HiringPhaseStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+}
+
+"""
+Talent category for hiring
+"""
+type TalentCategory {
+  gradeId: String!
+  grade: Grade!
+  targetCount: Int!
+  estimatedMonthlyCapacity: Int!
+  skills: [String!]!
+  experienceRequired: String!
+  estimatedRecruitmentTimeWeeks: Int!
+}
+
+"""
+Gap analysis filter input
+"""
+input GapAnalysisFilterInput {
+  companyId: String
+  departmentId: String
+  gapStatus: GapStatus
+  riskLevel: GapAnalysisRiskLevel
+  dateRange: DateRangeInput
+}
+
+"""
+Pagination input for gap analyses
+"""
+input GapAnalysisPaginationInput {
+  skip: Int
+  take: Int
+  orderBy: GapAnalysisSortInput
+}
+
+"""
+Gap analysis sort input
+"""
+input GapAnalysisSortInput {
+  field: GapAnalysisSortField!
+  order: SortOrder!
+}
+
+"""
+Gap analysis sort fields
+"""
+enum GapAnalysisSortField {
+  ANALYSIS_DATE
+  HEADCOUNT_GAP
+  CAPACITY_GAP
+  RISK_LEVEL
+}
+
+"""
+Gap analysis response wrapper
+"""
+type GapAnalysisConnection {
+  nodes: [GapAnalysis!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+"""
+Gap analysis recommendation
+"""
+type GapAnalysisRecommendation {
+  id: String!
+  type: RecommendationType!
+  priority: RecommendationPriority!
+  description: String!
+  estimatedTimeframe: String!
+  estimatedCost: Int
+  expectedOutcome: String!
+  implementationSteps: [String!]!
+}
+
+"""
+Historical gap trend
+"""
+type GapTrend {
+  analysisDate: DateTime!
+  headcountGap: Int!
+  capacityGap: Int!
+  gapStatus: GapStatus!
+  riskLevel: GapAnalysisRiskLevel!
+}
+
+"""
+Department gap comparison
+"""
+type DepartmentGapComparison {
+  department: Department!
+  gapAnalysis: GapAnalysis
+  headcountGap: Int!
+  capacityGap: Int!
+  gapStatus: GapStatus!
+  riskLevel: GapAnalysisRiskLevel!
+  comparedToCompanyAverage: Float!
+}
+
+"""
+Hiring forecast
+"""
+type HiringForecast {
+  gapAnalysis: GapAnalysis!
+  quarterlyProjections: [QuarterlyProjection!]!
+  totalEstimatedHires: Int!
+  averageMonthlyHiringRate: Int!
+  riskFactors: [String!]!
+}
+
+"""
+Quarterly hiring projection
+"""
+type QuarterlyProjection {
+  quarter: String!
+  projectedHires: Int!
+  targetTalentGrades: [String!]!
+  estimatedCost: Int!
+}
+
+# ============================================================================
+# Extended Query Type
+# ============================================================================
+
+extend type Query {
+  """
+  Get gap analysis by ID
+  """
+  gapAnalysis(id: String!): GapAnalysis
+
+  """
+  List gap analyses with filtering
+  """
+  gapAnalyses(
+    filter: GapAnalysisFilterInput
+    pagination: GapAnalysisPaginationInput
+  ): GapAnalysisConnection!
+
+  """
+  Get latest gap analysis for company
+  """
+  latestCompanyGapAnalysis(companyId: String!): GapAnalysis
+
+  """
+  Get latest gap analysis for department
+  """
+  latestDepartmentGapAnalysis(departmentId: String!): GapAnalysis
+
+  """
+  Get gap trend over time
+  """
+  gapAnalysisTrend(
+    companyId: String!
+    departmentId: String
+    dateRange: DateRangeInput!
+  ): [GapTrend!]!
+
+  """
+  Compare gaps across departments
+  """
+  departmentGapComparison(companyId: String!): [DepartmentGapComparison!]!
+
+  """
+  Get hiring forecast from latest gap analysis
+  """
+  hiringForecast(companyId: String!): HiringForecast
+
+  """
+  Get criticality assessment
+  """
+  gapCriticalityAssessment(companyId: String!): GapCriticalityAssessment!
+}
+
+"""
+Gap criticality assessment
+"""
+type GapCriticalityAssessment {
+  timestamp: DateTime!
+  criticalDepartments: [DepartmentGapComparison!]!
+  timelinessOfAction: String!
+  estimatedTimeToFillGap: String!
+  recommendedImmediateActions: [String!]!
+}
+
+# ============================================================================
+# Extended Mutation Type
+# ============================================================================
+
+extend type Mutation {
+  """
+  Create new gap analysis
+  """
+  createGapAnalysis(input: CreateGapAnalysisInput!): GapAnalysis!
+
+  """
+  Update existing gap analysis
+  """
+  updateGapAnalysis(id: String!, input: UpdateGapAnalysisInput!): GapAnalysis!
+
+  """
+  Generate hiring plan from gap analysis
+  """
+  generateHiringPlan(gapAnalysisId: String!, phases: Int): HiringPlan!
+
+  """
+  Update hiring plan
+  """
+  updateHiringPlan(id: String!, input: UpdateHiringPlanInput!): HiringPlan!
+
+  """
+  Approve hiring plan
+  """
+  approveHiringPlan(id: String!, approvedBy: String!): HiringPlan!
+
+  """
+  Track hiring progress
+  """
+  updateHiringProgress(
+    hiringPlanId: String!
+    actualHires: Int!
+    completedPhase: Int
+  ): HiringPlan!
+}
+
+"""
+Create gap analysis input
+"""
+input CreateGapAnalysisInput {
+  companyId: String!
+  departmentId: String
+  forecastPeriodMonths: Int!
+  forecastedWorkloadUnits: Int!
+  startDate: DateTime
+}
+
+"""
+Update gap analysis input
+"""
+input UpdateGapAnalysisInput {
+  forecastedWorkloadUnits: Int
+  forecastAccuracy: Float
+  confidenceLevel: String
+}
+
+"""
+Update hiring plan input
+"""
+input UpdateHiringPlanInput {
+  targetHeadcount: Int
+  hiringStartDate: DateTime
+  targetCompletionDate: DateTime
+  status: HiringPlanStatus
+  progressPercentage: Int
+}
+
+# ============================================================================
+# Extended Subscription Type
+# ============================================================================
+
+extend type Subscription {
+  """
+  Subscribe to gap analysis updates
+  """
+  gapAnalysisUpdated(companyId: String!): GapAnalysis!
+
+  """
+  Subscribe to gap threshold events
+  """
+  gapThresholdCrossed(companyId: String!): GapThresholdEvent!
+}
+
+"""
+Gap threshold event
+"""
+type GapThresholdEvent {
+  analysis: GapAnalysis!
+  previousStatus: GapStatus!
+  newStatus: GapStatus!
+  timestamp: DateTime!
+  severity: String!
+}

@@ -35,8 +35,8 @@ type Process {
   """
   company: Company!
   department: Department!
-  taskAssignments: [TaskAssignment]
-  loadSnapshots: [LoadSnapshot]
+  taskAssignments: [TaskAssignment!]!
+  loadSnapshots: [LoadSnapshot!]!
 
   """
   Timestamps
