@@ -11,12 +11,7 @@ import { GraphQLContext } from "../../../context";
  * Higher-order function to wrap resolvers with audit logging
  * Logs: userId, action, resourceId, timestamp
  *
- * Usage:
- * ```
- * const loggedResolver = withAuditLogging(
- *   originalResolver,
- *   "CREATE_SHIPMENT"
- * );
+
  * ```
  */
 export function withAuditLogging(

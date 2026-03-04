@@ -16,6 +16,8 @@ const config: CodegenConfig = {
     "server/graphql/schema/analytics/gapAnalysis.graphql",
     "server/graphql/schema/audit/employeeHistory.graphql",
     "server/graphql/schema/audit/auditLog.graphql",
+    "server/graphql/schema/user/types.graphql",
+    "server/graphql/schema/user/queries.graphql",
   ],
   documents: "shared/graphql/client/**/*.graphql",
 
@@ -26,7 +28,7 @@ const config: CodegenConfig = {
     "server/graphql/types/generated.ts": {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
-        contextType: "../context#ServiceContext",
+        contextType: "../context/context#GraphQLContext",
         avoidOptionals: true,
         resolverValidationOptions: {
           requireResolversForResolveType: false,
@@ -34,29 +36,33 @@ const config: CodegenConfig = {
         },
         mappers: {
           // Auth (better-auth)
-          User: "@/server/db/generated/prisma#User",
-          Session: "@/server/db/generated/prisma#Session",
-          Account: "@/server/db/generated/prisma#Account",
-          Verification: "@/server/db/generated/prisma#Verification",
+          User: "@/server/db/generated/prisma/models#UserModel",
+          Session: "@/server/db/generated/prisma/models#SessionModel",
+          Account: "@/server/db/generated/prisma/models#AccountModel",
+          Verification: "@/server/db/generated/prisma/models#VerificationModel",
 
           // Core Domain
-          Company: "@/server/db/generated/prisma#Company",
-          Department: "@/server/db/generated/prisma#Department",
-          Employee: "@/server/db/generated/prisma#Employee",
-          Grade: "@/server/db/generated/prisma#Grade",
+          Company: "@/server/db/generated/prisma/models#CompanyModel",
+          Department: "@/server/db/generated/prisma/models#DepartmentModel",
+          Employee: "@/server/db/generated/prisma/models#EmployeeModel",
+          Grade: "@/server/db/generated/prisma/models#GradeModel",
 
           // Operations Domain
-          Process: "@/server/db/generated/prisma#Process",
-          TaskAssignment: "@/server/db/generated/prisma#TaskAssignment",
+          Process: "@/server/db/generated/prisma/models#ProcessModel",
+          TaskAssignment:
+            "@/server/db/generated/prisma/models#TaskAssignmentModel",
 
           // Analytics Domain
-          LoadSnapshot: "@/server/db/generated/prisma#LoadSnapshot",
-          GapAnalysisResult: "@/server/db/generated/prisma#GapAnalysisResult",
-          HiringRequest: "@/server/db/generated/prisma#HiringRequest",
+          LoadSnapshot: "@/server/db/generated/prisma/models#LoadSnapshotModel",
+          GapAnalysisResult:
+            "@/server/db/generated/prisma/models#GapAnalysisResultModel",
+          HiringRequest:
+            "@/server/db/generated/prisma/models#HiringRequestModel",
 
           // Audit Domain
-          EmployeeHistory: "@/server/db/generated/prisma#EmployeeHistory",
-          AuditLog: "@/server/db/generated/prisma#AuditLog",
+          EmployeeHistory:
+            "@/server/db/generated/prisma/models#EmployeeHistoryModel",
+          AuditLog: "@/server/db/generated/prisma/models#AuditLogModel",
         },
         scalars: {
           DateTime: "Date",
