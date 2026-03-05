@@ -5,8 +5,20 @@
  * Handles all gap analysis-related queries with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + gapAnalysis:read permission */
+const gapAnalysisReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["gapAnalysis:read"] },
+);
 
 export const gapAnalysisQueries: Pick<
   QueryResolvers,
@@ -30,10 +42,7 @@ export const gapAnalysisQueries: Pick<
         throw new Error(`Failed to fetch gap analysis: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
@@ -85,21 +94,18 @@ export const gapAnalysisQueries: Pick<
         throw new Error(`Failed to list gap analyses: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
    * Get gap analysis trend over time
    */
   gapAnalysisTrend: withMiddleware(
-    async (_parent, { companyId, dateRange }, context) => {
+    async (_parent, { dateRange }) => {
       try {
         return [
           {
-            date: new Date(dateRange.start),
+            date: new Date(dateRange.from),
             gap: 0,
             trend: "STABLE",
           },
@@ -108,10 +114,7 @@ export const gapAnalysisQueries: Pick<
         throw new Error(`Failed to fetch gap analysis trend: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
@@ -131,10 +134,7 @@ export const gapAnalysisQueries: Pick<
         throw new Error(`Failed to fetch gap criticality assessment: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
@@ -155,10 +155,7 @@ export const gapAnalysisQueries: Pick<
         throw new Error(`Failed to fetch hiring forecast: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
@@ -176,10 +173,7 @@ export const gapAnalysisQueries: Pick<
         );
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 
   /**
@@ -197,10 +191,7 @@ export const gapAnalysisQueries: Pick<
         );
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:read"],
-    },
+    gapAnalysisReadMiddleware,
   ),
 };
 

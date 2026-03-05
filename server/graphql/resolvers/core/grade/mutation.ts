@@ -5,8 +5,32 @@
  * Handles all grade modification operations with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + grade:create permission */
+const gradeCreateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["grade:create"] },
+);
+
+/** Require authentication + grade:update permission */
+const gradeUpdateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["grade:update"] },
+);
+
+/** Require authentication + grade:delete permission */
+const gradeDeleteMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["grade:delete"] },
+);
 
 // : Pick<MutationResolvers, "createGrade" | "updateGrade" | "deleteGrade">
 export const gradeMutations = {
@@ -43,10 +67,7 @@ export const gradeMutations = {
         throw new Error(`Failed to create grade: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:create"],
-    },
+    gradeCreateMiddleware,
   ),
 
   /**
@@ -111,11 +132,7 @@ export const gradeMutations = {
         throw new Error(`Failed to update grade: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:update"],
-      // requireRole: "MANAGER",
-    },
+    gradeUpdateMiddleware,
   ),
 
   /**
@@ -135,11 +152,7 @@ export const gradeMutations = {
         throw new Error(`Failed to delete grade: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:delete"],
-      // requireRole: "MANAGER",
-    },
+    gradeDeleteMiddleware,
   ),
 };
 

@@ -5,8 +5,44 @@
  * Handles all employee-related queries with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + employee:read permission */
+const employeeReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:read"] },
+);
+
+/** Require authentication + employee:read + department:read permissions */
+const employeeWithDepartmentMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:read", "department:read"] },
+);
+
+/** Require authentication + employee:read + analytics:read permissions */
+const employeeWithAnalyticsMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:read", "analytics:read"] },
+);
+
+/** Require authentication + employee:read + taskAssignment:read permissions */
+const employeeWithTasksMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:read", "taskAssignment:read"] },
+);
+
+/** Require authentication + employee:read + audit:read permissions */
+const employeeWithAuditMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:read", "audit:read"] },
+);
 
 export const employeeQueries: Pick<
   QueryResolvers,
@@ -34,10 +70,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read"],
-    },
+    employeeReadMiddleware,
   ),
 
   /**
@@ -92,10 +125,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to list employees: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read"],
-    },
+    employeeReadMiddleware,
   ),
 
   /**
@@ -113,10 +143,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch department employees: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "department:read"],
-    },
+    employeeWithDepartmentMiddleware,
   ),
 
   /**
@@ -138,10 +165,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee capacity: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "analytics:read"],
-    },
+    employeeWithAnalyticsMiddleware,
   ),
 
   /**
@@ -171,10 +195,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee load index: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "analytics:read"],
-    },
+    employeeWithAnalyticsMiddleware,
   ),
 
   /**
@@ -191,10 +212,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee tasks: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "taskAssignment:read"],
-    },
+    employeeWithTasksMiddleware,
   ),
 
   /**
@@ -233,10 +251,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee task stats: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "analytics:read"],
-    },
+    employeeWithAnalyticsMiddleware,
   ),
 
   /**
@@ -262,10 +277,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee load trend: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "analytics:read"],
-    },
+    employeeWithAnalyticsMiddleware,
   ),
 
   /**
@@ -286,10 +298,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee timeline: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "audit:read"],
-    },
+    employeeWithAuditMiddleware,
   ),
 
   /**
@@ -316,10 +325,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee audit report: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "audit:read"],
-    },
+    employeeWithAuditMiddleware,
   ),
 
   /**
@@ -333,10 +339,7 @@ export const employeeQueries: Pick<
         throw new Error(`Failed to fetch employee history entry: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:read", "audit:read"],
-    },
+    employeeWithAuditMiddleware,
   ),
 };
 

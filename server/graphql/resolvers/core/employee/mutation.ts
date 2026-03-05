@@ -5,8 +5,32 @@
  * Handles all employee modification operations with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + employee:create permission */
+const employeeCreateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:create"] },
+);
+
+/** Require authentication + employee:update permission */
+const employeeUpdateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:update"] },
+);
+
+/** Require authentication + employee:delete permission */
+const employeeDeleteMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["employee:delete"] },
+);
 
 export const employeeMutations: Pick<
   MutationResolvers,
@@ -68,10 +92,7 @@ export const employeeMutations: Pick<
         throw new Error(`Failed to create employee: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:create"],
-    },
+    employeeCreateMiddleware,
   ),
 
   /**
@@ -164,10 +185,7 @@ export const employeeMutations: Pick<
         throw new Error(`Failed to update employee: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:update"],
-    },
+    employeeUpdateMiddleware,
   ),
 
   /**
@@ -215,10 +233,7 @@ export const employeeMutations: Pick<
         throw new Error(`Failed to dismiss employee: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:delete"],
-    },
+    employeeDeleteMiddleware,
   ),
 
   /**
@@ -265,10 +280,7 @@ export const employeeMutations: Pick<
         throw new Error(`Failed to update employee efficiency: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["employee:update"],
-    },
+    employeeUpdateMiddleware,
   ),
 };
 

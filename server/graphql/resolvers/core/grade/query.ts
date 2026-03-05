@@ -5,8 +5,20 @@
  * Handles all grade-related queries with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + grade:read permission */
+const gradeReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["grade:read"] },
+);
 
 export const gradeQueries: Pick<
   QueryResolvers,
@@ -23,10 +35,7 @@ export const gradeQueries: Pick<
         throw new Error(`Failed to fetch grade: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:read"],
-    },
+    gradeReadMiddleware,
   ),
 
   /**
@@ -49,10 +58,7 @@ export const gradeQueries: Pick<
         throw new Error(`Failed to list grades: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:read"],
-    },
+    gradeReadMiddleware,
   ),
 
   /**
@@ -75,10 +81,7 @@ export const gradeQueries: Pick<
         throw new Error(`Failed to fetch grade stats: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["grade:read"],
-    },
+    gradeReadMiddleware,
   ),
 };
 

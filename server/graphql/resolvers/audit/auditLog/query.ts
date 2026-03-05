@@ -5,8 +5,20 @@
  * Handles all audit log-related queries with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + auditLog:read permission */
+const auditLogReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["auditLog:read"] },
+);
 
 export const auditLogQueries: Pick<
   QueryResolvers,
@@ -30,10 +42,7 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to fetch audit log: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
@@ -88,10 +97,7 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to list audit logs: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
@@ -110,10 +116,7 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to fetch data access audit: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
@@ -135,10 +138,7 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to fetch security incident report: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
@@ -157,27 +157,21 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to fetch suspicious activities: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
    * Get failed login attempts
    */
   failedLoginAttempts: withMiddleware(
-    async (_parent, { dateRange }, context) => {
+    async (_parent) => {
       try {
         return [];
       } catch (error) {
         throw new Error(`Failed to fetch failed login attempts: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 
   /**
@@ -204,10 +198,7 @@ export const auditLogQueries: Pick<
         throw new Error(`Failed to fetch entity audit trail: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["auditLog:read"],
-    },
+    auditLogReadMiddleware,
   ),
 };
 

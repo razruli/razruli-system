@@ -5,8 +5,26 @@
  * Handles all gap analysis modification operations with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + gapAnalysis:create permission */
+const gapAnalysisCreateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["gapAnalysis:create"] },
+);
+
+/** Require authentication + gapAnalysis:update permission */
+const gapAnalysisUpdateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["gapAnalysis:update"] },
+);
 
 export const gapAnalysisMutations: Pick<
   MutationResolvers,
@@ -37,10 +55,7 @@ export const gapAnalysisMutations: Pick<
         throw new Error(`Failed to create gap analysis: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:create"],
-    },
+    gapAnalysisCreateMiddleware,
   ),
 
   /**
@@ -70,10 +85,7 @@ export const gapAnalysisMutations: Pick<
         throw new Error(`Failed to update gap analysis: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["gapAnalysis:update"],
-    },
+    gapAnalysisUpdateMiddleware,
   ),
 
   /**

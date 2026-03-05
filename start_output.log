@@ -4733,3 +4733,89 @@ Persisting failed: Another write batch or compaction is already active (Only a s
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (224911) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Meta for resolve_internal (TaskId 289886))
+
+Caused by:
+    0: Looking up data for TaskId 289886 from database failed
+    1: Unable to open static sorted file referenced from 00000359.meta
+    2: Unable to open static sorted file 00000353.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224911) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Meta for resolve_internal (TaskId 289886))
+
+Caused by:
+    0: Looking up data for TaskId 289886 from database failed
+    1: Unable to open static sorted file referenced from 00000359.meta
+    2: Unable to open static sorted file 00000353.sst
+    3: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (224757) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <EsmAssetReference as ModuleReference>::resolve_reference (TaskId 288529))
+
+Caused by:
+    0: Looking up data for TaskId 288529 from database failed
+    1: Unable to open static sorted file referenced from 00000178.meta
+    2: Unable to open static sorted file 00000174.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224758) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <EsmAssetReference as ModuleReference>::resolve_reference (TaskId 288529))
+
+Caused by:
+    0: Looking up data for TaskId 288529 from database failed
+    1: Unable to open static sorted file referenced from 00000178.meta
+    2: Unable to open static sorted file 00000174.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (225578) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <EsmAssetReference as ModuleReference>::resolve_reference (TaskId 288529))
+
+Caused by:
+    0: Looking up data for TaskId 288529 from database failed
+    1: Unable to open static sorted file referenced from 00000178.meta
+    2: Unable to open static sorted file 00000174.sst
+    3: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (224619) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <ModuleAssetContext as AssetContext>::resolve_asset (TaskId 288241))
+
+Caused by:
+    0: Looking up data for TaskId 288241 from database failed
+    1: Unable to open static sorted file referenced from 00000351.meta
+    2: Unable to open static sorted file 00000347.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224910) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Meta for <ModuleAssetContext as AssetContext>::resolve_asset (TaskId 448361))
+
+Caused by:
+    0: Looking up data for TaskId 448361 from database failed
+    1: Unable to open static sorted file referenced from 00000359.meta
+    2: Unable to open static sorted file 00000353.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224619) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <ModuleAssetContext as AssetContext>::resolve_asset (TaskId 288241))
+
+Caused by:
+    0: Looking up data for TaskId 288241 from database failed
+    1: Unable to open static sorted file referenced from 00000351.meta
+    2: Unable to open static sorted file 00000347.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224910) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Meta for <ModuleAssetContext as AssetContext>::resolve_asset (TaskId 448361))
+
+Caused by:
+    0: Looking up data for TaskId 448361 from database failed
+    1: Unable to open static sorted file referenced from 00000359.meta
+    2: Unable to open static sorted file 00000353.sst
+    3: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
