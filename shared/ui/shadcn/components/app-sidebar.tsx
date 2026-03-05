@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 import {
   AudioWaveform,
@@ -13,19 +13,19 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/shared/ui/shadcn/components/nav-main"
-import { NavProjects } from "@/shared/ui/shadcn/components/nav-projects"
-import { NavUser } from "@/shared/ui/shadcn/components/nav-user"
-import { TeamSwitcher } from "@/shared/ui/shadcn/components/team-switcher"
+import { NavMain } from "@/shared/ui/shadcn/components/nav-main";
+import { NavProjects } from "@/shared/ui/shadcn/components/nav-projects";
+import { NavUser } from "@/shared/ui/shadcn/components/nav-user";
+import { TeamSwitcher } from "@/shared/ui/shadcn/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/shared/ui/shadcn/sidebar"
+} from "@/shared/ui/shadcn/sidebar";
 
 // This is sample data.
 const data = {
@@ -155,7 +155,7 @@ const data = {
       icon: Map,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -172,5 +172,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
