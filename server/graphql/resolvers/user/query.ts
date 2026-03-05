@@ -16,7 +16,7 @@ export const me: QueryResolvers["me"] = async (
     }
 
     logger.info("me query called", { userId: ctx.user.id });
-    const user = await ctx.services.userService.getCurrentUser(ctx.user.id);
+    const user = await ctx.services.user.getCurrentUser(ctx.user.id);
     return user;
   } catch (error) {
     logger.error("Error in me resolver", error);
@@ -57,7 +57,7 @@ export const me: QueryResolvers["me"] = async (
 //     const MAX_LIMIT = 100;
 //     const safeLimit = Math.min(Number(limit), MAX_LIMIT);
 
-//     const result = await ctx.services.userService.listUsers({
+//     const result = await ctx.services.user.listUsers({
 //       limit: safeLimit,
 //       sortOrder: sortOrder as "asc" | "desc",
 //       ...stripNulls({

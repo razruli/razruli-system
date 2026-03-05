@@ -14,7 +14,7 @@ import gradeSubscriptions from "./subscription";
 /**
  * Complete resolver set for Grade domain
  * Combines and exports all resolver types
- * 
+en * 
  * NOTE: Grade mutations (createGrade, updateGrade, deleteGrade) are not included
  * because Grade is reference data that doesn't change often and mutations are not
  * defined in the GraphQL schema

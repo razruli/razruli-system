@@ -5,8 +5,8 @@ import { analyticsResolvers } from "./analytics";
 import { auditResolvers } from "./audit";
 import { coreResolvers } from "./core";
 import { operationsResolvers } from "./operations";
+import { userResolvers } from "./user";
 import * as PageFields from "./page/fields";
-import { usersResultFieldResolvers } from "./user";
 
 export const typeResolvers = {
   // ========== SCALAR RESOLVERS ==========
@@ -44,8 +44,10 @@ export const typeResolvers = {
   DepartmentEmployeeHistory: auditResolvers.DepartmentEmployeeHistory,
   EmployeeAuditReport: auditResolvers.EmployeeAuditReport,
 
+  // ========== USER DOMAIN TYPE FIELD RESOLVERS ==========
+  UsersResult: userResolvers.UsersResult,
+
   // ========== CUSTOM TYPE FIELD RESOLVERS ==========
-  UsersResult: usersResultFieldResolvers,
   PageInfo: PageFields.pageInfoResolver,
 };
 

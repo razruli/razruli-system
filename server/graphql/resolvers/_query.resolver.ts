@@ -4,11 +4,11 @@
  * ============================================================================
  * Unified composition of all domain query resolvers
  * Imports and composes queries from:
+ * - Auth & User domain
  * - Core domain (company, department, employee, grade)
  * - Operations domain (process, taskAssignment)
  * - Analytics domain (gapAnalysis, loadSnapshot)
  * - Audit domain (auditLog, employeeHistory)
- * - User domain
  */
 
 import { QueryResolvers } from "../types/generated";
@@ -17,6 +17,7 @@ import { analyticsResolvers } from "./analytics";
 import { auditResolvers } from "./audit";
 import { coreResolvers } from "./core";
 import { operationsResolvers } from "./operations";
+import { userResolvers } from "./user";
 
 /**
  * Unified Query resolver
@@ -25,6 +26,9 @@ import { operationsResolvers } from "./operations";
 export const queryResolver: QueryResolvers = {
   // Health check
   health: () => "OK",
+
+  // Auth & User domain queries
+  ...userResolvers.Query,
 
   // Core domain queries
   ...coreResolvers.Query,
