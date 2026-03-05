@@ -5,10 +5,7 @@
  * Handles all load snapshot-related queries with middleware orchestration
  */
 
-import {
-  composeMiddleware,
-  withMiddleware,
-} from "@/server/graphql/middleware";
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE COMPOSITION ====================
@@ -34,16 +31,13 @@ export const loadSnapshotQueries: Pick<
    * Get a single load snapshot by ID
    * Requires authentication to read snapshot data
    */
-  loadSnapshot: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        return await context.services.loadSnapshot.getById(id);
-      } catch (error) {
-        throw new Error(`Failed to fetch load snapshot: ${error}`);
-      }
-    },
-    loadSnapshotReadMiddleware,
-  ),
+  loadSnapshot: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      return await context.services.loadSnapshot.getById(id);
+    } catch (error) {
+      throw new Error(`Failed to fetch load snapshot: ${error}`);
+    }
+  }, loadSnapshotReadMiddleware),
 
   /**
    * List load snapshots with filtering and pagination
@@ -115,25 +109,22 @@ export const loadSnapshotQueries: Pick<
   /**
    * Get load anomalies (unusual load patterns)
    */
-  loadAnomalies: withMiddleware(
-    async (_parent, { companyId }, context) => {
-      try {
-        const employees = await context.prisma.employee.findMany({
-          where: { companyId },
-        });
+  loadAnomalies: withMiddleware(async (_parent, { companyId }, context) => {
+    try {
+      const employees = await context.prisma.employee.findMany({
+        where: { companyId },
+      });
 
-        const snapshots = await context.prisma.loadSnapshot.findMany({
-          where: { employeeId: { in: employees.map((e) => e.id) } },
-        });
+      const snapshots = await context.prisma.loadSnapshot.findMany({
+        where: { employeeId: { in: employees.map((e) => e.id) } },
+      });
 
-        // Placeholder - return snapshots with extreme loads
-        return snapshots.filter((s) => (s.allocatedLoad as any) > 150);
-      } catch (error) {
-        throw new Error(`Failed to fetch load anomalies: ${error}`);
-      }
-    },
-    loadSnapshotWithAnalyticsMiddleware,
-  ),
+      // Placeholder - return snapshots with extreme loads
+      return snapshots.filter((s) => (s.allocatedLoad as any) > 150);
+    } catch (error) {
+      throw new Error(`Failed to fetch load anomalies: ${error}`);
+    }
+  }, loadSnapshotWithAnalyticsMiddleware),
 
   /**
    * Get latest load snapshot for an employee

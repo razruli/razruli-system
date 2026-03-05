@@ -5,10 +5,7 @@
  * Handles all load snapshot modification operations with middleware orchestration
  */
 
-import {
-  composeMiddleware,
-  withMiddleware,
-} from "@/server/graphql/middleware";
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE COMPOSITION ====================
@@ -28,32 +25,29 @@ export const loadSnapshotMutations: Pick<
    * Create a new load snapshot
    * Requires authentication - captures current load state
    */
-  createLoadSnapshot: withMiddleware(
-    async (_parent, { input }, context) => {
-      try {
-        // Validate required fields
-        if (!input.employeeId) {
-          throw new Error("Missing required field: employeeId");
-        }
-
-        // Create load snapshot with input data
-        const loadSnapshot = await context.services.loadSnapshot.create({
-          employeeId: input.employeeId,
-          totalCapacityHours: input.totalCapacityHours,
-          allocatedHours: input.allocatedHours,
-          freeloadsHours: input.freeloadsHours,
-          loadIndex: input.loadIndex,
-          snapshotDate: input.snapshotDate,
-        });
-
-        // TODO: Implement event emitter
-        return loadSnapshot;
-      } catch (error) {
-        throw new Error(`Failed to create load snapshot: ${error}`);
+  createLoadSnapshot: withMiddleware(async (_parent, { input }, context) => {
+    try {
+      // Validate required fields
+      if (!input.employeeId) {
+        throw new Error("Missing required field: employeeId");
       }
-    },
-    loadSnapshotCreateMiddleware,
-  ),
+
+      // Create load snapshot with input data
+      const loadSnapshot = await context.services.loadSnapshot.create({
+        employeeId: input.employeeId,
+        totalCapacityHours: input.totalCapacityHours,
+        allocatedHours: input.allocatedHours,
+        freeloadsHours: input.freeloadsHours,
+        loadIndex: input.loadIndex,
+        snapshotDate: input.snapshotDate,
+      });
+
+      // TODO: Implement event emitter
+      return loadSnapshot;
+    } catch (error) {
+      throw new Error(`Failed to create load snapshot: ${error}`);
+    }
+  }, loadSnapshotCreateMiddleware),
 
   /**
    * Update an existing load snapshot
