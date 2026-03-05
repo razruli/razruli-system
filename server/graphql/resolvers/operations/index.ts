@@ -37,7 +37,10 @@ export const operationsResolvers = {
 
   // Type field resolvers
   Process: processResolvers.Process,
+  ProcessMetrics: processResolvers.ProcessMetrics,
   TaskAssignment: taskAssignmentResolvers.TaskAssignment,
+  TaskAssignmentMetrics: taskAssignmentResolvers.TaskAssignmentMetrics,
+  EmployeeTaskStats: taskAssignmentResolvers.EmployeeTaskStats,
 };
 
 // Export individual entities for selective imports

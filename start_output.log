@@ -1,0 +1,263 @@
+
+> gruzin@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.10.14:3000
+- Environments: .env
+
+✓ Starting...
+✓ Ready in 1069ms
+[DEBUG] Loaded schema file: scalars.graphql 
+[DEBUG] Loaded schema file: index.graphql 
+[DEBUG] Loaded schema file: gapAnalysis.graphql 
+[DEBUG] Loaded schema file: loadSnapshot.graphql 
+[DEBUG] Loaded schema file: auditLog.graphql 
+[DEBUG] Loaded schema file: employeeHistory.graphql 
+[DEBUG] Loaded schema file: company.graphql 
+[DEBUG] Loaded schema file: department.graphql 
+[DEBUG] Loaded schema file: employee.graphql 
+[DEBUG] Loaded schema file: grade.graphql 
+[DEBUG] Loaded schema file: process.graphql 
+[DEBUG] Loaded schema file: taskAssignment.graphql 
+[DEBUG] Loaded schema file: types.graphql 
+[DEBUG] Loaded schema file: queries.graphql 
+[DEBUG] Loaded schema file: types.graphql 
+[INFO] Loaded 15 GraphQL schema files 
+[INFO] Apollo Server starting... 
+[INFO] GraphQL schema loaded with fragments 
+ GET /api/graphql 200 in 1024ms (compile: 1000ms, render: 24ms)
+ GET /favicon.ico 404 in 1513ms (compile: 1227ms, render: 285ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '46e91834-3660-4822-8f0c-75d77c87fd1e',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 45,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 44 }
+ POST /api/graphql 200 in 69ms (compile: 3ms, render: 66ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '3c1bda49-338b-444f-9c69-88475c6bb575',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 29,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 29 }
+ POST /api/graphql 200 in 48ms (compile: 4ms, render: 44ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '36cc69e1-36ce-41af-ab32-a5ca087e5dca',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 21,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 20 }
+ POST /api/graphql 200 in 43ms (compile: 8ms, render: 35ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '9361ee39-9528-47f5-8251-908f30566bf6',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 22,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 22 }
+ POST /api/graphql 200 in 42ms (compile: 9ms, render: 34ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '7282b086-edaf-4d3c-9629-61ed047616cf',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 11,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 11 }
+ POST /api/graphql 200 in 23ms (compile: 1461µs, render: 22ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: 'b6b34313-a854-4f47-93ed-5f28f6cab8c0',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 11,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 11 }
+ POST /api/graphql 200 in 23ms (compile: 2ms, render: 21ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '059bf745-8dc6-4211-bb87-935ef04b01de',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 9,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 9 }
+ POST /api/graphql 200 in 24ms (compile: 3ms, render: 20ms)
+[DEBUG] GraphQL context created successfully {
+  requestId: '73ff48ba-44a5-4112-8718-afd6bcc9bacb',
+  authenticated: false
+}
+[DEBUG] GraphQL operation started {
+  operationName: undefined,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] GraphQL request started: IntrospectionQuery 
+[INFO] GraphQL operation resolved: IntrospectionQuery { operationType: 'query' }
+[INFO] GraphQL request completed {
+  operationName: undefined,
+  duration: 16,
+  variableNames: [],
+  query: '\n' +
+    '    query IntrospectionQuery {\n' +
+    '      __schema {\n' +
+    '        \n' +
+    '        queryType { name }\n' +
+    '        mutatio'
+}
+[INFO] Request completed successfully { duration: 15 }
+ POST /api/graphql 200 in 38ms (compile: 5ms, render: 33ms)

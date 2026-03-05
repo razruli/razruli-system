@@ -38,6 +38,8 @@ export const auditResolvers = {
   // Type field resolvers
   AuditLog: auditLogResolvers.AuditLog,
   EmployeeHistory: employeeHistoryResolvers.EmployeeHistory,
+  DepartmentEmployeeHistory: employeeHistoryResolvers.DepartmentEmployeeHistory,
+  EmployeeAuditReport: employeeHistoryResolvers.EmployeeAuditReport,
 };
 
 // Export individual entities for selective imports

@@ -9,6 +9,7 @@ import {
   gapAnalysisFieldResolvers,
   departmentGapComparisonFieldResolvers,
   hiringForecastFieldResolvers,
+  talentCategoryFieldResolvers,
 } from "./fields";
 import gapAnalysisMutations from "./mutation";
 import gapAnalysisQueries from "./query";
@@ -33,6 +34,7 @@ export const gapAnalysisResolvers = {
   GapAnalysis: gapAnalysisFieldResolvers,
   DepartmentGapComparison: departmentGapComparisonFieldResolvers,
   HiringForecast: hiringForecastFieldResolvers,
+  TalentCategory: talentCategoryFieldResolvers,
 };
 
 export {
@@ -42,6 +44,7 @@ export {
   gapAnalysisFieldResolvers,
   departmentGapComparisonFieldResolvers,
   hiringForecastFieldResolvers,
+  talentCategoryFieldResolvers,
 };
 
 export default gapAnalysisResolvers;

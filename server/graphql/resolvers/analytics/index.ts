@@ -37,7 +37,14 @@ export const analyticsResolvers = {
 
   // Type field resolvers
   GapAnalysis: gapAnalysisResolvers.GapAnalysis,
+  DepartmentGapComparison: gapAnalysisResolvers.DepartmentGapComparison,
+  HiringForecast: gapAnalysisResolvers.HiringForecast,
+  TalentCategory: gapAnalysisResolvers.TalentCategory,
   LoadSnapshot: loadSnapshotResolvers.LoadSnapshot,
+  CompanyLoadAnalysis: loadSnapshotResolvers.CompanyLoadAnalysis,
+  DepartmentLoadOverview: loadSnapshotResolvers.DepartmentLoadOverview,
+  EmployeeLoadBreakdown: loadSnapshotResolvers.EmployeeLoadBreakdown,
+  EmployeeLoadHistory: loadSnapshotResolvers.EmployeeLoadHistory,
 };
 
 // Export individual entities for selective imports
