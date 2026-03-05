@@ -22,6 +22,12 @@ export const employeeResolvers = {
     departmentEmployees: employeeQueries.departmentEmployees,
     employeeCapacity: employeeQueries.employeeCapacity,
     employeeLoadIndex: employeeQueries.employeeLoadIndex,
+    employeeTasks: employeeQueries.employeeTasks,
+    employeeTaskStats: employeeQueries.employeeTaskStats,
+    employeeLoadTrend: employeeQueries.employeeLoadTrend,
+    employeeTimeline: employeeQueries.employeeTimeline,
+    employeeAuditReport: employeeQueries.employeeAuditReport,
+    employeeHistoryEntry: employeeQueries.employeeHistoryEntry,
   },
 
   Mutation: {

@@ -20,6 +20,9 @@ export const taskAssignmentResolvers = {
   Query: {
     taskAssignment: taskAssignmentQueries.taskAssignment,
     taskAssignments: taskAssignmentQueries.taskAssignments,
+    blockedTasks: taskAssignmentQueries.blockedTasks,
+    overdueTasks: taskAssignmentQueries.overdueTasks,
+    taskWithMetrics: taskAssignmentQueries.taskWithMetrics,
   },
 
   Mutation: {

@@ -4674,3 +4674,35 @@ Caused by:
     3: No such file or directory (os error 2)
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
 Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (224910) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <PostCssTransform as SourceTransform>::transform (TaskId 139047))
+
+Caused by:
+    0: Looking up data for TaskId 139047 from database failed
+    1: Unable to open static sorted file referenced from 00000351.meta
+    2: Unable to open static sorted file 00000347.sst
+    3: No such file or directory (os error 2)
+
+thread 'tokio-runtime-worker' (224910) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:156:17:
+Failed to restore task data (corrupted database or bug): Data for <PostCssTransform as SourceTransform>::transform (TaskId 139047))
+
+Caused by:
+    0: Looking up data for TaskId 139047 from database failed
+    1: Unable to open static sorted file referenced from 00000351.meta
+    2: Unable to open static sorted file 00000347.sst
+    3: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+
+thread 'tokio-runtime-worker' (224910) panicked at /build/turbopack/crates/turbo-tasks-backend/src/backend/mod.rs:963:22:
+Failed to lookup task type: Looking up task type for TaskId 280893 from database failed
+
+Caused by:
+    0: Unable to open static sorted file referenced from 00000321.meta
+    1: Unable to open static sorted file 00000319.sst
+    2: No such file or directory (os error 2)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)
+Persisting failed: Another write batch or compaction is already active (Only a single write operations is allowed at a time)

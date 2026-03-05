@@ -8,7 +8,10 @@
 import { withMiddleware } from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
 
-export const processQueries: Pick<QueryResolvers, "process" | "processes"> = {
+export const processQueries: Pick<
+  QueryResolvers,
+  "process" | "processes" | "processTasks" | "processWithMetrics" | "companyProcessMetrics"
+> = {
   /**
    * Get a single process by ID
    * Requires authentication to read process data
@@ -75,6 +78,110 @@ export const processQueries: Pick<QueryResolvers, "process" | "processes"> = {
         };
       } catch (error) {
         throw new Error(`Failed to list processes: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["process:read"],
+    },
+  ),
+
+  /**
+   * Get tasks assigned to a specific process
+   */
+  processTasks: withMiddleware(
+    async (_parent, { processId }, context) => {
+      try {
+        return await context.services.taskAssignment.findByProcess(processId);
+      } catch (error) {
+        throw new Error(`Failed to fetch process tasks: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["process:read"],
+    },
+  ),
+
+  /**
+   * Get process with associated metrics
+   * Includes: completion rate, task count, total load, etc.
+   */
+  processWithMetrics: withMiddleware(
+    async (_parent, { id }, context) => {
+      try {
+        const process = await context.services.process.getById(id);
+        if (!process) return null;
+
+        const tasks = await context.services.taskAssignment.findByProcess(id);
+        const totalLoad = tasks.reduce(
+          (sum, task) => sum + (task.plannedHours || 0),
+          0,
+        );
+
+        return {
+          process,
+          totalTasks: tasks.length,
+          completedTasks: tasks.filter((t) => t.status === "COMPLETED").length,
+          totalPlannedHours: totalLoad,
+          avgTaskLoad: tasks.length > 0 ? totalLoad / tasks.length : 0,
+          completionRate:
+            tasks.length > 0
+              ? (tasks.filter((t) => t.status === "COMPLETED").length /
+                  tasks.length) *
+                100
+              : 0,
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch process metrics: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["process:read"],
+    },
+  ),
+
+  /**
+   * Get metrics for all processes in a company
+   */
+  companyProcessMetrics: withMiddleware(
+    async (_parent, { companyId }, context) => {
+      try {
+        const processes = await context.prisma.process.findMany({
+          where: { companyId },
+        });
+
+        const metrics = await Promise.all(
+          processes.map(async (process) => {
+            const tasks = await context.services.taskAssignment.findByProcess(
+              process.id,
+            );
+            const totalLoad = tasks.reduce(
+              (sum, task) => sum + (task.plannedHours || 0),
+              0,
+            );
+
+            return {
+              process,
+              totalTasks: tasks.length,
+              completedTasks: tasks.filter((t) => t.status === "COMPLETED")
+                .length,
+              totalPlannedHours: totalLoad,
+              avgTaskLoad: tasks.length > 0 ? totalLoad / tasks.length : 0,
+              completionRate:
+                tasks.length > 0
+                  ? (tasks.filter((t) => t.status === "COMPLETED").length /
+                      tasks.length) *
+                    100
+                  : 0,
+            };
+          }),
+        );
+
+        return metrics;
+      } catch (error) {
+        throw new Error(`Failed to fetch company process metrics: ${error}`);
       }
     },
     {

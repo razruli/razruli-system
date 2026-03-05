@@ -10,7 +10,7 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 
 export const taskAssignmentQueries: Pick<
   QueryResolvers,
-  "taskAssignment" | "taskAssignments"
+  "taskAssignment" | "taskAssignments" | "blockedTasks" | "overdueTasks" | "taskWithMetrics"
 > = {
   /**
    * Get a single task assignment by ID
@@ -102,6 +102,101 @@ export const taskAssignmentQueries: Pick<
   //     requiredPermissions: ["taskAssignment:read"],
   //   },
   // ),
+
+  /**
+   * Get blocked tasks (tasks that are blocked by other tasks)
+   */
+  blockedTasks: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        const tasks = await context.prisma.taskAssignment.findMany({
+          where: {
+            status: "BLOCKED",
+            ...(employeeId && { employeeId }),
+          },
+          include: { employee: true, process: true },
+        });
+
+        return tasks;
+      } catch (error) {
+        throw new Error(`Failed to fetch blocked tasks: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["taskAssignment:read"],
+    },
+  ),
+
+  /**
+   * Get overdue tasks (tasks past due date)
+   */
+  overdueTasks: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        const now = new Date();
+        const tasks = await context.prisma.taskAssignment.findMany({
+          where: {
+            dueDate: {
+              lt: now,
+            },
+            status: { not: "COMPLETED" },
+            ...(employeeId && { employeeId }),
+          },
+          include: { employee: true, process: true },
+        });
+
+        return tasks;
+      } catch (error) {
+        throw new Error(`Failed to fetch overdue tasks: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["taskAssignment:read"],
+    },
+  ),
+
+  /**
+   * Get task assignment with associated metrics
+   * Includes: completion progress, time remaining, load impact, etc.
+   */
+  taskWithMetrics: withMiddleware(
+    async (_parent, { id }, context) => {
+      try {
+        const task = await context.services.taskAssignment.getById(id);
+        if (!task) return null;
+
+        const now = new Date();
+        const isOverdue = task.dueDate && task.dueDate < now && task.status !== "COMPLETED";
+        const timeRemaining = task.dueDate
+          ? Math.max(0, task.dueDate.getTime() - now.getTime())
+          : null;
+
+        return {
+          task,
+          completionPercentage:
+            task.status === "COMPLETED"
+              ? 100
+              : task.status === "IN_PROGRESS"
+                ? 50
+                : task.status === "BLOCKED"
+                  ? 0
+                  : 25,
+          isOverdue,
+          timeRemaining,
+          estimatedLoad: task.plannedHours || 0,
+          priority: task.priority || "MEDIUM",
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch task metrics: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["taskAssignment:read"],
+    },
+  ),
 };
 
 export default taskAssignmentQueries;

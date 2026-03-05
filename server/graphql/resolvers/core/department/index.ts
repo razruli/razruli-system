@@ -23,6 +23,11 @@ export const departmentResolvers = {
     department: departmentQueries.department,
     departments: departmentQueries.departments,
     departmentWithMetrics: departmentQueries.departmentWithMetrics,
+    departmentProcesses: departmentQueries.departmentProcesses,
+    departmentSnapshots: departmentQueries.departmentSnapshots,
+    departmentGapComparison: departmentQueries.departmentGapComparison,
+    departmentLoadOverview: departmentQueries.departmentLoadOverview,
+    departmentEmployeeHistory: departmentQueries.departmentEmployeeHistory,
   },
 
   Mutation: {

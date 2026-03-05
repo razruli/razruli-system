@@ -17,6 +17,9 @@ export const processResolvers = {
   Query: {
     process: processQueries.process,
     processes: processQueries.processes,
+    processTasks: processQueries.processTasks,
+    processWithMetrics: processQueries.processWithMetrics,
+    companyProcessMetrics: processQueries.companyProcessMetrics,
   },
 
   Mutation: {

@@ -15,6 +15,12 @@ export const employeeQueries: Pick<
   | "departmentEmployees"
   | "employeeCapacity"
   | "employeeLoadIndex"
+  | "employeeTasks"
+  | "employeeTaskStats"
+  | "employeeLoadTrend"
+  | "employeeTimeline"
+  | "employeeAuditReport"
+  | "employeeHistoryEntry"
 > = {
   /**
    * Get a single employee by ID
@@ -168,6 +174,168 @@ export const employeeQueries: Pick<
     {
       requireAuth: true,
       requiredPermissions: ["employee:read", "analytics:read"],
+    },
+  ),
+
+  /**
+   * Get tasks assigned to an employee
+   */
+  employeeTasks: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        const tasks = await context.services.taskAssignment.findByEmployee(
+          employeeId,
+        );
+        return tasks;
+      } catch (error) {
+        throw new Error(`Failed to fetch employee tasks: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "taskAssignment:read"],
+    },
+  ),
+
+  /**
+   * Get task statistics for an employee
+   */
+  employeeTaskStats: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        const tasks = await context.services.taskAssignment.findByEmployee(
+          employeeId,
+        );
+
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter((t) => t.status === "COMPLETED")
+          .length;
+        const inProgressTasks = tasks.filter((t) => t.status === "IN_PROGRESS")
+          .length;
+        const blockedTasks = tasks.filter((t) => t.status === "BLOCKED").length;
+        const totalPlannedHours = tasks.reduce(
+          (sum, t) => sum + (t.plannedHours || 0),
+          0,
+        );
+
+        return {
+          employee: await context.services.employee.getById(employeeId),
+          totalTasks,
+          completedTasks,
+          inProgressTasks,
+          blockedTasks,
+          completionRate:
+            totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
+          totalPlannedHours,
+          avgTaskLoad: totalTasks > 0 ? totalPlannedHours / totalTasks : 0,
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch employee task stats: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "analytics:read"],
+    },
+  ),
+
+  /**
+   * Get employee's load trend over time
+   */
+  employeeLoadTrend: withMiddleware(
+    async (_parent, { employeeId, dateRange }, context) => {
+      try {
+        const startDate = new Date(dateRange.start);
+        const endDate = new Date(dateRange.end);
+
+        // Placeholder implementation
+        return {
+          employee: await context.services.employee.getById(employeeId),
+          startDate,
+          endDate,
+          dataPoints: [],
+          avgLoad: 0,
+          peakLoad: 0,
+          minLoad: 0,
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch employee load trend: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "analytics:read"],
+    },
+  ),
+
+  /**
+   * Get employee's timeline of events
+   */
+  employeeTimeline: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        // Placeholder implementation
+        return [
+          {
+            timestamp: new Date(),
+            eventType: "ASSIGNED",
+            description: "Task assigned",
+          },
+        ];
+      } catch (error) {
+        throw new Error(`Failed to fetch employee timeline: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "audit:read"],
+    },
+  ),
+
+  /**
+   * Get employee's audit report
+   */
+  employeeAuditReport: withMiddleware(
+    async (_parent, { employeeId, dateRange }, context) => {
+      try {
+        const startDate = new Date(dateRange.start);
+        const endDate = new Date(dateRange.end);
+
+        // Placeholder implementation
+        return {
+          employee: await context.services.employee.getById(employeeId),
+          from: startDate,
+          to: endDate,
+          totalChanges: 0,
+          approvedChanges: 0,
+          pendingChanges: 0,
+          rejectedChanges: 0,
+          changes: [],
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch employee audit report: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "audit:read"],
+    },
+  ),
+
+  /**
+   * Get a specific employee history entry
+   */
+  employeeHistoryEntry: withMiddleware(
+    async (_parent, { id }, context) => {
+      try {
+        return await context.services.employeeHistory.getById(id);
+      } catch (error) {
+        throw new Error(`Failed to fetch employee history entry: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["employee:read", "audit:read"],
     },
   ),
 };
