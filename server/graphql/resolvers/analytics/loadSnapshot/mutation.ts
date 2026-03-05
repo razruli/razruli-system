@@ -5,8 +5,20 @@
  * Handles all load snapshot modification operations with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + loadSnapshot:create permission */
+const loadSnapshotCreateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["loadSnapshot:create"] },
+);
 
 export const loadSnapshotMutations: Pick<
   MutationResolvers,
@@ -40,10 +52,7 @@ export const loadSnapshotMutations: Pick<
         throw new Error(`Failed to create load snapshot: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["loadSnapshot:create"],
-    },
+    loadSnapshotCreateMiddleware,
   ),
 
   /**

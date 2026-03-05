@@ -1,5 +1,17 @@
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + department:read permission */
+const departmentReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["department:read"] },
+);
 
 export const departmentQueries: Pick<
   QueryResolvers,
@@ -16,10 +28,7 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read"],
-    },
+    departmentReadMiddleware,
   ),
 
   /**
@@ -50,10 +59,7 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to list departments: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read"],
-    },
+    departmentReadMiddleware,
   ),
 
   /**
@@ -81,10 +87,7 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department metrics: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read"],
-    },
+    departmentReadMiddleware,
   ),
 
   /**
@@ -101,10 +104,10 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department processes: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read", "process:read"],
-    },
+    composeMiddleware(
+      { requireAuth: true },
+      { requiredPermissions: ["department:read", "process:read"] },
+    ),
   ),
 
   /**
@@ -129,10 +132,10 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department snapshots: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read", "analytics:read"],
-    },
+    composeMiddleware(
+      { requireAuth: true },
+      { requiredPermissions: ["department:read", "analytics:read"] },
+    ),
   ),
 
   /**
@@ -157,10 +160,10 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department gap comparison: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read", "analytics:read"],
-    },
+    composeMiddleware(
+      { requireAuth: true },
+      { requiredPermissions: ["department:read", "analytics:read"] },
+    ),
   ),
 
   /**
@@ -188,10 +191,10 @@ export const departmentQueries: Pick<
         throw new Error(`Failed to fetch department load overview: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read", "analytics:read"],
-    },
+    composeMiddleware(
+      { requireAuth: true },
+      { requiredPermissions: ["department:read", "analytics:read"] },
+    ),
   ),
 
   /**
@@ -226,9 +229,10 @@ export const departmentQueries: Pick<
         );
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:read", "audit:read"],
+    composeMiddleware(
+      { requireAuth: true },
+      { requiredPermissions: ["department:read", "audit:read"] },
+    ),
     },
   ),
 };

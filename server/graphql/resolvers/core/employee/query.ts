@@ -5,10 +5,7 @@
  * Handles all employee-related queries with middleware orchestration
  */
 
-import {
-  composeMiddleware,
-  withMiddleware,
-} from "@/server/graphql/middleware";
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE COMPOSITION ====================
@@ -62,16 +59,13 @@ export const employeeQueries: Pick<
    * Get a single employee by ID
    * Requires authentication to read employee data
    */
-  employee: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        return await context.services.employee.getById(id);
-      } catch (error) {
-        throw new Error(`Failed to fetch employee: ${error}`);
-      }
-    },
-    employeeReadMiddleware,
-  ),
+  employee: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      return await context.services.employee.getById(id);
+    } catch (error) {
+      throw new Error(`Failed to fetch employee: ${error}`);
+    }
+  }, employeeReadMiddleware),
 
   /**
    * List employees with filtering and pagination
@@ -150,23 +144,20 @@ export const employeeQueries: Pick<
    * Get employee capacity as percentage
    * Returns current capacity utilization (0-200)
    */
-  employeeCapacity: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        // Verify employee exists
-        await context.services.employee.getByIdOrThrow(id);
+  employeeCapacity: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      // Verify employee exists
+      await context.services.employee.getByIdOrThrow(id);
 
-        // Calculate capacity as percentage
-        // This is the allocated load / available capacity
-        const capacity = await context.services.employee.calculateCapacity(id);
+      // Calculate capacity as percentage
+      // This is the allocated load / available capacity
+      const capacity = await context.services.employee.calculateCapacity(id);
 
-        return capacity;
-      } catch (error) {
-        throw new Error(`Failed to fetch employee capacity: ${error}`);
-      }
-    },
-    employeeWithAnalyticsMiddleware,
-  ),
+      return capacity;
+    } catch (error) {
+      throw new Error(`Failed to fetch employee capacity: ${error}`);
+    }
+  }, employeeWithAnalyticsMiddleware),
 
   /**
    * Get employee load index for workload analysis
@@ -201,19 +192,15 @@ export const employeeQueries: Pick<
   /**
    * Get tasks assigned to an employee
    */
-  employeeTasks: withMiddleware(
-    async (_parent, { employeeId }, context) => {
-      try {
-        const tasks = await context.services.taskAssignment.findByEmployee(
-          employeeId,
-        );
-        return tasks;
-      } catch (error) {
-        throw new Error(`Failed to fetch employee tasks: ${error}`);
-      }
-    },
-    employeeWithTasksMiddleware,
-  ),
+  employeeTasks: withMiddleware(async (_parent, { employeeId }, context) => {
+    try {
+      const tasks =
+        await context.services.taskAssignment.findByEmployee(employeeId);
+      return tasks;
+    } catch (error) {
+      throw new Error(`Failed to fetch employee tasks: ${error}`);
+    }
+  }, employeeWithTasksMiddleware),
 
   /**
    * Get task statistics for an employee
@@ -221,15 +208,16 @@ export const employeeQueries: Pick<
   employeeTaskStats: withMiddleware(
     async (_parent, { employeeId }, context) => {
       try {
-        const tasks = await context.services.taskAssignment.findByEmployee(
-          employeeId,
-        );
+        const tasks =
+          await context.services.taskAssignment.findByEmployee(employeeId);
 
         const totalTasks = tasks.length;
-        const completedTasks = tasks.filter((t) => t.status === "COMPLETED")
-          .length;
-        const inProgressTasks = tasks.filter((t) => t.status === "IN_PROGRESS")
-          .length;
+        const completedTasks = tasks.filter(
+          (t) => t.status === "COMPLETED",
+        ).length;
+        const inProgressTasks = tasks.filter(
+          (t) => t.status === "IN_PROGRESS",
+        ).length;
         const blockedTasks = tasks.filter((t) => t.status === "BLOCKED").length;
         const totalPlannedHours = tasks.reduce(
           (sum, t) => sum + (t.plannedHours || 0),
@@ -283,23 +271,20 @@ export const employeeQueries: Pick<
   /**
    * Get employee's timeline of events
    */
-  employeeTimeline: withMiddleware(
-    async (_parent, { employeeId }, context) => {
-      try {
-        // Placeholder implementation
-        return [
-          {
-            timestamp: new Date(),
-            eventType: "ASSIGNED",
-            description: "Task assigned",
-          },
-        ];
-      } catch (error) {
-        throw new Error(`Failed to fetch employee timeline: ${error}`);
-      }
-    },
-    employeeWithAuditMiddleware,
-  ),
+  employeeTimeline: withMiddleware(async (_parent, { employeeId }, context) => {
+    try {
+      // Placeholder implementation
+      return [
+        {
+          timestamp: new Date(),
+          eventType: "ASSIGNED",
+          description: "Task assigned",
+        },
+      ];
+    } catch (error) {
+      throw new Error(`Failed to fetch employee timeline: ${error}`);
+    }
+  }, employeeWithAuditMiddleware),
 
   /**
    * Get employee's audit report
@@ -331,16 +316,13 @@ export const employeeQueries: Pick<
   /**
    * Get a specific employee history entry
    */
-  employeeHistoryEntry: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        return await context.services.employeeHistory.getById(id);
-      } catch (error) {
-        throw new Error(`Failed to fetch employee history entry: ${error}`);
-      }
-    },
-    employeeWithAuditMiddleware,
-  ),
+  employeeHistoryEntry: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      return await context.services.employeeHistory.getById(id);
+    } catch (error) {
+      throw new Error(`Failed to fetch employee history entry: ${error}`);
+    }
+  }, employeeWithAuditMiddleware),
 };
 
 export default employeeQueries;

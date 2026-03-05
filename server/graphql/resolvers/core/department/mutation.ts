@@ -5,8 +5,32 @@
  * Handles all department modification operations with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + department:create permission */
+const departmentCreateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["department:create"] },
+);
+
+/** Require authentication + department:update permission */
+const departmentUpdateMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["department:update"] },
+);
+
+/** Require authentication + department:delete permission */
+const departmentDeleteMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["department:delete"] },
+);
 
 export const departmentMutations: Pick<
   MutationResolvers,
@@ -45,10 +69,7 @@ export const departmentMutations: Pick<
         throw new Error(`Failed to create department: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:create"],
-    },
+    departmentCreateMiddleware,
   ),
 
   /**
@@ -90,10 +111,7 @@ export const departmentMutations: Pick<
         throw new Error(`Failed to update department: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:update"],
-    },
+    departmentUpdateMiddleware,
   ),
 
   /**
@@ -113,10 +131,7 @@ export const departmentMutations: Pick<
         throw new Error(`Failed to delete department: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:delete"],
-    },
+    departmentDeleteMiddleware,
   ),
 
   /**
@@ -134,10 +149,7 @@ export const departmentMutations: Pick<
         throw new Error(`Failed to assign department head: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["department:update"],
-    },
+    departmentUpdateMiddleware,
   ),
 };
 

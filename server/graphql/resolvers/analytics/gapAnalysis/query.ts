@@ -5,10 +5,7 @@
  * Handles all gap analysis-related queries with middleware orchestration
  */
 
-import {
-  composeMiddleware,
-  withMiddleware,
-} from "@/server/graphql/middleware";
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE COMPOSITION ====================
@@ -34,16 +31,13 @@ export const gapAnalysisQueries: Pick<
    * Get a single gap analysis by ID
    * Requires authentication to read analysis data
    */
-  gapAnalysis: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        return await context.services.gapAnalysis.getById(id);
-      } catch (error) {
-        throw new Error(`Failed to fetch gap analysis: ${error}`);
-      }
-    },
-    gapAnalysisReadMiddleware,
-  ),
+  gapAnalysis: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      return await context.services.gapAnalysis.getById(id);
+    } catch (error) {
+      throw new Error(`Failed to fetch gap analysis: ${error}`);
+    }
+  }, gapAnalysisReadMiddleware),
 
   /**
    * List gap analyses with filtering and pagination
@@ -100,22 +94,19 @@ export const gapAnalysisQueries: Pick<
   /**
    * Get gap analysis trend over time
    */
-  gapAnalysisTrend: withMiddleware(
-    async (_parent, { dateRange }) => {
-      try {
-        return [
-          {
-            date: new Date(dateRange.from),
-            gap: 0,
-            trend: "STABLE",
-          },
-        ];
-      } catch (error) {
-        throw new Error(`Failed to fetch gap analysis trend: ${error}`);
-      }
-    },
-    gapAnalysisReadMiddleware,
-  ),
+  gapAnalysisTrend: withMiddleware(async (_parent, { dateRange }) => {
+    try {
+      return [
+        {
+          date: new Date(dateRange.from),
+          gap: 0,
+          trend: "STABLE",
+        },
+      ];
+    } catch (error) {
+      throw new Error(`Failed to fetch gap analysis trend: ${error}`);
+    }
+  }, gapAnalysisReadMiddleware),
 
   /**
    * Get gap criticality assessment
@@ -140,23 +131,20 @@ export const gapAnalysisQueries: Pick<
   /**
    * Get hiring forecast
    */
-  hiringForecast: withMiddleware(
-    async (_parent, { companyId }, context) => {
-      try {
-        return {
-          company: await context.services.company.getById(companyId),
-          forecastPeriod: "6_MONTHS",
-          recommendedHires: 0,
-          priorityRoles: [],
-          estimatedCost: 0,
-          timeline: [],
-        };
-      } catch (error) {
-        throw new Error(`Failed to fetch hiring forecast: ${error}`);
-      }
-    },
-    gapAnalysisReadMiddleware,
-  ),
+  hiringForecast: withMiddleware(async (_parent, { companyId }, context) => {
+    try {
+      return {
+        company: await context.services.company.getById(companyId),
+        forecastPeriod: "6_MONTHS",
+        recommendedHires: 0,
+        priorityRoles: [],
+        estimatedCost: 0,
+        timeline: [],
+      };
+    } catch (error) {
+      throw new Error(`Failed to fetch hiring forecast: ${error}`);
+    }
+  }, gapAnalysisReadMiddleware),
 
   /**
    * Get latest company gap analysis

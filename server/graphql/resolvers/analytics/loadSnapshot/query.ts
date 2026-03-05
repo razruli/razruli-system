@@ -5,8 +5,26 @@
  * Handles all load snapshot-related queries with middleware orchestration
  */
 
-import { withMiddleware } from "@/server/graphql/middleware";
+import {
+  composeMiddleware,
+  withMiddleware,
+} from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
+
+// ==================== MIDDLEWARE COMPOSITION ====================
+// Define reusable middleware configurations
+
+/** Require authentication + loadSnapshot:read permission */
+const loadSnapshotReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["loadSnapshot:read"] },
+);
+
+/** Require authentication + loadSnapshot:read + analytics:read permissions */
+const loadSnapshotWithAnalyticsMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["loadSnapshot:read", "analytics:read"] },
+);
 
 export const loadSnapshotQueries: Pick<
   QueryResolvers,
@@ -24,10 +42,7 @@ export const loadSnapshotQueries: Pick<
         throw new Error(`Failed to fetch load snapshot: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["loadSnapshot:read"],
-    },
+    loadSnapshotReadMiddleware,
   ),
 
   /**
@@ -80,10 +95,7 @@ export const loadSnapshotQueries: Pick<
         throw new Error(`Failed to list load snapshots: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["loadSnapshot:read"],
-    },
+    loadSnapshotReadMiddleware,
   ),
 
   /**
@@ -97,10 +109,7 @@ export const loadSnapshotQueries: Pick<
   //       throw new Error(`Failed to fetch employee load snapshots: ${error}`);
   //     }
   //   },
-  //   {
-  //     requireAuth: true,
-  //     requiredPermissions: ["loadSnapshot:read"],
-  //   },
+  //   loadSnapshotReadMiddleware,
   // ),
 
   /**
@@ -123,10 +132,7 @@ export const loadSnapshotQueries: Pick<
         throw new Error(`Failed to fetch load anomalies: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["loadSnapshot:read", "analytics:read"],
-    },
+    loadSnapshotWithAnalyticsMiddleware,
   ),
 
   /**
@@ -143,10 +149,7 @@ export const loadSnapshotQueries: Pick<
         throw new Error(`Failed to fetch latest employee snapshot: ${error}`);
       }
     },
-    {
-      requireAuth: true,
-      requiredPermissions: ["loadSnapshot:read"],
-    },
+    loadSnapshotReadMiddleware,
   ),
 };
 

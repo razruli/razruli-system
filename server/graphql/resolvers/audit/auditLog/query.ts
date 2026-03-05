@@ -5,10 +5,7 @@
  * Handles all audit log-related queries with middleware orchestration
  */
 
-import {
-  composeMiddleware,
-  withMiddleware,
-} from "@/server/graphql/middleware";
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { QueryResolvers } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE COMPOSITION ====================
@@ -34,16 +31,13 @@ export const auditLogQueries: Pick<
    * Get a single audit log by ID
    * Requires authentication to read audit data
    */
-  auditLog: withMiddleware(
-    async (_parent, { id }, context) => {
-      try {
-        return await context.services.auditLog.getById(id);
-      } catch (error) {
-        throw new Error(`Failed to fetch audit log: ${error}`);
-      }
-    },
-    auditLogReadMiddleware,
-  ),
+  auditLog: withMiddleware(async (_parent, { id }, context) => {
+    try {
+      return await context.services.auditLog.getById(id);
+    } catch (error) {
+      throw new Error(`Failed to fetch audit log: ${error}`);
+    }
+  }, auditLogReadMiddleware),
 
   /**
    * List audit logs with filtering and pagination
@@ -103,21 +97,18 @@ export const auditLogQueries: Pick<
   /**
    * Get data access audit for a company
    */
-  dataAccessAudit: withMiddleware(
-    async (_parent, { companyId }, context) => {
-      try {
-        return (
-          (await context.prisma.auditLog.findMany({
-            where: { companyId },
-            take: 100,
-          })) || []
-        );
-      } catch (error) {
-        throw new Error(`Failed to fetch data access audit: ${error}`);
-      }
-    },
-    auditLogReadMiddleware,
-  ),
+  dataAccessAudit: withMiddleware(async (_parent, { companyId }, context) => {
+    try {
+      return (
+        (await context.prisma.auditLog.findMany({
+          where: { companyId },
+          take: 100,
+        })) || []
+      );
+    } catch (error) {
+      throw new Error(`Failed to fetch data access audit: ${error}`);
+    }
+  }, auditLogReadMiddleware),
 
   /**
    * Get security incident report
@@ -163,16 +154,13 @@ export const auditLogQueries: Pick<
   /**
    * Get failed login attempts
    */
-  failedLoginAttempts: withMiddleware(
-    async (_parent) => {
-      try {
-        return [];
-      } catch (error) {
-        throw new Error(`Failed to fetch failed login attempts: ${error}`);
-      }
-    },
-    auditLogReadMiddleware,
-  ),
+  failedLoginAttempts: withMiddleware(async (_parent) => {
+    try {
+      return [];
+    } catch (error) {
+      throw new Error(`Failed to fetch failed login attempts: ${error}`);
+    }
+  }, auditLogReadMiddleware),
 
   /**
    * Get audit trail for a specific entity
