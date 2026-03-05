@@ -10,7 +10,13 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 
 export const gapAnalysisQueries: Pick<
   QueryResolvers,
-  "gapAnalysis" | "gapAnalyses"
+  | "gapAnalysis"
+  | "gapAnalyses"
+  | "gapAnalysisTrend"
+  | "gapCriticalityAssessment"
+  | "hiringForecast"
+  | "latestCompanyGapAnalysis"
+  | "latestDepartmentGapAnalysis"
 > = {
   /**
    * Get a single gap analysis by ID
@@ -77,6 +83,118 @@ export const gapAnalysisQueries: Pick<
         };
       } catch (error) {
         throw new Error(`Failed to list gap analyses: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["gapAnalysis:read"],
+    },
+  ),
+
+  /**
+   * Get gap analysis trend over time
+   */
+  gapAnalysisTrend: withMiddleware(
+    async (_parent, { companyId, dateRange }, context) => {
+      try {
+        return [
+          {
+            date: new Date(dateRange.start),
+            gap: 0,
+            trend: "STABLE",
+          },
+        ];
+      } catch (error) {
+        throw new Error(`Failed to fetch gap analysis trend: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["gapAnalysis:read"],
+    },
+  ),
+
+  /**
+   * Get gap criticality assessment
+   */
+  gapCriticalityAssessment: withMiddleware(
+    async (_parent, { companyId }, context) => {
+      try {
+        return {
+          company: await context.services.company.getById(companyId),
+          criticalityScore: 0,
+          riskLevel: "LOW",
+          affectedDepartments: 0,
+          priorityAreas: [],
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch gap criticality assessment: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["gapAnalysis:read"],
+    },
+  ),
+
+  /**
+   * Get hiring forecast
+   */
+  hiringForecast: withMiddleware(
+    async (_parent, { companyId }, context) => {
+      try {
+        return {
+          company: await context.services.company.getById(companyId),
+          forecastPeriod: "6_MONTHS",
+          recommendedHires: 0,
+          priorityRoles: [],
+          estimatedCost: 0,
+          timeline: [],
+        };
+      } catch (error) {
+        throw new Error(`Failed to fetch hiring forecast: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["gapAnalysis:read"],
+    },
+  ),
+
+  /**
+   * Get latest company gap analysis
+   */
+  latestCompanyGapAnalysis: withMiddleware(
+    async (_parent, { companyId }, context) => {
+      try {
+        return await context.services.gapAnalysis.getLatestForCompany(
+          companyId,
+        );
+      } catch (error) {
+        throw new Error(
+          `Failed to fetch latest company gap analysis: ${error}`,
+        );
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["gapAnalysis:read"],
+    },
+  ),
+
+  /**
+   * Get latest department gap analysis
+   */
+  latestDepartmentGapAnalysis: withMiddleware(
+    async (_parent, { departmentId }, context) => {
+      try {
+        return await context.services.gapAnalysis.getLatestForDepartment(
+          departmentId,
+        );
+      } catch (error) {
+        throw new Error(
+          `Failed to fetch latest department gap analysis: ${error}`,
+        );
       }
     },
     {

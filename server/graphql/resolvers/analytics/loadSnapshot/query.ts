@@ -10,7 +10,7 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 
 export const loadSnapshotQueries: Pick<
   QueryResolvers,
-  "loadSnapshot" | "loadSnapshots"
+  "loadSnapshot" | "loadSnapshots" | "loadAnomalies" | "latestEmployeeSnapshot"
 > = {
   /**
    * Get a single load snapshot by ID
@@ -102,6 +102,52 @@ export const loadSnapshotQueries: Pick<
   //     requiredPermissions: ["loadSnapshot:read"],
   //   },
   // ),
+
+  /**
+   * Get load anomalies (unusual load patterns)
+   */
+  loadAnomalies: withMiddleware(
+    async (_parent, { companyId }, context) => {
+      try {
+        const employees = await context.prisma.employee.findMany({
+          where: { companyId },
+        });
+
+        const snapshots = await context.prisma.loadSnapshot.findMany({
+          where: { employeeId: { in: employees.map((e) => e.id) } },
+        });
+
+        // Placeholder - return snapshots with extreme loads
+        return snapshots.filter((s) => (s.allocatedLoad as any) > 150);
+      } catch (error) {
+        throw new Error(`Failed to fetch load anomalies: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["loadSnapshot:read", "analytics:read"],
+    },
+  ),
+
+  /**
+   * Get latest load snapshot for an employee
+   */
+  latestEmployeeSnapshot: withMiddleware(
+    async (_parent, { employeeId }, context) => {
+      try {
+        return await context.prisma.loadSnapshot.findFirst({
+          where: { employeeId },
+          orderBy: { createdAt: "desc" },
+        });
+      } catch (error) {
+        throw new Error(`Failed to fetch latest employee snapshot: ${error}`);
+      }
+    },
+    {
+      requireAuth: true,
+      requiredPermissions: ["loadSnapshot:read"],
+    },
+  ),
 };
 
 export default loadSnapshotQueries;
