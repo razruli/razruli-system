@@ -10,7 +10,13 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 
 export const auditLogQueries: Pick<
   QueryResolvers,
-  "auditLog" | "auditLogs" | "dataAccessAudit" | "securityIncidentReport" | "suspiciousActivities" | "failedLoginAttempts" | "entityAuditTrail"
+  | "auditLog"
+  | "auditLogs"
+  | "dataAccessAudit"
+  | "securityIncidentReport"
+  | "suspiciousActivities"
+  | "failedLoginAttempts"
+  | "entityAuditTrail"
 > = {
   /**
    * Get a single audit log by ID

@@ -28,7 +28,7 @@ export const gapAnalysisMutations: Pick<
         const gapAnalysis = await context.services.gapAnalysis.create({
           companyId: input.companyId,
           departmentId: input.departmentId,
-          analysisDate: input.analysisDate,
+          analysisDate: input.startDate,
         });
 
         // TODO: Implement event emitter
@@ -48,21 +48,13 @@ export const gapAnalysisMutations: Pick<
    * Supports partial updates
    */
   updateGapAnalysis: withMiddleware(
-    async (_parent, { id, input }, context) => {
+    async (_parent, { id }, context) => {
       try {
         // Get old values
-        const oldAnalysis =
-          await context.services.gapAnalysis.getByIdOrThrow(id);
+        const oldAnalysis = await context.services.gapAnalysis.getById(id);
 
         // Build update data from provided fields
         const updateData: Record<string, unknown> = {};
-
-        if (
-          input.analysisDate !== undefined &&
-          input.analysisDate !== oldAnalysis.analysisDate
-        ) {
-          updateData.analysisDate = input.analysisDate;
-        }
 
         if (Object.keys(updateData).length === 0) {
           return oldAnalysis;

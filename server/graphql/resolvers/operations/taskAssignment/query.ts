@@ -10,7 +10,11 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 
 export const taskAssignmentQueries: Pick<
   QueryResolvers,
-  "taskAssignment" | "taskAssignments" | "blockedTasks" | "overdueTasks" | "taskWithMetrics"
+  | "taskAssignment"
+  | "taskAssignments"
+  | "blockedTasks"
+  | "overdueTasks"
+  | "taskWithMetrics"
 > = {
   /**
    * Get a single task assignment by ID
@@ -168,7 +172,8 @@ export const taskAssignmentQueries: Pick<
         if (!task) return null;
 
         const now = new Date();
-        const isOverdue = task.dueDate && task.dueDate < now && task.status !== "COMPLETED";
+        const isOverdue =
+          task.dueDate && task.dueDate < now && task.status !== "COMPLETED";
         const timeRemaining = task.dueDate
           ? Math.max(0, task.dueDate.getTime() - now.getTime())
           : null;

@@ -2,15 +2,19 @@ import type { GraphQLResolveInfo } from "graphql";
 
 import type { GraphQLContext } from "@/server/graphql/context";
 
-export interface MiddlewareOptions {
+/**
+ * Generic middleware options with type-safe argument validation
+ * @template TArgs - The argument type passed to the resolver
+ */
+export interface MiddlewareOptions<TArgs = any> {
   /** Require authenticated user */
   requireAuth?: boolean;
 
   /** Required permissions in format "resource:action" */
   requiredPermissions?: string[];
 
-  /** Custom validation function */
-  validate?: (args: any) => boolean | Promise<boolean>;
+  /** Custom validation function with type-safe args */
+  validate?: (args: TArgs) => boolean | Promise<boolean>;
 
   /** Custom validation error message */
   validationMessage?: string;
@@ -19,9 +23,17 @@ export interface MiddlewareOptions {
   skipMiddleware?: boolean;
 }
 
-export interface MiddlewareContext {
-  context: GraphQLContext;
-  args: any;
+/**
+ * Generic middleware context with typed arguments
+ * @template TArgs - The argument type
+ * @template TContext - The context type (defaults to GraphQLContext)
+ */
+export interface MiddlewareContext<
+  TArgs = any,
+  TContext extends GraphQLContext = GraphQLContext,
+> {
+  context: TContext;
+  args: TArgs;
   info: GraphQLResolveInfo;
 }
 
