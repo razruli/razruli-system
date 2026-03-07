@@ -1,0 +1,265 @@
+// ============================================================================
+// ACTOR MODEL - Business Entity Identity Layer
+// ============================================================================
+// Separates authentication (User) from business logic (Actor)
+// User: only manages auth with better-auth
+// Actor: represents the business entity with roles, permissions, and relations
+// ============================================================================
+
+model Actor {
+  id String @id @default(cuid())
+
+  /**
+   * Authentication Link
+   * Many-to-one relationship to User (via userId)
+   * Actor is purely business logic, User is purely authentication
+   */
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /**
+   * Business Identity
+   */
+  name String
+  email String
+  avatar String?
+  phone String?
+  bio String?
+
+  /**
+   * Business Context
+   */
+  companyId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  departmentId String?
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  /**
+   * Status
+   */
+  status ActorStatus @default(ACTIVE)
+
+  /**
+   * Authorization
+   */
+  roles ActorRole[]
+  permissions ActorPermission[]
+
+  /**
+   * Relations for tracking actions
+   */
+  auditLogsCreated AuditLog[] @relation("CreatedByActor")
+  employeeHistoryCreated EmployeeHistory[] @relation("CreatedByActor")
+  employeeHistoryApproved EmployeeHistory[] @relation("ApprovedByActor")
+
+  /**
+   * Metadata
+   */
+  metadata Json?
+  lastLoginAt DateTime?
+  lastActivityAt DateTime?
+
+  /**
+   * Timestamps
+   */
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([email])
+  @@index([userId])
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([status])
+  @@map("actor")
+}
+
+// ============================================================================
+// ROLE MODEL - Authorization Roles
+// ============================================================================
+model Role {
+  id String @id @default(cuid())
+
+  /**
+   * Role metadata
+   */
+  name String @unique
+  description String?
+  slug String @unique
+
+  /**
+   * Scope: either system-wide or company-specific
+   */
+  scope RoleScope @default(SYSTEM)
+  companyId String? // null = system role, non-null = company-specific role
+  company Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  /**
+   * Relations
+   */
+  actorRoles ActorRole[]
+  permissions RolePermission[]
+
+  /**
+   * Timestamps
+   */
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, companyId])
+  @@index([scope])
+  @@index([companyId])
+  @@map("role")
+}
+
+// ============================================================================
+// PERMISSION MODEL - Fine-grained Authorization
+// ============================================================================
+model Permission {
+  id String @id @default(cuid())
+
+  /**
+   * Permission metadata
+   */
+  name String @unique
+  description String?
+  slug String @unique
+
+  /**
+   * Resource and action
+   * e.g., "employee:read", "employee:write", "process:delete"
+   */
+  resource String // e.g., "employee", "process", "company"
+  action String   // e.g., "read", "create", "update", "delete", "approve"
+
+  /**
+   * Scope: system-wide or company-specific
+   */
+  scope PermissionScope @default(SYSTEM)
+
+  /**
+   * Relations
+   */
+  roles RolePermission[]
+  actors ActorPermission[]
+
+  /**
+   * Timestamps
+   */
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([resource, action])
+  @@index([scope])
+  @@map("permission")
+}
+
+// ============================================================================
+// JUNCTION TABLES - Authorization Relationships
+// ============================================================================
+
+model ActorRole {
+  id String @id @default(cuid())
+
+  /**
+   * Relations
+   */
+  actorId String
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  roleId String
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  /**
+   * Effective period
+   */
+  assignedAt DateTime @default(now())
+  expiresAt DateTime?
+
+  /**
+   * Metadata
+   */
+  assignedBy String? // Actor ID who assigned this role
+  reason String?
+
+  @@unique([actorId, roleId])
+  @@index([actorId])
+  @@index([roleId])
+  @@index([expiresAt])
+  @@map("actor_role")
+}
+
+model RolePermission {
+  id String @id @default(cuid())
+
+  /**
+   * Relations
+   */
+  roleId String
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  /**
+   * Timestamps
+   */
+  assignedAt DateTime @default(now())
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permission")
+}
+
+model ActorPermission {
+  id String @id @default(cuid())
+
+  /**
+   * Direct permissions (overrides role permissions)
+   */
+  actorId String
+  actor Actor @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  permissionId String
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  /**
+   * Grant/Deny
+   */
+  grant Boolean @default(true) // true = grant, false = deny (explicit deny)
+  reason String?
+
+  /**
+   * Effective period
+   */
+  assignedAt DateTime @default(now())
+  expiresAt DateTime?
+
+  @@unique([actorId, permissionId])
+  @@index([actorId])
+  @@index([permissionId])
+  @@map("actor_permission")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum ActorStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_ACTIVATION
+  ARCHIVED
+}
+
+enum RoleScope {
+  SYSTEM  // Global system role
+  COMPANY // Company-specific role
+}
+
+enum PermissionScope {
+  SYSTEM  // Global permission
+  COMPANY // Company-specific permission
+}

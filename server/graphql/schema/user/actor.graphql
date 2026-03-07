@@ -1,0 +1,252 @@
+# ============================================================================
+# ACTOR TYPE DEFINITIONS - Business User Identity
+# ============================================================================
+
+"""
+Actor type - Represents a business user with roles and permissions
+Wraps the User (authentication) with business context
+"""
+type Actor implements Node {
+  id: ID!
+
+  """
+  Authentication link
+  """
+  userId: String!
+  user: User!
+
+  """
+  Business identity
+  """
+  name: String!
+  email: String!
+  avatar: String
+  phone: String
+  bio: String
+
+  """
+  Business context
+  """
+  companyId: String!
+  company: Company!
+
+  departmentId: String
+  department: Department
+
+  """
+  Status
+  """
+  status: ActorStatus!
+
+  """
+  Authorization
+  """
+  roles: [ActorRole!]!
+  permissions: [ActorPermission!]!
+
+  """
+  Activity tracking
+  """
+  lastLoginAt: DateTime
+  lastActivityAt: DateTime
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Actor status enumeration
+"""
+enum ActorStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_ACTIVATION
+  ARCHIVED
+}
+
+"""
+Actor role assignment
+"""
+type ActorRole implements Node {
+  id: ID!
+
+  actorId: String!
+  actor: Actor!
+
+  roleId: String!
+  role: Role!
+
+  reason: String
+
+  assignedAt: DateTime!
+  expiresAt: DateTime
+}
+
+"""
+Actor permission assignment
+"""
+type ActorPermission implements Node {
+  id: ID!
+
+  actorId: String!
+  actor: Actor!
+
+  permissionId: String!
+  permission: Permission!
+
+  grant: Boolean!
+  reason: String
+
+  assignedAt: DateTime!
+  expiresAt: DateTime
+}
+
+"""
+Input for creating an actor
+"""
+input CreateActorInput {
+  userId: String!
+  name: String!
+  email: String!
+  companyId: String!
+  departmentId: String
+  avatar: String
+  phone: String
+  bio: String
+}
+
+"""
+Input for updating an actor
+"""
+input UpdateActorInput {
+  name: String
+  avatar: String
+  phone: String
+  bio: String
+  departmentId: String
+  status: ActorStatus
+}
+
+"""
+Filter input for actors
+"""
+input ActorFilterInput {
+  companyId: String
+  departmentId: String
+  status: ActorStatus
+  search: String
+}
+
+"""
+Actor pagination input
+"""
+input ActorPaginationInput {
+  skip: Int
+  take: Int
+  sortBy: String
+  sortOrder: SortOrder
+}
+
+"""
+Actor response wrapper
+"""
+type ActorConnection {
+  nodes: [Actor!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+extend type Query {
+  """
+  Get actor by ID
+  """
+  actor(id: String!): Actor
+
+  """
+  Get current actor (authenticated user's business identity)
+  """
+  myActor: Actor
+
+  """
+  List actors with filtering and pagination
+  """
+  actors(
+    filter: ActorFilterInput
+    pagination: ActorPaginationInput
+  ): ActorConnection!
+
+  """
+  Get actors in a company
+  """
+  companyActors(
+    companyId: String!
+    pagination: ActorPaginationInput
+  ): ActorConnection!
+
+  """
+  Get actors in a department
+  """
+  departmentActors(
+    departmentId: String!
+    pagination: ActorPaginationInput
+  ): ActorConnection!
+}
+
+extend type Mutation {
+  """
+  Create a new actor (admin only)
+  """
+  createActor(input: CreateActorInput!): Actor!
+
+  """
+  Update an actor
+  """
+  updateActor(id: String!, input: UpdateActorInput!): Actor!
+
+  """
+  Deactivate an actor
+  """
+  deactivateActor(id: String!): Actor!
+
+  """
+  Suspend an actor
+  """
+  suspendActor(id: String!, reason: String): Actor!
+
+  """
+  Assign a role to an actor
+  """
+  assignActorRole(actorId: String!, roleId: String!, reason: String): Boolean!
+
+  """
+  Remove a role from an actor
+  """
+  removeActorRole(actorId: String!, roleId: String!): Boolean!
+
+  """
+  Grant a permission to an actor
+  """
+  grantActorPermission(
+    actorId: String!
+    permissionId: String!
+    reason: String
+  ): Boolean!
+
+  """
+  Deny a permission to an actor
+  """
+  denyActorPermission(
+    actorId: String!
+    permissionId: String!
+    reason: String
+  ): Boolean!
+
+  """
+  Revoke a permission from an actor
+  """
+  revokeActorPermission(actorId: String!, permissionId: String!): Boolean!
+}

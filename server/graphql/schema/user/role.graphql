@@ -1,0 +1,274 @@
+# ============================================================================
+# ROLE & PERMISSION TYPE DEFINITIONS - Authorization
+# ============================================================================
+
+"""
+Role type - Represents a collection of permissions
+Can be system-wide or company-specific
+"""
+type Role implements Node {
+  id: ID!
+
+  """
+  Role metadata
+  """
+  name: String!
+  slug: String!
+  description: String
+
+  """
+  Scope
+  """
+  scope: RoleScope!
+
+  companyId: String
+  company: Company
+
+  """
+  Permissions in this role
+  """
+  permissions: [RolePermission!]!
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Role scope enumeration
+"""
+enum RoleScope {
+  SYSTEM
+  COMPANY
+}
+
+"""
+Permission type - Fine-grained access control
+"""
+type Permission implements Node {
+  id: ID!
+
+  """
+  Permission metadata
+  """
+  name: String!
+  slug: String!
+  description: String
+
+  """
+  Resource and action
+  """
+  resource: String!
+  action: String!
+
+  """
+  Scope
+  """
+  scope: PermissionScope!
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Permission scope enumeration
+"""
+enum PermissionScope {
+  SYSTEM
+  COMPANY
+}
+
+"""
+Role permission assignment
+"""
+type RolePermission implements Node {
+  id: ID!
+
+  roleId: String!
+  role: Role!
+
+  permissionId: String!
+  permission: Permission!
+
+  assignedAt: DateTime!
+}
+
+"""
+Input for creating a role
+"""
+input CreateRoleInput {
+  name: String!
+  slug: String!
+  description: String
+  scope: RoleScope!
+  companyId: String
+  permissionIds: [String!]
+}
+
+"""
+Input for updating a role
+"""
+input UpdateRoleInput {
+  name: String
+  description: String
+  permissionIds: [String!]
+}
+
+"""
+Input for creating a permission
+"""
+input CreatePermissionInput {
+  name: String!
+  slug: String!
+  description: String
+  resource: String!
+  action: String!
+  scope: PermissionScope!
+}
+
+"""
+Input for updating a permission
+"""
+input UpdatePermissionInput {
+  name: String
+  description: String
+  resource: String
+  action: String
+}
+
+"""
+Filter input for roles
+"""
+input RoleFilterInput {
+  companyId: String
+  scope: RoleScope
+  search: String
+}
+
+"""
+Role pagination input
+"""
+input RolePaginationInput {
+  skip: Int
+  take: Int
+  sortBy: String
+  sortOrder: SortOrder
+}
+
+"""
+Role response wrapper
+"""
+type RoleConnection {
+  nodes: [Role!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+"""
+Filter input for permissions
+"""
+input PermissionFilterInput {
+  resource: String
+  action: String
+  scope: PermissionScope
+  search: String
+}
+
+"""
+Permission pagination input
+"""
+input PermissionPaginationInput {
+  skip: Int
+  take: Int
+  sortBy: String
+  sortOrder: SortOrder
+}
+
+"""
+Permission response wrapper
+"""
+type PermissionConnection {
+  nodes: [Permission!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+extend type Query {
+  """
+  Get role by ID (admin only)
+  """
+  role(id: String!): Role
+
+  """
+  List roles with filtering (admin only)
+  """
+  roles(
+    filter: RoleFilterInput
+    pagination: RolePaginationInput
+  ): RoleConnection!
+
+  """
+  Get permission by ID (admin only)
+  """
+  permission(id: String!): Permission
+
+  """
+  List permissions with filtering (admin only)
+  """
+  permissions(
+    filter: PermissionFilterInput
+    pagination: PermissionPaginationInput
+  ): PermissionConnection!
+
+  """
+  Get all system permissions (for UI)
+  """
+  systemPermissions: [Permission!]!
+}
+
+extend type Mutation {
+  """
+  Create a new role (admin only)
+  """
+  createRole(input: CreateRoleInput!): Role!
+
+  """
+  Update a role (admin only)
+  """
+  updateRole(id: String!, input: UpdateRoleInput!): Role!
+
+  """
+  Delete a role (admin only)
+  """
+  deleteRole(id: String!): Boolean!
+
+  """
+  Assign permission to role (admin only)
+  """
+  assignRolePermission(roleId: String!, permissionId: String!): Boolean!
+
+  """
+  Remove permission from role (admin only)
+  """
+  removeRolePermission(roleId: String!, permissionId: String!): Boolean!
+
+  """
+  Create a new permission (admin only)
+  """
+  createPermission(input: CreatePermissionInput!): Permission!
+
+  """
+  Update a permission (admin only)
+  """
+  updatePermission(id: String!, input: UpdatePermissionInput!): Permission!
+
+  """
+  Delete a permission (admin only)
+  """
+  deletePermission(id: String!): Boolean!
+}
