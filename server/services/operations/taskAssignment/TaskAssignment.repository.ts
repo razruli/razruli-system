@@ -70,4 +70,8 @@ export class TaskAssignmentRepository extends BaseRepository<TaskAssignment> {
   ): Promise<TaskAssignment> {
     return this.prisma.taskAssignment.update({ where: { id }, data });
   }
+
+  async delete(id: string): Promise<TaskAssignment> {
+    return this.prisma.taskAssignment.delete({ where: { id } });
+  }
 }

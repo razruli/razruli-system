@@ -99,6 +99,37 @@ export class TaskAssignmentService extends BaseService {
     return item;
   }
 
+  async update(
+    id: string,
+    data: Partial<{
+      status: string;
+      plannedHours: number;
+      actualHours: number;
+      calculatedLoad: number;
+    }>,
+  ): Promise<TaskAssignment> {
+    this.log("info", `Updating task assignment`, { id });
+
+    const updated = await this.repository.update(id, data);
+
+    this.log("info", `Task assignment updated`, { id });
+    this.invalidate(id);
+    this.invalidateAll();
+
+    return updated;
+  }
+
+  async delete(id: string): Promise<TaskAssignment> {
+    this.log("info", `Deleting task assignment`, { id });
+
+    const deleted = await this.repository.delete(id);
+
+    this.log("info", `Task assignment deleted`, { id });
+    this.invalidateAll();
+
+    return deleted;
+  }
+
   async cancelByEmployee(employeeId: string): Promise<number> {
     this.log("info", `Canceling all active task assignments for employee`, {
       employeeId,
