@@ -18,6 +18,8 @@ const config: CodegenConfig = {
     "server/graphql/schema/audit/auditLog.graphql",
     "server/graphql/schema/user/types.graphql",
     "server/graphql/schema/user/queries.graphql",
+    "server/graphql/schema/user/actor.graphql",
+    "server/graphql/schema/user/role.graphql",
   ],
   documents: "shared/graphql/client/**/*.graphql",
 
@@ -41,6 +43,16 @@ const config: CodegenConfig = {
           Account: "@/server/db/generated/prisma/models#AccountModel",
           Verification: "@/server/db/generated/prisma/models#VerificationModel",
 
+          // Actor & Authorization
+          Actor: "@/server/db/generated/prisma/models#ActorModel",
+          Role: "@/server/db/generated/prisma/models#RoleModel",
+          Permission: "@/server/db/generated/prisma/models#PermissionModel",
+          ActorRole: "@/server/db/generated/prisma/models#ActorRoleModel",
+          RolePermission:
+            "@/server/db/generated/prisma/models#RolePermissionModel",
+          ActorPermission:
+            "@/server/db/generated/prisma/models#ActorPermissionModel",
+
           // Core Domain
           Company: "@/server/db/generated/prisma/models#CompanyModel",
           Department: "@/server/db/generated/prisma/models#DepartmentModel",
@@ -54,7 +66,7 @@ const config: CodegenConfig = {
 
           // Analytics Domain
           LoadSnapshot: "@/server/db/generated/prisma/models#LoadSnapshotModel",
-          GapAnalysisResult:
+          GapAnalysis:
             "@/server/db/generated/prisma/models#GapAnalysisResultModel",
           HiringRequest:
             "@/server/db/generated/prisma/models#HiringRequestModel",

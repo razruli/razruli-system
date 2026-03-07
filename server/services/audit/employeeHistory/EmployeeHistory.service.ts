@@ -6,6 +6,11 @@
 
 import { BaseService } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "@/server/services/base/pagination";
 
 import { EmployeeHistoryRepository } from "./EmployeeHistory.repository";
 
@@ -33,6 +38,24 @@ export class EmployeeHistoryService extends BaseService {
   async getAll() {
     const cacheKey = this.listCacheKey({});
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
+  }
+
+  /**
+   * Find employee histories with filtering and pagination
+   */
+  async find(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<any>> {
+    const filterKey = filter ? JSON.stringify(filter) : "none";
+    const paginationKey = pagination
+      ? `${pagination.skip || 0}-${pagination.take || 20}`
+      : "0-20";
+    const cacheKey = this.queryCacheKey(`find:${filterKey}:${paginationKey}`);
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.find(filter, pagination),
+    );
   }
 
   async create(data: any) {

@@ -11,6 +11,7 @@ import DataLoader from "dataloader";
 import type {
   PrismaClient,
   User as PrismaUser,
+  Actor as PrismaActor,
   Company as PrismaCompany,
   Department as PrismaDepartment,
   Employee as PrismaEmployee,
@@ -22,6 +23,7 @@ import type {
   EmployeeHistory as PrismaEmployeeHistory,
   AuditLog as PrismaAuditLog,
 } from "@/server/db/generated/prisma/client";
+import { ActorService } from "@/server/services/actor/Actor.service";
 import type { GapAnalysisService } from "@/server/services/analytics/gapAnalysis/GapAnalysis.service";
 import type { LoadSnapshotService } from "@/server/services/analytics/loadSnapshot/LoadSnapshot.service";
 import type { AuditLogService } from "@/server/services/audit/auditLog/AuditLog.service";
@@ -43,6 +45,7 @@ import type { UserService } from "@/server/services/user/user.service";
 export interface DataLoaderRegistry {
   // Auth & User
   user: DataLoader<string, PrismaUser | null>;
+  actor: DataLoader<string, PrismaActor | null>;
 
   // Core domain
   company: DataLoader<string, PrismaCompany | null>;
@@ -64,6 +67,8 @@ export interface DataLoaderRegistry {
 
   // Batch loaders for common patterns
   employeesByDepartment: DataLoader<string, PrismaEmployee[]>;
+  actorsByCompany: DataLoader<string, PrismaActor[]>;
+  actorsByDepartment: DataLoader<string, PrismaActor[]>;
   tasksByEmployee: DataLoader<string, PrismaTaskAssignment[]>;
   snapshotsByEmployee: DataLoader<string, PrismaLoadSnapshot[]>;
 }
@@ -77,6 +82,7 @@ export interface DataLoaderRegistry {
 export interface ServicesRegistry {
   // Auth & User
   user: UserService;
+  actor: ActorService;
 
   // Core domain
   company: CompanyService;
@@ -114,6 +120,9 @@ export interface GraphQLContext {
 
   // Authenticated user (this request only)
   user: PrismaUser | null;
+
+  // Authenticated actor (this request only)
+  actor?: PrismaActor | null;
 
   // DataLoaders (FRESH per request)
   loaders: DataLoaderRegistry;

@@ -5,6 +5,11 @@
 // ============================================================================
 
 import { BaseService } from "@/server/services/base";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "@/server/services/base/pagination";
 import type { ServiceContext } from "@/server/types/context";
 
 import { GapAnalysisRepository } from "./GapAnalysis.repository";
@@ -27,6 +32,48 @@ export class GapAnalysisService extends BaseService {
     const cacheKey = this.listCacheKey({});
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
+
+  /**
+   * Find gap analyses with filtering and pagination
+   * Returns paginated results for GraphQL connection type
+   */
+  async find(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<any>> {
+    // Build cache key from filter and pagination
+    const filterKey = filter ? JSON.stringify(filter) : "none";
+    const paginationKey = pagination
+      ? `${pagination.skip || 0}-${pagination.take || 20}`
+      : "0-20";
+    const cacheKey = this.queryCacheKey(`find:${filterKey}:${paginationKey}`);
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.find(filter, pagination),
+    );
+  }
+
+  /**
+   * Get latest gap analysis for a company
+   */
+  async getLatestForCompany(companyId: string): Promise<any> {
+    const cacheKey = this.cacheKey(`latest-company-${companyId}`);
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findLatestForCompany(companyId),
+    );
+  }
+
+  /**
+   * Get latest gap analysis for a department
+   */
+  async getLatestForDepartment(departmentId: string): Promise<any> {
+    const cacheKey = this.cacheKey(`latest-department-${departmentId}`);
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.findLatestForDepartment(departmentId),
+    );
+  }
+
+  // ==================== MUTATIONS ====================
 
   async create(data: any) {
     const item = await this.repository.create(data);

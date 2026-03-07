@@ -6,6 +6,11 @@
 
 import { BaseService } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "@/server/services/base/pagination";
 
 import { LoadSnapshotRepository } from "./LoadSnapshot.repository";
 
@@ -28,7 +33,25 @@ export class LoadSnapshotService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
-  async findByEmployee(employeeId: string) {
+  /**
+   * Find load snapshots with filtering and pagination
+   */
+  async find(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<any>> {
+    const filterKey = filter ? JSON.stringify(filter) : "none";
+    const paginationKey = pagination
+      ? `${pagination.skip || 0}-${pagination.take || 20}`
+      : "0-20";
+    const cacheKey = this.queryCacheKey(`find:${filterKey}:${paginationKey}`);
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.find(filter, pagination),
+    );
+  }
+
+  // ==================== SPECIFIC QUERIES ====================
     const cacheKey = this.listCacheKey({ employeeId });
     return this.getOrFetch(cacheKey, () =>
       this.repository.findByEmployee(employeeId),

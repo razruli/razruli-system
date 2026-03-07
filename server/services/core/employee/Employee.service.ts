@@ -147,8 +147,11 @@ export class EmployeeService extends BaseService {
     fio: string;
     gradeId: number;
     gender: string;
+    birthDate?: Date | null;
     hireDate: Date;
     employmentType?: string;
+    workingHoursPerDay?: number;
+    kEfficiency?: number;
   }): Promise<Employee> {
     this.log("info", `Creating employee`, { fio: data.fio });
 

@@ -46,6 +46,8 @@ export const typeResolvers = {
 
   // ========== USER DOMAIN TYPE FIELD RESOLVERS ==========
   UsersResult: userResolvers.UsersResult,
+  Actor: userResolvers.Actor,
+  Role: userResolvers.Role,
 
   // ========== CUSTOM TYPE FIELD RESOLVERS ==========
   PageInfo: PageFields.pageInfoResolver,

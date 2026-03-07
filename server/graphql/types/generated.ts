@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { UserModel, SessionModel, AccountModel, VerificationModel, CompanyModel, DepartmentModel, EmployeeModel, GradeModel, ProcessModel, TaskAssignmentModel, LoadSnapshotModel, GapAnalysisResultModel, HiringRequestModel, EmployeeHistoryModel, AuditLogModel } from '@/server/db/generated/prisma/models';
+import { UserModel, SessionModel, AccountModel, VerificationModel, ActorModel, RoleModel, PermissionModel, ActorRoleModel, RolePermissionModel, ActorPermissionModel, CompanyModel, DepartmentModel, EmployeeModel, GradeModel, ProcessModel, TaskAssignmentModel, LoadSnapshotModel, GapAnalysisResultModel, HiringRequestModel, EmployeeHistoryModel, AuditLogModel } from '@/server/db/generated/prisma/models';
 import { GraphQLContext } from '../context/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -39,6 +39,100 @@ export type ActionTypeSummary = {
   failureCount: Scalars['Int']['output'];
   successCount: Scalars['Int']['output'];
 };
+
+/**
+ * Actor type - Represents a business user with roles and permissions
+ * Wraps the User (authentication) with business context
+ */
+export type Actor = Node & {
+  __typename?: 'Actor';
+  avatar: Maybe<Scalars['String']['output']>;
+  bio: Maybe<Scalars['String']['output']>;
+  company: Company;
+  /** Business context */
+  companyId: Scalars['String']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  department: Maybe<Department>;
+  departmentId: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  lastActivityAt: Maybe<Scalars['DateTime']['output']>;
+  /** Activity tracking */
+  lastLoginAt: Maybe<Scalars['DateTime']['output']>;
+  /** Business identity */
+  name: Scalars['String']['output'];
+  permissions: Array<ActorPermission>;
+  phone: Maybe<Scalars['String']['output']>;
+  /** Authorization */
+  roles: Array<ActorRole>;
+  /** Status */
+  status: ActorStatus;
+  updatedAt: Scalars['DateTime']['output'];
+  user: User;
+  /** Authentication link */
+  userId: Scalars['String']['output'];
+};
+
+/** Actor response wrapper */
+export type ActorConnection = {
+  __typename?: 'ActorConnection';
+  nodes: Array<Actor>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for actors */
+export type ActorFilterInput = {
+  companyId: InputMaybe<Scalars['String']['input']>;
+  departmentId: InputMaybe<Scalars['String']['input']>;
+  search: InputMaybe<Scalars['String']['input']>;
+  status: InputMaybe<ActorStatus>;
+};
+
+/** Actor pagination input */
+export type ActorPaginationInput = {
+  skip: InputMaybe<Scalars['Int']['input']>;
+  sortBy: InputMaybe<Scalars['String']['input']>;
+  sortOrder: InputMaybe<SortOrder>;
+  take: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Actor permission assignment */
+export type ActorPermission = Node & {
+  __typename?: 'ActorPermission';
+  actor: Actor;
+  actorId: Scalars['String']['output'];
+  assignedAt: Scalars['DateTime']['output'];
+  expiresAt: Maybe<Scalars['DateTime']['output']>;
+  grant: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  permission: Permission;
+  permissionId: Scalars['String']['output'];
+  reason: Maybe<Scalars['String']['output']>;
+};
+
+/** Actor role assignment */
+export type ActorRole = Node & {
+  __typename?: 'ActorRole';
+  actor: Actor;
+  actorId: Scalars['String']['output'];
+  assignedAt: Scalars['DateTime']['output'];
+  expiresAt: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  reason: Maybe<Scalars['String']['output']>;
+  role: Role;
+  roleId: Scalars['String']['output'];
+};
+
+/** Actor status enumeration */
+export enum ActorStatus {
+  Active = 'ACTIVE',
+  Archived = 'ARCHIVED',
+  Inactive = 'INACTIVE',
+  PendingActivation = 'PENDING_ACTIVATION',
+  Suspended = 'SUSPENDED'
+}
 
 /** Audit action type */
 export enum AuditActionType {
@@ -227,6 +321,18 @@ export type ComplianceReport = {
   userAccessSummary: Array<UserAccessSummary>;
 };
 
+/** Input for creating an actor */
+export type CreateActorInput = {
+  avatar: InputMaybe<Scalars['String']['input']>;
+  bio: InputMaybe<Scalars['String']['input']>;
+  companyId: Scalars['String']['input'];
+  departmentId: InputMaybe<Scalars['String']['input']>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  phone: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['String']['input'];
+};
+
 /** Input for creating a company */
 export type CreateCompanyInput = {
   name: Scalars['String']['input'];
@@ -265,6 +371,16 @@ export type CreateGapAnalysisInput = {
   startDate: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+/** Input for creating a permission */
+export type CreatePermissionInput = {
+  action: Scalars['String']['input'];
+  description: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  resource: Scalars['String']['input'];
+  scope: PermissionScope;
+  slug: Scalars['String']['input'];
+};
+
 /** Input for creating a process */
 export type CreateProcessInput = {
   capacityUnits: Scalars['Int']['input'];
@@ -276,6 +392,17 @@ export type CreateProcessInput = {
   name: Scalars['String']['input'];
   priority: InputMaybe<ProcessPriority>;
   processType: ProcessType;
+  status: InputMaybe<ProcessStatus>;
+};
+
+/** Input for creating a role */
+export type CreateRoleInput = {
+  companyId: InputMaybe<Scalars['String']['input']>;
+  description: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  permissionIds: InputMaybe<Array<Scalars['String']['input']>>;
+  scope: RoleScope;
+  slug: Scalars['String']['input'];
 };
 
 /** Input for creating a task assignment */
@@ -340,6 +467,14 @@ export type Department = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** Department connection with pagination */
+export type DepartmentConnection = {
+  __typename?: 'DepartmentConnection';
+  nodes: Array<Department>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** Department history summary */
 export type DepartmentEmployeeHistory = {
   __typename?: 'DepartmentEmployeeHistory';
@@ -375,13 +510,6 @@ export type DepartmentGapComparison = {
   gapStatus: GapStatus;
   headcountGap: Scalars['Int']['output'];
   riskLevel: GapAnalysisRiskLevel;
-};
-
-/** Response with department list */
-export type DepartmentListResponse = {
-  __typename?: 'DepartmentListResponse';
-  items: Array<Department>;
-  total: Scalars['Int']['output'];
 };
 
 /** Department load overview */
@@ -1076,10 +1204,14 @@ export type Mutation = {
   approveHiringPlan: HiringPlan;
   /** Mark audit logs for archival */
   archiveAuditLogs: Scalars['Int']['output'];
+  /** Assign a role to an actor */
+  assignActorRole: Scalars['Boolean']['output'];
   /** Assign department head */
   assignDepartmentHead: Department;
   /** Assign capacity to process */
   assignProcessCapacity: Process;
+  /** Assign permission to role (admin only) */
+  assignRolePermission: Scalars['Boolean']['output'];
   /** Block a task with reason */
   blockTaskAssignment: TaskAssignment;
   /** Bulk log audit entries */
@@ -1090,6 +1222,8 @@ export type Mutation = {
   completeProcess: Process;
   /** Complete a task assignment */
   completeTaskAssignment: TaskAssignment;
+  /** Create a new actor (admin only) */
+  createActor: Actor;
   /** Create new company (admin only) */
   createCompany: Maybe<Company>;
   /** Create snapshots for all employees */
@@ -1102,22 +1236,36 @@ export type Mutation = {
   createGapAnalysis: GapAnalysis;
   /** Create a load snapshot */
   createLoadSnapshot: LoadSnapshot;
+  /** Create a new permission (admin only) */
+  createPermission: Permission;
   /** Create a new process */
   createProcess: Process;
+  /** Create a new role (admin only) */
+  createRole: Role;
   /** Create a new task assignment */
   createTaskAssignment: TaskAssignment;
+  /** Deactivate an actor */
+  deactivateActor: Actor;
   /** Delete department */
   deleteDepartment: Scalars['Boolean']['output'];
+  /** Delete a permission (admin only) */
+  deletePermission: Scalars['Boolean']['output'];
   /** Delete a process */
   deleteProcess: Scalars['Boolean']['output'];
+  /** Delete a role (admin only) */
+  deleteRole: Scalars['Boolean']['output'];
   /** Delete a task assignment */
   deleteTaskAssignment: Scalars['Boolean']['output'];
+  /** Deny a permission to an actor */
+  denyActorPermission: Scalars['Boolean']['output'];
   /** Dismiss employee (soft delete) */
   dismissEmployee: Employee;
   /** Export audit logs */
   exportAuditLogs: Scalars['String']['output'];
   /** Generate hiring plan from gap analysis */
   generateHiringPlan: HiringPlan;
+  /** Grant a permission to an actor */
+  grantActorPermission: Scalars['Boolean']['output'];
   /** Log an audit entry */
   logAuditEntry: AuditLog;
   /** Reassign task to different employee */
@@ -1126,12 +1274,22 @@ export type Mutation = {
   recordEmployeeHistory: EmployeeHistory;
   /** Reject employee history change */
   rejectEmployeeHistory: EmployeeHistory;
+  /** Remove a role from an actor */
+  removeActorRole: Scalars['Boolean']['output'];
+  /** Remove permission from role (admin only) */
+  removeRolePermission: Scalars['Boolean']['output'];
+  /** Revoke a permission from an actor */
+  revokeActorPermission: Scalars['Boolean']['output'];
   /** Start a process */
   startProcess: Process;
   /** Start a task assignment */
   startTaskAssignment: TaskAssignment;
+  /** Suspend an actor */
+  suspendActor: Actor;
   /** Unblock a task */
   unblockTaskAssignment: TaskAssignment;
+  /** Update an actor */
+  updateActor: Actor;
   /** Update company settings */
   updateCompany: Maybe<Company>;
   /** Update department */
@@ -1146,8 +1304,12 @@ export type Mutation = {
   updateHiringPlan: HiringPlan;
   /** Track hiring progress */
   updateHiringProgress: HiringPlan;
+  /** Update a permission (admin only) */
+  updatePermission: Permission;
   /** Update an existing process */
   updateProcess: Process;
+  /** Update a role (admin only) */
+  updateRole: Role;
   /** Update a task assignment */
   updateTaskAssignment: TaskAssignment;
   /** Update task progress */
@@ -1187,6 +1349,17 @@ export type MutationArchiveAuditLogsArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationAssignActorRoleArgs = {
+  actorId: Scalars['String']['input'];
+  reason: InputMaybe<Scalars['String']['input']>;
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationAssignDepartmentHeadArgs = {
   departmentId: Scalars['String']['input'];
   employeeId: Scalars['String']['input'];
@@ -1201,6 +1374,16 @@ export type MutationAssignProcessCapacityArgs = {
   capacityUnits: Scalars['Int']['input'];
   kMultiplier: Scalars['Float']['input'];
   processId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationAssignRolePermissionArgs = {
+  permissionId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
 };
 
 
@@ -1248,6 +1431,15 @@ export type MutationCompleteProcessArgs = {
  */
 export type MutationCompleteTaskAssignmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateActorArgs = {
+  input: CreateActorInput;
 };
 
 
@@ -1311,8 +1503,26 @@ export type MutationCreateLoadSnapshotArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationCreatePermissionArgs = {
+  input: CreatePermissionInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationCreateProcessArgs = {
   input: CreateProcessInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateRoleArgs = {
+  input: CreateRoleInput;
 };
 
 
@@ -1329,7 +1539,25 @@ export type MutationCreateTaskAssignmentArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationDeactivateActorArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationDeleteDepartmentArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeletePermissionArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -1347,8 +1575,28 @@ export type MutationDeleteProcessArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationDeleteRoleArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationDeleteTaskAssignmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDenyActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+  reason: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1379,6 +1627,17 @@ export type MutationExportAuditLogsArgs = {
 export type MutationGenerateHiringPlanArgs = {
   gapAnalysisId: Scalars['String']['input'];
   phases: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationGrantActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+  reason: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1424,6 +1683,36 @@ export type MutationRejectEmployeeHistoryArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationRemoveActorRoleArgs = {
+  actorId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRemoveRolePermissionArgs = {
+  permissionId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRevokeActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationStartProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -1442,9 +1731,29 @@ export type MutationStartTaskAssignmentArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationSuspendActorArgs = {
+  id: Scalars['String']['input'];
+  reason: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationUnblockTaskAssignmentArgs = {
   id: Scalars['String']['input'];
   resolution: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateActorArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateActorInput;
 };
 
 
@@ -1523,9 +1832,29 @@ export type MutationUpdateHiringProgressArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationUpdatePermissionArgs = {
+  id: Scalars['String']['input'];
+  input: UpdatePermissionInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationUpdateProcessArgs = {
   id: Scalars['String']['input'];
   input: UpdateProcessInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateRoleArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateRoleInput;
 };
 
 
@@ -1565,6 +1894,54 @@ export type PaginationInput = {
   limit: InputMaybe<Scalars['Int']['input']>;
   offset: InputMaybe<Scalars['Int']['input']>;
 };
+
+/** Permission type - Fine-grained access control */
+export type Permission = Node & {
+  __typename?: 'Permission';
+  action: Scalars['String']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  description: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Permission metadata */
+  name: Scalars['String']['output'];
+  /** Resource and action */
+  resource: Scalars['String']['output'];
+  /** Scope */
+  scope: PermissionScope;
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Permission response wrapper */
+export type PermissionConnection = {
+  __typename?: 'PermissionConnection';
+  nodes: Array<Permission>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for permissions */
+export type PermissionFilterInput = {
+  action: InputMaybe<Scalars['String']['input']>;
+  resource: InputMaybe<Scalars['String']['input']>;
+  scope: InputMaybe<PermissionScope>;
+  search: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Permission pagination input */
+export type PermissionPaginationInput = {
+  skip: InputMaybe<Scalars['Int']['input']>;
+  sortBy: InputMaybe<Scalars['String']['input']>;
+  sortOrder: InputMaybe<SortOrder>;
+  take: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Permission scope enumeration */
+export enum PermissionScope {
+  Company = 'COMPANY',
+  System = 'SYSTEM'
+}
 
 /** Process type representing business processes */
 export type Process = {
@@ -1707,6 +2084,10 @@ export type QuarterlyProjection = {
  */
 export type Query = {
   __typename?: 'Query';
+  /** Get actor by ID */
+  actor: Maybe<Actor>;
+  /** List actors with filtering and pagination */
+  actors: ActorConnection;
   /** Get audit log entry by ID */
   auditLog: Maybe<AuditLog>;
   /** List audit logs with filtering */
@@ -1719,6 +2100,8 @@ export type Query = {
   companies: Maybe<Array<Maybe<Company>>>;
   /** Get company by ID */
   company: Maybe<Company>;
+  /** Get actors in a company */
+  companyActors: ActorConnection;
   /** Get company-wide load analysis */
   companyLoadAnalysis: CompanyLoadAnalysis;
   /** Get processes by company with metrics */
@@ -1729,6 +2112,8 @@ export type Query = {
   dataAccessAudit: Array<AuditLog>;
   /** Get department by ID */
   department: Maybe<Department>;
+  /** Get actors in a department */
+  departmentActors: ActorConnection;
   /** Get department employee history summary */
   departmentEmployeeHistory: DepartmentEmployeeHistory;
   /** Get employees in specific department */
@@ -1744,7 +2129,7 @@ export type Query = {
   /** Get department with all employees and load metrics */
   departmentWithMetrics: Maybe<DepartmentMetrics>;
   /** Get all departments for company */
-  departments: DepartmentListResponse;
+  departments: DepartmentConnection;
   /** Get employee by ID */
   employee: Maybe<Employee>;
   /** Get audit report for employee */
@@ -1808,10 +2193,16 @@ export type Query = {
   /** List load snapshots with filtering */
   loadSnapshots: LoadSnapshotConnection;
   me: Maybe<User>;
+  /** Get current actor (authenticated user's business identity) */
+  myActor: Maybe<Actor>;
   /** Get authenticated user's company */
   myCompany: Maybe<Company>;
   /** Get overdue tasks */
   overdueTasks: Array<TaskAssignment>;
+  /** Get permission by ID (admin only) */
+  permission: Maybe<Permission>;
+  /** List permissions with filtering (admin only) */
+  permissions: PermissionConnection;
   /** Get process by ID */
   process: Maybe<Process>;
   /** Get tasks in a process */
@@ -1820,10 +2211,16 @@ export type Query = {
   processWithMetrics: Maybe<ProcessMetrics>;
   /** List all processes with filtering and pagination */
   processes: ProcessConnection;
+  /** Get role by ID (admin only) */
+  role: Maybe<Role>;
+  /** List roles with filtering (admin only) */
+  roles: RoleConnection;
   /** Get security incident report */
   securityIncidentReport: SecurityIncidentReport;
   /** Find suspicious activities */
   suspiciousActivities: Array<AuditLog>;
+  /** Get all system permissions (for UI) */
+  systemPermissions: Array<Permission>;
   /** Get task assignment by ID */
   taskAssignment: Maybe<TaskAssignment>;
   /** List all task assignments with filtering and pagination */
@@ -1835,6 +2232,25 @@ export type Query = {
   /** Get user activity summary */
   userActivitySummary: UserActivitySummary;
   users: UsersResult;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryActorArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryActorsArgs = {
+  filter: InputMaybe<ActorFilterInput>;
+  pagination: InputMaybe<ActorPaginationInput>;
 };
 
 
@@ -1889,6 +2305,16 @@ export type QueryCompanyArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryCompanyActorsArgs = {
+  companyId: Scalars['String']['input'];
+  pagination: InputMaybe<ActorPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryCompanyLoadAnalysisArgs = {
   companyId: Scalars['String']['input'];
   dateRange: InputMaybe<DateRangeInput>;
@@ -1931,6 +2357,16 @@ export type QueryDataAccessAuditArgs = {
  */
 export type QueryDepartmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentActorsArgs = {
+  departmentId: Scalars['String']['input'];
+  pagination: InputMaybe<ActorPaginationInput>;
 };
 
 
@@ -2302,6 +2738,25 @@ export type QueryOverdueTasksArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryPermissionArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryPermissionsArgs = {
+  filter: InputMaybe<PermissionFilterInput>;
+  pagination: InputMaybe<PermissionPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -2333,6 +2788,25 @@ export type QueryProcessWithMetricsArgs = {
 export type QueryProcessesArgs = {
   filter: InputMaybe<ProcessFilterInput>;
   pagination: InputMaybe<ProcessPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRoleArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRolesArgs = {
+  filter: InputMaybe<RoleFilterInput>;
+  pagination: InputMaybe<RolePaginationInput>;
 };
 
 
@@ -2450,6 +2924,68 @@ export type RiskActivityEvent = {
   riskScore: Scalars['Int']['output'];
   timestamp: Scalars['DateTime']['output'];
 };
+
+/**
+ * Role type - Represents a collection of permissions
+ * Can be system-wide or company-specific
+ */
+export type Role = Node & {
+  __typename?: 'Role';
+  company: Maybe<Company>;
+  companyId: Maybe<Scalars['String']['output']>;
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  description: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Role metadata */
+  name: Scalars['String']['output'];
+  /** Permissions in this role */
+  permissions: Array<RolePermission>;
+  /** Scope */
+  scope: RoleScope;
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Role response wrapper */
+export type RoleConnection = {
+  __typename?: 'RoleConnection';
+  nodes: Array<Role>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for roles */
+export type RoleFilterInput = {
+  companyId: InputMaybe<Scalars['String']['input']>;
+  scope: InputMaybe<RoleScope>;
+  search: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Role pagination input */
+export type RolePaginationInput = {
+  skip: InputMaybe<Scalars['Int']['input']>;
+  sortBy: InputMaybe<Scalars['String']['input']>;
+  sortOrder: InputMaybe<SortOrder>;
+  take: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Role permission assignment */
+export type RolePermission = Node & {
+  __typename?: 'RolePermission';
+  assignedAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  permission: Permission;
+  permissionId: Scalars['String']['output'];
+  role: Role;
+  roleId: Scalars['String']['output'];
+};
+
+/** Role scope enumeration */
+export enum RoleScope {
+  Company = 'COMPANY',
+  System = 'SYSTEM'
+}
 
 /** Security incident */
 export type SecurityIncident = {
@@ -2918,6 +3454,16 @@ export enum TrendDirection {
   Stable = 'STABLE'
 }
 
+/** Input for updating an actor */
+export type UpdateActorInput = {
+  avatar: InputMaybe<Scalars['String']['input']>;
+  bio: InputMaybe<Scalars['String']['input']>;
+  departmentId: InputMaybe<Scalars['String']['input']>;
+  name: InputMaybe<Scalars['String']['input']>;
+  phone: InputMaybe<Scalars['String']['input']>;
+  status: InputMaybe<ActorStatus>;
+};
+
 /** Input for updating a company */
 export type UpdateCompanyInput = {
   name: InputMaybe<Scalars['String']['input']>;
@@ -2959,6 +3505,14 @@ export type UpdateHiringPlanInput = {
   targetHeadcount: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** Input for updating a permission */
+export type UpdatePermissionInput = {
+  action: InputMaybe<Scalars['String']['input']>;
+  description: InputMaybe<Scalars['String']['input']>;
+  name: InputMaybe<Scalars['String']['input']>;
+  resource: InputMaybe<Scalars['String']['input']>;
+};
+
 /** Input for updating a process */
 export type UpdateProcessInput = {
   capacityUnits: InputMaybe<Scalars['Int']['input']>;
@@ -2968,6 +3522,13 @@ export type UpdateProcessInput = {
   name: InputMaybe<Scalars['String']['input']>;
   priority: InputMaybe<ProcessPriority>;
   status: InputMaybe<ProcessStatus>;
+};
+
+/** Input for updating a role */
+export type UpdateRoleInput = {
+  description: InputMaybe<Scalars['String']['input']>;
+  name: InputMaybe<Scalars['String']['input']>;
+  permissionIds: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 /** Input for updating a task assignment */
@@ -3129,13 +3690,28 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
-  Node: ( UserModel );
+  Node:
+    | ( ActorModel )
+    | ( ActorPermissionModel )
+    | ( ActorRoleModel )
+    | ( PermissionModel )
+    | ( RoleModel )
+    | ( RolePermissionModel )
+    | ( UserModel )
+  ;
 };
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   AccessRiskLevel: AccessRiskLevel;
   ActionTypeSummary: ResolverTypeWrapper<ActionTypeSummary>;
+  Actor: ResolverTypeWrapper<ActorModel>;
+  ActorConnection: ResolverTypeWrapper<Omit<ActorConnection, 'nodes'> & { nodes: Array<ResolversTypes['Actor']> }>;
+  ActorFilterInput: ActorFilterInput;
+  ActorPaginationInput: ActorPaginationInput;
+  ActorPermission: ResolverTypeWrapper<ActorPermissionModel>;
+  ActorRole: ResolverTypeWrapper<ActorRoleModel>;
+  ActorStatus: ActorStatus;
   AuditActionType: AuditActionType;
   AuditLog: ResolverTypeWrapper<AuditLogModel>;
   AuditLogConnection: ResolverTypeWrapper<Omit<AuditLogConnection, 'nodes'> & { nodes: Array<ResolversTypes['AuditLog']> }>;
@@ -3152,21 +3728,24 @@ export type ResolversTypes = {
   Company: ResolverTypeWrapper<CompanyModel>;
   CompanyLoadAnalysis: ResolverTypeWrapper<Omit<CompanyLoadAnalysis, 'company' | 'departmentMetrics'> & { company: ResolversTypes['Company'], departmentMetrics: Array<ResolversTypes['DepartmentLoadOverview']> }>;
   ComplianceReport: ResolverTypeWrapper<Omit<ComplianceReport, 'company' | 'highRiskActivities' | 'userAccessSummary'> & { company: ResolversTypes['Company'], highRiskActivities: Array<ResolversTypes['AuditLog']>, userAccessSummary: Array<ResolversTypes['UserAccessSummary']> }>;
+  CreateActorInput: CreateActorInput;
   CreateCompanyInput: CreateCompanyInput;
   CreateDepartmentInput: CreateDepartmentInput;
   CreateEmployeeInput: CreateEmployeeInput;
   CreateGapAnalysisInput: CreateGapAnalysisInput;
+  CreatePermissionInput: CreatePermissionInput;
   CreateProcessInput: CreateProcessInput;
+  CreateRoleInput: CreateRoleInput;
   CreateTaskAssignmentInput: CreateTaskAssignmentInput;
   CrossDirection: CrossDirection;
   DateRange: ResolverTypeWrapper<DateRange>;
   DateRangeInput: DateRangeInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Department: ResolverTypeWrapper<DepartmentModel>;
+  DepartmentConnection: ResolverTypeWrapper<Omit<DepartmentConnection, 'nodes'> & { nodes: Array<ResolversTypes['Department']> }>;
   DepartmentEmployeeHistory: ResolverTypeWrapper<Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversTypes['Department'], timeline: Array<ResolversTypes['EmployeeTimelineEntry']> }>;
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: ResolverTypeWrapper<Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversTypes['Department'], gapAnalysis: Maybe<ResolversTypes['GapAnalysis']> }>;
-  DepartmentListResponse: ResolverTypeWrapper<Omit<DepartmentListResponse, 'items'> & { items: Array<ResolversTypes['Department']> }>;
   DepartmentLoadOverview: ResolverTypeWrapper<Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversTypes['Department'], employeeBreakdown: Array<ResolversTypes['EmployeeLoadBreakdown']> }>;
   DepartmentMetrics: ResolverTypeWrapper<Omit<DepartmentMetrics, 'department'> & { department: ResolversTypes['Department'] }>;
   Employee: ResolverTypeWrapper<EmployeeModel>;
@@ -3191,7 +3770,7 @@ export type ResolversTypes = {
   Error: ResolverTypeWrapper<Error>;
   ExportFormat: ExportFormat;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
-  GapAnalysis: ResolverTypeWrapper<Omit<GapAnalysis, 'company' | 'department' | 'hiringPlan'> & { company: ResolversTypes['Company'], department: Maybe<ResolversTypes['Department']>, hiringPlan: Maybe<ResolversTypes['HiringPlan']> }>;
+  GapAnalysis: ResolverTypeWrapper<GapAnalysisResultModel>;
   GapAnalysisConnection: ResolverTypeWrapper<Omit<GapAnalysisConnection, 'nodes'> & { nodes: Array<ResolversTypes['GapAnalysis']> }>;
   GapAnalysisFilterInput: GapAnalysisFilterInput;
   GapAnalysisPaginationInput: GapAnalysisPaginationInput;
@@ -3231,6 +3810,11 @@ export type ResolversTypes = {
   Node: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Node']>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginationInput: PaginationInput;
+  Permission: ResolverTypeWrapper<PermissionModel>;
+  PermissionConnection: ResolverTypeWrapper<Omit<PermissionConnection, 'nodes'> & { nodes: Array<ResolversTypes['Permission']> }>;
+  PermissionFilterInput: PermissionFilterInput;
+  PermissionPaginationInput: PermissionPaginationInput;
+  PermissionScope: PermissionScope;
   Process: ResolverTypeWrapper<ProcessModel>;
   ProcessConnection: ResolverTypeWrapper<Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversTypes['Process']> }>;
   ProcessFilterInput: ProcessFilterInput;
@@ -3248,6 +3832,12 @@ export type ResolversTypes = {
   RecommendationType: RecommendationType;
   RecordEmployeeHistoryInput: RecordEmployeeHistoryInput;
   RiskActivityEvent: ResolverTypeWrapper<Omit<RiskActivityEvent, 'log'> & { log: ResolversTypes['AuditLog'] }>;
+  Role: ResolverTypeWrapper<RoleModel>;
+  RoleConnection: ResolverTypeWrapper<Omit<RoleConnection, 'nodes'> & { nodes: Array<ResolversTypes['Role']> }>;
+  RoleFilterInput: RoleFilterInput;
+  RolePaginationInput: RolePaginationInput;
+  RolePermission: ResolverTypeWrapper<RolePermissionModel>;
+  RoleScope: RoleScope;
   SecurityIncident: ResolverTypeWrapper<Omit<SecurityIncident, 'involvedLogs'> & { involvedLogs: Array<ResolversTypes['AuditLog']> }>;
   SecurityIncidentEvent: ResolverTypeWrapper<Omit<SecurityIncidentEvent, 'incident'> & { incident: ResolversTypes['SecurityIncident'] }>;
   SecurityIncidentReport: ResolverTypeWrapper<Omit<SecurityIncidentReport, 'company' | 'incidents'> & { company: ResolversTypes['Company'], incidents: Array<ResolversTypes['SecurityIncident']> }>;
@@ -3270,12 +3860,15 @@ export type ResolversTypes = {
   TaskType: TaskType;
   TaskTypeCount: ResolverTypeWrapper<TaskTypeCount>;
   TrendDirection: TrendDirection;
+  UpdateActorInput: UpdateActorInput;
   UpdateCompanyInput: UpdateCompanyInput;
   UpdateDepartmentInput: UpdateDepartmentInput;
   UpdateEmployeeInput: UpdateEmployeeInput;
   UpdateGapAnalysisInput: UpdateGapAnalysisInput;
   UpdateHiringPlanInput: UpdateHiringPlanInput;
+  UpdatePermissionInput: UpdatePermissionInput;
   UpdateProcessInput: UpdateProcessInput;
+  UpdateRoleInput: UpdateRoleInput;
   UpdateTaskAssignmentInput: UpdateTaskAssignmentInput;
   Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
   User: ResolverTypeWrapper<UserModel>;
@@ -3290,6 +3883,12 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   ActionTypeSummary: ActionTypeSummary;
+  Actor: ActorModel;
+  ActorConnection: Omit<ActorConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Actor']> };
+  ActorFilterInput: ActorFilterInput;
+  ActorPaginationInput: ActorPaginationInput;
+  ActorPermission: ActorPermissionModel;
+  ActorRole: ActorRoleModel;
   AuditLog: AuditLogModel;
   AuditLogConnection: Omit<AuditLogConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['AuditLog']> };
   AuditLogFilterInput: AuditLogFilterInput;
@@ -3302,20 +3901,23 @@ export type ResolversParentTypes = {
   Company: CompanyModel;
   CompanyLoadAnalysis: Omit<CompanyLoadAnalysis, 'company' | 'departmentMetrics'> & { company: ResolversParentTypes['Company'], departmentMetrics: Array<ResolversParentTypes['DepartmentLoadOverview']> };
   ComplianceReport: Omit<ComplianceReport, 'company' | 'highRiskActivities' | 'userAccessSummary'> & { company: ResolversParentTypes['Company'], highRiskActivities: Array<ResolversParentTypes['AuditLog']>, userAccessSummary: Array<ResolversParentTypes['UserAccessSummary']> };
+  CreateActorInput: CreateActorInput;
   CreateCompanyInput: CreateCompanyInput;
   CreateDepartmentInput: CreateDepartmentInput;
   CreateEmployeeInput: CreateEmployeeInput;
   CreateGapAnalysisInput: CreateGapAnalysisInput;
+  CreatePermissionInput: CreatePermissionInput;
   CreateProcessInput: CreateProcessInput;
+  CreateRoleInput: CreateRoleInput;
   CreateTaskAssignmentInput: CreateTaskAssignmentInput;
   DateRange: DateRange;
   DateRangeInput: DateRangeInput;
   DateTime: Scalars['DateTime']['output'];
   Department: DepartmentModel;
+  DepartmentConnection: Omit<DepartmentConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Department']> };
   DepartmentEmployeeHistory: Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversParentTypes['Department'], timeline: Array<ResolversParentTypes['EmployeeTimelineEntry']> };
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversParentTypes['Department'], gapAnalysis: Maybe<ResolversParentTypes['GapAnalysis']> };
-  DepartmentListResponse: Omit<DepartmentListResponse, 'items'> & { items: Array<ResolversParentTypes['Department']> };
   DepartmentLoadOverview: Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversParentTypes['Department'], employeeBreakdown: Array<ResolversParentTypes['EmployeeLoadBreakdown']> };
   DepartmentMetrics: Omit<DepartmentMetrics, 'department'> & { department: ResolversParentTypes['Department'] };
   Employee: EmployeeModel;
@@ -3336,7 +3938,7 @@ export type ResolversParentTypes = {
   EntityAuditTrail: Omit<EntityAuditTrail, 'changesByUser' | 'timeline'> & { changesByUser: Array<ResolversParentTypes['ChangeByUser']>, timeline: Array<ResolversParentTypes['AuditLog']> };
   Error: Error;
   Float: Scalars['Float']['output'];
-  GapAnalysis: Omit<GapAnalysis, 'company' | 'department' | 'hiringPlan'> & { company: ResolversParentTypes['Company'], department: Maybe<ResolversParentTypes['Department']>, hiringPlan: Maybe<ResolversParentTypes['HiringPlan']> };
+  GapAnalysis: GapAnalysisResultModel;
   GapAnalysisConnection: Omit<GapAnalysisConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['GapAnalysis']> };
   GapAnalysisFilterInput: GapAnalysisFilterInput;
   GapAnalysisPaginationInput: GapAnalysisPaginationInput;
@@ -3367,6 +3969,10 @@ export type ResolversParentTypes = {
   Node: ResolversInterfaceTypes<ResolversParentTypes>['Node'];
   PageInfo: PageInfo;
   PaginationInput: PaginationInput;
+  Permission: PermissionModel;
+  PermissionConnection: Omit<PermissionConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Permission']> };
+  PermissionFilterInput: PermissionFilterInput;
+  PermissionPaginationInput: PermissionPaginationInput;
   Process: ProcessModel;
   ProcessConnection: Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Process']> };
   ProcessFilterInput: ProcessFilterInput;
@@ -3378,6 +3984,11 @@ export type ResolversParentTypes = {
   Query: Record<PropertyKey, never>;
   RecordEmployeeHistoryInput: RecordEmployeeHistoryInput;
   RiskActivityEvent: Omit<RiskActivityEvent, 'log'> & { log: ResolversParentTypes['AuditLog'] };
+  Role: RoleModel;
+  RoleConnection: Omit<RoleConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Role']> };
+  RoleFilterInput: RoleFilterInput;
+  RolePaginationInput: RolePaginationInput;
+  RolePermission: RolePermissionModel;
   SecurityIncident: Omit<SecurityIncident, 'involvedLogs'> & { involvedLogs: Array<ResolversParentTypes['AuditLog']> };
   SecurityIncidentEvent: Omit<SecurityIncidentEvent, 'incident'> & { incident: ResolversParentTypes['SecurityIncident'] };
   SecurityIncidentReport: Omit<SecurityIncidentReport, 'company' | 'incidents'> & { company: ResolversParentTypes['Company'], incidents: Array<ResolversParentTypes['SecurityIncident']> };
@@ -3393,12 +4004,15 @@ export type ResolversParentTypes = {
   TaskStatusChangeEvent: Omit<TaskStatusChangeEvent, 'assignment'> & { assignment: ResolversParentTypes['TaskAssignment'] };
   TaskStatusCount: TaskStatusCount;
   TaskTypeCount: TaskTypeCount;
+  UpdateActorInput: UpdateActorInput;
   UpdateCompanyInput: UpdateCompanyInput;
   UpdateDepartmentInput: UpdateDepartmentInput;
   UpdateEmployeeInput: UpdateEmployeeInput;
   UpdateGapAnalysisInput: UpdateGapAnalysisInput;
   UpdateHiringPlanInput: UpdateHiringPlanInput;
+  UpdatePermissionInput: UpdatePermissionInput;
   UpdateProcessInput: UpdateProcessInput;
+  UpdateRoleInput: UpdateRoleInput;
   UpdateTaskAssignmentInput: UpdateTaskAssignmentInput;
   Upload: Scalars['Upload']['output'];
   User: UserModel;
@@ -3413,6 +4027,60 @@ export type ActionTypeSummaryResolvers<ContextType = GraphQLContext, ParentType 
   count: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   failureCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
+export type ActorResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Actor'] = ResolversParentTypes['Actor']> = {
+  avatar: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  bio: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  company: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
+  companyId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  department: Resolver<Maybe<ResolversTypes['Department']>, ParentType, ContextType>;
+  departmentId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  email: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  lastActivityAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  lastLoginAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  permissions: Resolver<Array<ResolversTypes['ActorPermission']>, ParentType, ContextType>;
+  phone: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  roles: Resolver<Array<ResolversTypes['ActorRole']>, ParentType, ContextType>;
+  status: Resolver<ResolversTypes['ActorStatus'], ParentType, ContextType>;
+  updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  user: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  userId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ActorConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ActorConnection'] = ResolversParentTypes['ActorConnection']> = {
+  nodes: Resolver<Array<ResolversTypes['Actor']>, ParentType, ContextType>;
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
+export type ActorPermissionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ActorPermission'] = ResolversParentTypes['ActorPermission']> = {
+  actor: Resolver<ResolversTypes['Actor'], ParentType, ContextType>;
+  actorId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  assignedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  expiresAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  grant: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  permission: Resolver<ResolversTypes['Permission'], ParentType, ContextType>;
+  permissionId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  reason: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ActorRoleResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ActorRole'] = ResolversParentTypes['ActorRole']> = {
+  actor: Resolver<ResolversTypes['Actor'], ParentType, ContextType>;
+  actorId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  assignedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  expiresAt: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  reason: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  role: Resolver<ResolversTypes['Role'], ParentType, ContextType>;
+  roleId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AuditLogResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['AuditLog'] = ResolversParentTypes['AuditLog']> = {
@@ -3521,6 +4189,12 @@ export type DepartmentResolvers<ContextType = GraphQLContext, ParentType extends
   updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
+export type DepartmentConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentConnection'] = ResolversParentTypes['DepartmentConnection']> = {
+  nodes: Resolver<Array<ResolversTypes['Department']>, ParentType, ContextType>;
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type DepartmentEmployeeHistoryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentEmployeeHistory'] = ResolversParentTypes['DepartmentEmployeeHistory']> = {
   capacityAdded: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   capacityLost: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -3543,11 +4217,6 @@ export type DepartmentGapComparisonResolvers<ContextType = GraphQLContext, Paren
   gapStatus: Resolver<ResolversTypes['GapStatus'], ParentType, ContextType>;
   headcountGap: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   riskLevel: Resolver<ResolversTypes['GapAnalysisRiskLevel'], ParentType, ContextType>;
-};
-
-export type DepartmentListResponseResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentListResponse'] = ResolversParentTypes['DepartmentListResponse']> = {
-  items: Resolver<Array<ResolversTypes['Department']>, ParentType, ContextType>;
-  total: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type DepartmentLoadOverviewResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentLoadOverview'] = ResolversParentTypes['DepartmentLoadOverview']> = {
@@ -3894,34 +4563,49 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   approveEmployeeHistory: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType, RequireFields<MutationApproveEmployeeHistoryArgs, 'id'>>;
   approveHiringPlan: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationApproveHiringPlanArgs, 'approvedBy' | 'id'>>;
   archiveAuditLogs: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationArchiveAuditLogsArgs, 'dateRange'>>;
+  assignActorRole: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAssignActorRoleArgs, 'actorId' | 'roleId'>>;
   assignDepartmentHead: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationAssignDepartmentHeadArgs, 'departmentId' | 'employeeId'>>;
   assignProcessCapacity: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationAssignProcessCapacityArgs, 'capacityUnits' | 'kMultiplier' | 'processId'>>;
+  assignRolePermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAssignRolePermissionArgs, 'permissionId' | 'roleId'>>;
   blockTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationBlockTaskAssignmentArgs, 'id' | 'reason'>>;
   bulkLogAuditEntries: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<MutationBulkLogAuditEntriesArgs, 'entries'>>;
   cancelProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCancelProcessArgs, 'id'>>;
   completeProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCompleteProcessArgs, 'id'>>;
   completeTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationCompleteTaskAssignmentArgs, 'id'>>;
+  createActor: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationCreateActorArgs, 'input'>>;
   createCompany: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'input'>>;
   createCompanyLoadSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType, RequireFields<MutationCreateCompanyLoadSnapshotsArgs, 'companyId'>>;
   createDepartment: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationCreateDepartmentArgs, 'input'>>;
   createEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationCreateEmployeeArgs, 'input'>>;
   createGapAnalysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType, RequireFields<MutationCreateGapAnalysisArgs, 'input'>>;
   createLoadSnapshot: Resolver<ResolversTypes['LoadSnapshot'], ParentType, ContextType, RequireFields<MutationCreateLoadSnapshotArgs, 'employeeId' | 'snapshotType'>>;
+  createPermission: Resolver<ResolversTypes['Permission'], ParentType, ContextType, RequireFields<MutationCreatePermissionArgs, 'input'>>;
   createProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCreateProcessArgs, 'input'>>;
+  createRole: Resolver<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationCreateRoleArgs, 'input'>>;
   createTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationCreateTaskAssignmentArgs, 'input'>>;
+  deactivateActor: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationDeactivateActorArgs, 'id'>>;
   deleteDepartment: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteDepartmentArgs, 'id'>>;
+  deletePermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePermissionArgs, 'id'>>;
   deleteProcess: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProcessArgs, 'id'>>;
+  deleteRole: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteRoleArgs, 'id'>>;
   deleteTaskAssignment: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteTaskAssignmentArgs, 'id'>>;
+  denyActorPermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDenyActorPermissionArgs, 'actorId' | 'permissionId'>>;
   dismissEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationDismissEmployeeArgs, 'id'>>;
   exportAuditLogs: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationExportAuditLogsArgs, 'filter' | 'format'>>;
   generateHiringPlan: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationGenerateHiringPlanArgs, 'gapAnalysisId'>>;
+  grantActorPermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationGrantActorPermissionArgs, 'actorId' | 'permissionId'>>;
   logAuditEntry: Resolver<ResolversTypes['AuditLog'], ParentType, ContextType, RequireFields<MutationLogAuditEntryArgs, 'input'>>;
   reassignTask: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationReassignTaskArgs, 'newEmployeeId' | 'taskId'>>;
   recordEmployeeHistory: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType, RequireFields<MutationRecordEmployeeHistoryArgs, 'input'>>;
   rejectEmployeeHistory: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType, RequireFields<MutationRejectEmployeeHistoryArgs, 'id' | 'rejectionReason'>>;
+  removeActorRole: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveActorRoleArgs, 'actorId' | 'roleId'>>;
+  removeRolePermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveRolePermissionArgs, 'permissionId' | 'roleId'>>;
+  revokeActorPermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRevokeActorPermissionArgs, 'actorId' | 'permissionId'>>;
   startProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationStartProcessArgs, 'id'>>;
   startTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationStartTaskAssignmentArgs, 'id'>>;
+  suspendActor: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationSuspendActorArgs, 'id'>>;
   unblockTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUnblockTaskAssignmentArgs, 'id'>>;
+  updateActor: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationUpdateActorArgs, 'id' | 'input'>>;
   updateCompany: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MutationUpdateCompanyArgs, 'id' | 'input'>>;
   updateDepartment: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationUpdateDepartmentArgs, 'id' | 'input'>>;
   updateEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationUpdateEmployeeArgs, 'id' | 'input'>>;
@@ -3929,13 +4613,15 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateGapAnalysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType, RequireFields<MutationUpdateGapAnalysisArgs, 'id' | 'input'>>;
   updateHiringPlan: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationUpdateHiringPlanArgs, 'id' | 'input'>>;
   updateHiringProgress: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationUpdateHiringProgressArgs, 'actualHires' | 'hiringPlanId'>>;
+  updatePermission: Resolver<ResolversTypes['Permission'], ParentType, ContextType, RequireFields<MutationUpdatePermissionArgs, 'id' | 'input'>>;
   updateProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationUpdateProcessArgs, 'id' | 'input'>>;
+  updateRole: Resolver<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationUpdateRoleArgs, 'id' | 'input'>>;
   updateTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUpdateTaskAssignmentArgs, 'id' | 'input'>>;
   updateTaskProgress: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUpdateTaskProgressArgs, 'completionPercentage' | 'id'>>;
 };
 
 export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
-  __resolveType: TypeResolveFn<'User', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Actor' | 'ActorPermission' | 'ActorRole' | 'Permission' | 'Role' | 'RolePermission' | 'User', ParentType, ContextType>;
 };
 
 export type PageInfoResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = {
@@ -3943,6 +4629,25 @@ export type PageInfoResolvers<ContextType = GraphQLContext, ParentType extends R
   limit: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   offset: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   total: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
+export type PermissionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Permission'] = ResolversParentTypes['Permission']> = {
+  action: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  resource: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  scope: Resolver<ResolversTypes['PermissionScope'], ParentType, ContextType>;
+  slug: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PermissionConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['PermissionConnection'] = ResolversParentTypes['PermissionConnection']> = {
+  nodes: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type ProcessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Process'] = ResolversParentTypes['Process']> = {
@@ -4002,17 +4707,21 @@ export type QuarterlyProjectionResolvers<ContextType = GraphQLContext, ParentTyp
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  actor: Resolver<Maybe<ResolversTypes['Actor']>, ParentType, ContextType, RequireFields<QueryActorArgs, 'id'>>;
+  actors: Resolver<ResolversTypes['ActorConnection'], ParentType, ContextType, QueryActorsArgs>;
   auditLog: Resolver<Maybe<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<QueryAuditLogArgs, 'id'>>;
   auditLogs: Resolver<ResolversTypes['AuditLogConnection'], ParentType, ContextType, RequireFields<QueryAuditLogsArgs, 'filter'>>;
   blockedTasks: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, QueryBlockedTasksArgs>;
   changesBy: Resolver<Array<ResolversTypes['EmployeeHistory']>, ParentType, ContextType, RequireFields<QueryChangesByArgs, 'userId'>>;
   companies: Resolver<Maybe<Array<Maybe<ResolversTypes['Company']>>>, ParentType, ContextType>;
   company: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<QueryCompanyArgs, 'id'>>;
+  companyActors: Resolver<ResolversTypes['ActorConnection'], ParentType, ContextType, RequireFields<QueryCompanyActorsArgs, 'companyId'>>;
   companyLoadAnalysis: Resolver<ResolversTypes['CompanyLoadAnalysis'], ParentType, ContextType, RequireFields<QueryCompanyLoadAnalysisArgs, 'companyId'>>;
   companyProcessMetrics: Resolver<Array<ResolversTypes['ProcessMetrics']>, ParentType, ContextType, RequireFields<QueryCompanyProcessMetricsArgs, 'companyId'>>;
   complianceReport: Resolver<ResolversTypes['ComplianceReport'], ParentType, ContextType, RequireFields<QueryComplianceReportArgs, 'companyId' | 'dateRange'>>;
   dataAccessAudit: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<QueryDataAccessAuditArgs, 'companyId'>>;
   department: Resolver<Maybe<ResolversTypes['Department']>, ParentType, ContextType, RequireFields<QueryDepartmentArgs, 'id'>>;
+  departmentActors: Resolver<ResolversTypes['ActorConnection'], ParentType, ContextType, RequireFields<QueryDepartmentActorsArgs, 'departmentId'>>;
   departmentEmployeeHistory: Resolver<ResolversTypes['DepartmentEmployeeHistory'], ParentType, ContextType, RequireFields<QueryDepartmentEmployeeHistoryArgs, 'dateRange' | 'departmentId'>>;
   departmentEmployees: Resolver<Array<ResolversTypes['Employee']>, ParentType, ContextType, RequireFields<QueryDepartmentEmployeesArgs, 'departmentId'>>;
   departmentGapComparison: Resolver<Array<ResolversTypes['DepartmentGapComparison']>, ParentType, ContextType, RequireFields<QueryDepartmentGapComparisonArgs, 'companyId'>>;
@@ -4020,7 +4729,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   departmentProcesses: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType, RequireFields<QueryDepartmentProcessesArgs, 'departmentId'>>;
   departmentSnapshots: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType, RequireFields<QueryDepartmentSnapshotsArgs, 'departmentId'>>;
   departmentWithMetrics: Resolver<Maybe<ResolversTypes['DepartmentMetrics']>, ParentType, ContextType, RequireFields<QueryDepartmentWithMetricsArgs, 'id'>>;
-  departments: Resolver<ResolversTypes['DepartmentListResponse'], ParentType, ContextType, RequireFields<QueryDepartmentsArgs, 'filter'>>;
+  departments: Resolver<ResolversTypes['DepartmentConnection'], ParentType, ContextType, RequireFields<QueryDepartmentsArgs, 'filter'>>;
   employee: Resolver<Maybe<ResolversTypes['Employee']>, ParentType, ContextType, RequireFields<QueryEmployeeArgs, 'id'>>;
   employeeAuditReport: Resolver<ResolversTypes['EmployeeAuditReport'], ParentType, ContextType, RequireFields<QueryEmployeeAuditReportArgs, 'dateRange' | 'employeeId'>>;
   employeeCapacity: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<QueryEmployeeCapacityArgs, 'id'>>;
@@ -4053,14 +4762,20 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   loadSnapshot: Resolver<Maybe<ResolversTypes['LoadSnapshot']>, ParentType, ContextType, RequireFields<QueryLoadSnapshotArgs, 'id'>>;
   loadSnapshots: Resolver<ResolversTypes['LoadSnapshotConnection'], ParentType, ContextType, RequireFields<QueryLoadSnapshotsArgs, 'filter'>>;
   me: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  myActor: Resolver<Maybe<ResolversTypes['Actor']>, ParentType, ContextType>;
   myCompany: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType>;
   overdueTasks: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, QueryOverdueTasksArgs>;
+  permission: Resolver<Maybe<ResolversTypes['Permission']>, ParentType, ContextType, RequireFields<QueryPermissionArgs, 'id'>>;
+  permissions: Resolver<ResolversTypes['PermissionConnection'], ParentType, ContextType, QueryPermissionsArgs>;
   process: Resolver<Maybe<ResolversTypes['Process']>, ParentType, ContextType, RequireFields<QueryProcessArgs, 'id'>>;
   processTasks: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, RequireFields<QueryProcessTasksArgs, 'processId'>>;
   processWithMetrics: Resolver<Maybe<ResolversTypes['ProcessMetrics']>, ParentType, ContextType, RequireFields<QueryProcessWithMetricsArgs, 'id'>>;
   processes: Resolver<ResolversTypes['ProcessConnection'], ParentType, ContextType, QueryProcessesArgs>;
+  role: Resolver<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryRoleArgs, 'id'>>;
+  roles: Resolver<ResolversTypes['RoleConnection'], ParentType, ContextType, QueryRolesArgs>;
   securityIncidentReport: Resolver<ResolversTypes['SecurityIncidentReport'], ParentType, ContextType, RequireFields<QuerySecurityIncidentReportArgs, 'companyId' | 'dateRange'>>;
   suspiciousActivities: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<QuerySuspiciousActivitiesArgs, 'companyId'>>;
+  systemPermissions: Resolver<Array<ResolversTypes['Permission']>, ParentType, ContextType>;
   taskAssignment: Resolver<Maybe<ResolversTypes['TaskAssignment']>, ParentType, ContextType, RequireFields<QueryTaskAssignmentArgs, 'id'>>;
   taskAssignments: Resolver<ResolversTypes['TaskAssignmentConnection'], ParentType, ContextType, QueryTaskAssignmentsArgs>;
   taskWithMetrics: Resolver<Maybe<ResolversTypes['TaskAssignmentMetrics']>, ParentType, ContextType, RequireFields<QueryTaskWithMetricsArgs, 'id'>>;
@@ -4074,6 +4789,36 @@ export type RiskActivityEventResolvers<ContextType = GraphQLContext, ParentType 
   reason: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   riskScore: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   timestamp: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+};
+
+export type RoleResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Role'] = ResolversParentTypes['Role']> = {
+  company: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType>;
+  companyId: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  createdAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  description: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  name: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  permissions: Resolver<Array<ResolversTypes['RolePermission']>, ParentType, ContextType>;
+  scope: Resolver<ResolversTypes['RoleScope'], ParentType, ContextType>;
+  slug: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type RoleConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['RoleConnection'] = ResolversParentTypes['RoleConnection']> = {
+  nodes: Resolver<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  pageInfo: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  totalCount: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
+export type RolePermissionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['RolePermission'] = ResolversParentTypes['RolePermission']> = {
+  assignedAt: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  permission: Resolver<ResolversTypes['Permission'], ParentType, ContextType>;
+  permissionId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  role: Resolver<ResolversTypes['Role'], ParentType, ContextType>;
+  roleId: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SecurityIncidentResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['SecurityIncident'] = ResolversParentTypes['SecurityIncident']> = {
@@ -4246,6 +4991,10 @@ export type UsersResultResolvers<ContextType = GraphQLContext, ParentType extend
 
 export type Resolvers<ContextType = GraphQLContext> = {
   ActionTypeSummary: ActionTypeSummaryResolvers<ContextType>;
+  Actor: ActorResolvers<ContextType>;
+  ActorConnection: ActorConnectionResolvers<ContextType>;
+  ActorPermission: ActorPermissionResolvers<ContextType>;
+  ActorRole: ActorRoleResolvers<ContextType>;
   AuditLog: AuditLogResolvers<ContextType>;
   AuditLogConnection: AuditLogConnectionResolvers<ContextType>;
   BigInt: GraphQLScalarType;
@@ -4257,9 +5006,9 @@ export type Resolvers<ContextType = GraphQLContext> = {
   DateRange: DateRangeResolvers<ContextType>;
   DateTime: GraphQLScalarType;
   Department: DepartmentResolvers<ContextType>;
+  DepartmentConnection: DepartmentConnectionResolvers<ContextType>;
   DepartmentEmployeeHistory: DepartmentEmployeeHistoryResolvers<ContextType>;
   DepartmentGapComparison: DepartmentGapComparisonResolvers<ContextType>;
-  DepartmentListResponse: DepartmentListResponseResolvers<ContextType>;
   DepartmentLoadOverview: DepartmentLoadOverviewResolvers<ContextType>;
   DepartmentMetrics: DepartmentMetricsResolvers<ContextType>;
   Employee: EmployeeResolvers<ContextType>;
@@ -4295,6 +5044,8 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Mutation: MutationResolvers<ContextType>;
   Node: NodeResolvers<ContextType>;
   PageInfo: PageInfoResolvers<ContextType>;
+  Permission: PermissionResolvers<ContextType>;
+  PermissionConnection: PermissionConnectionResolvers<ContextType>;
   Process: ProcessResolvers<ContextType>;
   ProcessConnection: ProcessConnectionResolvers<ContextType>;
   ProcessMetrics: ProcessMetricsResolvers<ContextType>;
@@ -4302,6 +5053,9 @@ export type Resolvers<ContextType = GraphQLContext> = {
   QuarterlyProjection: QuarterlyProjectionResolvers<ContextType>;
   Query: QueryResolvers<ContextType>;
   RiskActivityEvent: RiskActivityEventResolvers<ContextType>;
+  Role: RoleResolvers<ContextType>;
+  RoleConnection: RoleConnectionResolvers<ContextType>;
+  RolePermission: RolePermissionResolvers<ContextType>;
   SecurityIncident: SecurityIncidentResolvers<ContextType>;
   SecurityIncidentEvent: SecurityIncidentEventResolvers<ContextType>;
   SecurityIncidentReport: SecurityIncidentReportResolvers<ContextType>;

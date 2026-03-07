@@ -6,6 +6,11 @@
 
 import type { LoadSnapshot, Prisma } from "@/server/db/generated/prisma/client";
 import { BaseRepository } from "@/server/services/base/BaseRepository";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "@/server/services/base/pagination";
 
 export class LoadSnapshotRepository extends BaseRepository<LoadSnapshot> {
   protected readonly modelName = "loadSnapshot" as const;
@@ -22,7 +27,17 @@ export class LoadSnapshotRepository extends BaseRepository<LoadSnapshot> {
     return this.prisma.loadSnapshot.findMany();
   }
 
-  async findByEmployee(employeeId: string): Promise<LoadSnapshot[]> {
+  /**
+   * Find load snapshots with filtering and pagination
+   */
+  async find(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<LoadSnapshot>> {
+    return this.findWithPagination(filter, pagination);
+  }
+
+  // ==================== SPECIFIC QUERIES ====================
     return this.prisma.loadSnapshot.findMany({
       where: { employeeId },
       orderBy: { periodStart: "desc" },

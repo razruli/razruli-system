@@ -37,6 +37,100 @@ export type ActionTypeSummary = {
   successCount: Scalars['Int']['output'];
 };
 
+/**
+ * Actor type - Represents a business user with roles and permissions
+ * Wraps the User (authentication) with business context
+ */
+export type Actor = Node & {
+  __typename?: 'Actor';
+  avatar?: Maybe<Scalars['String']['output']>;
+  bio?: Maybe<Scalars['String']['output']>;
+  company: Company;
+  /** Business context */
+  companyId: Scalars['String']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  department?: Maybe<Department>;
+  departmentId?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  lastActivityAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Activity tracking */
+  lastLoginAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Business identity */
+  name: Scalars['String']['output'];
+  permissions: Array<ActorPermission>;
+  phone?: Maybe<Scalars['String']['output']>;
+  /** Authorization */
+  roles: Array<ActorRole>;
+  /** Status */
+  status: ActorStatus;
+  updatedAt: Scalars['DateTime']['output'];
+  user: User;
+  /** Authentication link */
+  userId: Scalars['String']['output'];
+};
+
+/** Actor response wrapper */
+export type ActorConnection = {
+  __typename?: 'ActorConnection';
+  nodes: Array<Actor>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for actors */
+export type ActorFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<ActorStatus>;
+};
+
+/** Actor pagination input */
+export type ActorPaginationInput = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Actor permission assignment */
+export type ActorPermission = Node & {
+  __typename?: 'ActorPermission';
+  actor: Actor;
+  actorId: Scalars['String']['output'];
+  assignedAt: Scalars['DateTime']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  grant: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  permission: Permission;
+  permissionId: Scalars['String']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+};
+
+/** Actor role assignment */
+export type ActorRole = Node & {
+  __typename?: 'ActorRole';
+  actor: Actor;
+  actorId: Scalars['String']['output'];
+  assignedAt: Scalars['DateTime']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+  role: Role;
+  roleId: Scalars['String']['output'];
+};
+
+/** Actor status enumeration */
+export enum ActorStatus {
+  Active = 'ACTIVE',
+  Archived = 'ARCHIVED',
+  Inactive = 'INACTIVE',
+  PendingActivation = 'PENDING_ACTIVATION',
+  Suspended = 'SUSPENDED'
+}
+
 /** Audit action type */
 export enum AuditActionType {
   Approval = 'APPROVAL',
@@ -224,6 +318,18 @@ export type ComplianceReport = {
   userAccessSummary: Array<UserAccessSummary>;
 };
 
+/** Input for creating an actor */
+export type CreateActorInput = {
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  companyId: Scalars['String']['input'];
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+  userId: Scalars['String']['input'];
+};
+
 /** Input for creating a company */
 export type CreateCompanyInput = {
   name: Scalars['String']['input'];
@@ -262,6 +368,16 @@ export type CreateGapAnalysisInput = {
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+/** Input for creating a permission */
+export type CreatePermissionInput = {
+  action: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  resource: Scalars['String']['input'];
+  scope: PermissionScope;
+  slug: Scalars['String']['input'];
+};
+
 /** Input for creating a process */
 export type CreateProcessInput = {
   capacityUnits: Scalars['Int']['input'];
@@ -273,6 +389,17 @@ export type CreateProcessInput = {
   name: Scalars['String']['input'];
   priority?: InputMaybe<ProcessPriority>;
   processType: ProcessType;
+  status?: InputMaybe<ProcessStatus>;
+};
+
+/** Input for creating a role */
+export type CreateRoleInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  permissionIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  scope: RoleScope;
+  slug: Scalars['String']['input'];
 };
 
 /** Input for creating a task assignment */
@@ -337,6 +464,14 @@ export type Department = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** Department connection with pagination */
+export type DepartmentConnection = {
+  __typename?: 'DepartmentConnection';
+  nodes: Array<Department>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 /** Department history summary */
 export type DepartmentEmployeeHistory = {
   __typename?: 'DepartmentEmployeeHistory';
@@ -372,13 +507,6 @@ export type DepartmentGapComparison = {
   gapStatus: GapStatus;
   headcountGap: Scalars['Int']['output'];
   riskLevel: GapAnalysisRiskLevel;
-};
-
-/** Response with department list */
-export type DepartmentListResponse = {
-  __typename?: 'DepartmentListResponse';
-  items: Array<Department>;
-  total: Scalars['Int']['output'];
 };
 
 /** Department load overview */
@@ -1073,10 +1201,14 @@ export type Mutation = {
   approveHiringPlan: HiringPlan;
   /** Mark audit logs for archival */
   archiveAuditLogs: Scalars['Int']['output'];
+  /** Assign a role to an actor */
+  assignActorRole: Scalars['Boolean']['output'];
   /** Assign department head */
   assignDepartmentHead: Department;
   /** Assign capacity to process */
   assignProcessCapacity: Process;
+  /** Assign permission to role (admin only) */
+  assignRolePermission: Scalars['Boolean']['output'];
   /** Block a task with reason */
   blockTaskAssignment: TaskAssignment;
   /** Bulk log audit entries */
@@ -1087,6 +1219,8 @@ export type Mutation = {
   completeProcess: Process;
   /** Complete a task assignment */
   completeTaskAssignment: TaskAssignment;
+  /** Create a new actor (admin only) */
+  createActor: Actor;
   /** Create new company (admin only) */
   createCompany?: Maybe<Company>;
   /** Create snapshots for all employees */
@@ -1099,22 +1233,36 @@ export type Mutation = {
   createGapAnalysis: GapAnalysis;
   /** Create a load snapshot */
   createLoadSnapshot: LoadSnapshot;
+  /** Create a new permission (admin only) */
+  createPermission: Permission;
   /** Create a new process */
   createProcess: Process;
+  /** Create a new role (admin only) */
+  createRole: Role;
   /** Create a new task assignment */
   createTaskAssignment: TaskAssignment;
+  /** Deactivate an actor */
+  deactivateActor: Actor;
   /** Delete department */
   deleteDepartment: Scalars['Boolean']['output'];
+  /** Delete a permission (admin only) */
+  deletePermission: Scalars['Boolean']['output'];
   /** Delete a process */
   deleteProcess: Scalars['Boolean']['output'];
+  /** Delete a role (admin only) */
+  deleteRole: Scalars['Boolean']['output'];
   /** Delete a task assignment */
   deleteTaskAssignment: Scalars['Boolean']['output'];
+  /** Deny a permission to an actor */
+  denyActorPermission: Scalars['Boolean']['output'];
   /** Dismiss employee (soft delete) */
   dismissEmployee: Employee;
   /** Export audit logs */
   exportAuditLogs: Scalars['String']['output'];
   /** Generate hiring plan from gap analysis */
   generateHiringPlan: HiringPlan;
+  /** Grant a permission to an actor */
+  grantActorPermission: Scalars['Boolean']['output'];
   /** Log an audit entry */
   logAuditEntry: AuditLog;
   /** Reassign task to different employee */
@@ -1123,12 +1271,22 @@ export type Mutation = {
   recordEmployeeHistory: EmployeeHistory;
   /** Reject employee history change */
   rejectEmployeeHistory: EmployeeHistory;
+  /** Remove a role from an actor */
+  removeActorRole: Scalars['Boolean']['output'];
+  /** Remove permission from role (admin only) */
+  removeRolePermission: Scalars['Boolean']['output'];
+  /** Revoke a permission from an actor */
+  revokeActorPermission: Scalars['Boolean']['output'];
   /** Start a process */
   startProcess: Process;
   /** Start a task assignment */
   startTaskAssignment: TaskAssignment;
+  /** Suspend an actor */
+  suspendActor: Actor;
   /** Unblock a task */
   unblockTaskAssignment: TaskAssignment;
+  /** Update an actor */
+  updateActor: Actor;
   /** Update company settings */
   updateCompany?: Maybe<Company>;
   /** Update department */
@@ -1143,8 +1301,12 @@ export type Mutation = {
   updateHiringPlan: HiringPlan;
   /** Track hiring progress */
   updateHiringProgress: HiringPlan;
+  /** Update a permission (admin only) */
+  updatePermission: Permission;
   /** Update an existing process */
   updateProcess: Process;
+  /** Update a role (admin only) */
+  updateRole: Role;
   /** Update a task assignment */
   updateTaskAssignment: TaskAssignment;
   /** Update task progress */
@@ -1184,6 +1346,17 @@ export type MutationArchiveAuditLogsArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationAssignActorRoleArgs = {
+  actorId: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationAssignDepartmentHeadArgs = {
   departmentId: Scalars['String']['input'];
   employeeId: Scalars['String']['input'];
@@ -1198,6 +1371,16 @@ export type MutationAssignProcessCapacityArgs = {
   capacityUnits: Scalars['Int']['input'];
   kMultiplier: Scalars['Float']['input'];
   processId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationAssignRolePermissionArgs = {
+  permissionId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
 };
 
 
@@ -1245,6 +1428,15 @@ export type MutationCompleteProcessArgs = {
  */
 export type MutationCompleteTaskAssignmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateActorArgs = {
+  input: CreateActorInput;
 };
 
 
@@ -1308,8 +1500,26 @@ export type MutationCreateLoadSnapshotArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationCreatePermissionArgs = {
+  input: CreatePermissionInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationCreateProcessArgs = {
   input: CreateProcessInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationCreateRoleArgs = {
+  input: CreateRoleInput;
 };
 
 
@@ -1326,7 +1536,25 @@ export type MutationCreateTaskAssignmentArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationDeactivateActorArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationDeleteDepartmentArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeletePermissionArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -1344,8 +1572,28 @@ export type MutationDeleteProcessArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationDeleteRoleArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationDeleteTaskAssignmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDenyActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1376,6 +1624,17 @@ export type MutationExportAuditLogsArgs = {
 export type MutationGenerateHiringPlanArgs = {
   gapAnalysisId: Scalars['String']['input'];
   phases?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationGrantActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1421,6 +1680,36 @@ export type MutationRejectEmployeeHistoryArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationRemoveActorRoleArgs = {
+  actorId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRemoveRolePermissionArgs = {
+  permissionId: Scalars['String']['input'];
+  roleId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationRevokeActorPermissionArgs = {
+  actorId: Scalars['String']['input'];
+  permissionId: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationStartProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -1439,9 +1728,29 @@ export type MutationStartTaskAssignmentArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationSuspendActorArgs = {
+  id: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationUnblockTaskAssignmentArgs = {
   id: Scalars['String']['input'];
   resolution?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateActorArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateActorInput;
 };
 
 
@@ -1520,9 +1829,29 @@ export type MutationUpdateHiringProgressArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationUpdatePermissionArgs = {
+  id: Scalars['String']['input'];
+  input: UpdatePermissionInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationUpdateProcessArgs = {
   id: Scalars['String']['input'];
   input: UpdateProcessInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateRoleArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateRoleInput;
 };
 
 
@@ -1562,6 +1891,54 @@ export type PaginationInput = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 };
+
+/** Permission type - Fine-grained access control */
+export type Permission = Node & {
+  __typename?: 'Permission';
+  action: Scalars['String']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Permission metadata */
+  name: Scalars['String']['output'];
+  /** Resource and action */
+  resource: Scalars['String']['output'];
+  /** Scope */
+  scope: PermissionScope;
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Permission response wrapper */
+export type PermissionConnection = {
+  __typename?: 'PermissionConnection';
+  nodes: Array<Permission>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for permissions */
+export type PermissionFilterInput = {
+  action?: InputMaybe<Scalars['String']['input']>;
+  resource?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<PermissionScope>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Permission pagination input */
+export type PermissionPaginationInput = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Permission scope enumeration */
+export enum PermissionScope {
+  Company = 'COMPANY',
+  System = 'SYSTEM'
+}
 
 /** Process type representing business processes */
 export type Process = {
@@ -1704,6 +2081,10 @@ export type QuarterlyProjection = {
  */
 export type Query = {
   __typename?: 'Query';
+  /** Get actor by ID */
+  actor?: Maybe<Actor>;
+  /** List actors with filtering and pagination */
+  actors: ActorConnection;
   /** Get audit log entry by ID */
   auditLog?: Maybe<AuditLog>;
   /** List audit logs with filtering */
@@ -1716,6 +2097,8 @@ export type Query = {
   companies?: Maybe<Array<Maybe<Company>>>;
   /** Get company by ID */
   company?: Maybe<Company>;
+  /** Get actors in a company */
+  companyActors: ActorConnection;
   /** Get company-wide load analysis */
   companyLoadAnalysis: CompanyLoadAnalysis;
   /** Get processes by company with metrics */
@@ -1726,6 +2109,8 @@ export type Query = {
   dataAccessAudit: Array<AuditLog>;
   /** Get department by ID */
   department?: Maybe<Department>;
+  /** Get actors in a department */
+  departmentActors: ActorConnection;
   /** Get department employee history summary */
   departmentEmployeeHistory: DepartmentEmployeeHistory;
   /** Get employees in specific department */
@@ -1741,7 +2126,7 @@ export type Query = {
   /** Get department with all employees and load metrics */
   departmentWithMetrics?: Maybe<DepartmentMetrics>;
   /** Get all departments for company */
-  departments: DepartmentListResponse;
+  departments: DepartmentConnection;
   /** Get employee by ID */
   employee?: Maybe<Employee>;
   /** Get audit report for employee */
@@ -1805,10 +2190,16 @@ export type Query = {
   /** List load snapshots with filtering */
   loadSnapshots: LoadSnapshotConnection;
   me?: Maybe<User>;
+  /** Get current actor (authenticated user's business identity) */
+  myActor?: Maybe<Actor>;
   /** Get authenticated user's company */
   myCompany?: Maybe<Company>;
   /** Get overdue tasks */
   overdueTasks: Array<TaskAssignment>;
+  /** Get permission by ID (admin only) */
+  permission?: Maybe<Permission>;
+  /** List permissions with filtering (admin only) */
+  permissions: PermissionConnection;
   /** Get process by ID */
   process?: Maybe<Process>;
   /** Get tasks in a process */
@@ -1817,10 +2208,16 @@ export type Query = {
   processWithMetrics?: Maybe<ProcessMetrics>;
   /** List all processes with filtering and pagination */
   processes: ProcessConnection;
+  /** Get role by ID (admin only) */
+  role?: Maybe<Role>;
+  /** List roles with filtering (admin only) */
+  roles: RoleConnection;
   /** Get security incident report */
   securityIncidentReport: SecurityIncidentReport;
   /** Find suspicious activities */
   suspiciousActivities: Array<AuditLog>;
+  /** Get all system permissions (for UI) */
+  systemPermissions: Array<Permission>;
   /** Get task assignment by ID */
   taskAssignment?: Maybe<TaskAssignment>;
   /** List all task assignments with filtering and pagination */
@@ -1832,6 +2229,25 @@ export type Query = {
   /** Get user activity summary */
   userActivitySummary: UserActivitySummary;
   users: UsersResult;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryActorArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryActorsArgs = {
+  filter?: InputMaybe<ActorFilterInput>;
+  pagination?: InputMaybe<ActorPaginationInput>;
 };
 
 
@@ -1886,6 +2302,16 @@ export type QueryCompanyArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryCompanyActorsArgs = {
+  companyId: Scalars['String']['input'];
+  pagination?: InputMaybe<ActorPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryCompanyLoadAnalysisArgs = {
   companyId: Scalars['String']['input'];
   dateRange?: InputMaybe<DateRangeInput>;
@@ -1928,6 +2354,16 @@ export type QueryDataAccessAuditArgs = {
  */
 export type QueryDepartmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentActorsArgs = {
+  departmentId: Scalars['String']['input'];
+  pagination?: InputMaybe<ActorPaginationInput>;
 };
 
 
@@ -2299,6 +2735,25 @@ export type QueryOverdueTasksArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryPermissionArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryPermissionsArgs = {
+  filter?: InputMaybe<PermissionFilterInput>;
+  pagination?: InputMaybe<PermissionPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -2330,6 +2785,25 @@ export type QueryProcessWithMetricsArgs = {
 export type QueryProcessesArgs = {
   filter?: InputMaybe<ProcessFilterInput>;
   pagination?: InputMaybe<ProcessPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRoleArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRolesArgs = {
+  filter?: InputMaybe<RoleFilterInput>;
+  pagination?: InputMaybe<RolePaginationInput>;
 };
 
 
@@ -2447,6 +2921,68 @@ export type RiskActivityEvent = {
   riskScore: Scalars['Int']['output'];
   timestamp: Scalars['DateTime']['output'];
 };
+
+/**
+ * Role type - Represents a collection of permissions
+ * Can be system-wide or company-specific
+ */
+export type Role = Node & {
+  __typename?: 'Role';
+  company?: Maybe<Company>;
+  companyId?: Maybe<Scalars['String']['output']>;
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Role metadata */
+  name: Scalars['String']['output'];
+  /** Permissions in this role */
+  permissions: Array<RolePermission>;
+  /** Scope */
+  scope: RoleScope;
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Role response wrapper */
+export type RoleConnection = {
+  __typename?: 'RoleConnection';
+  nodes: Array<Role>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Filter input for roles */
+export type RoleFilterInput = {
+  companyId?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<RoleScope>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Role pagination input */
+export type RolePaginationInput = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<SortOrder>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Role permission assignment */
+export type RolePermission = Node & {
+  __typename?: 'RolePermission';
+  assignedAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  permission: Permission;
+  permissionId: Scalars['String']['output'];
+  role: Role;
+  roleId: Scalars['String']['output'];
+};
+
+/** Role scope enumeration */
+export enum RoleScope {
+  Company = 'COMPANY',
+  System = 'SYSTEM'
+}
 
 /** Security incident */
 export type SecurityIncident = {
@@ -2915,6 +3451,16 @@ export enum TrendDirection {
   Stable = 'STABLE'
 }
 
+/** Input for updating an actor */
+export type UpdateActorInput = {
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  departmentId?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<ActorStatus>;
+};
+
 /** Input for updating a company */
 export type UpdateCompanyInput = {
   name?: InputMaybe<Scalars['String']['input']>;
@@ -2956,6 +3502,14 @@ export type UpdateHiringPlanInput = {
   targetHeadcount?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** Input for updating a permission */
+export type UpdatePermissionInput = {
+  action?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  resource?: InputMaybe<Scalars['String']['input']>;
+};
+
 /** Input for updating a process */
 export type UpdateProcessInput = {
   capacityUnits?: InputMaybe<Scalars['Int']['input']>;
@@ -2965,6 +3519,13 @@ export type UpdateProcessInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   priority?: InputMaybe<ProcessPriority>;
   status?: InputMaybe<ProcessStatus>;
+};
+
+/** Input for updating a role */
+export type UpdateRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permissionIds?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 /** Input for updating a task assignment */

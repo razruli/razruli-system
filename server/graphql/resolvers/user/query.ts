@@ -1,11 +1,37 @@
-// server/graphql/resolvers/user/queries.ts
+/**
+ * ============================================================================
+ * User Domain - Query Resolvers
+ * ============================================================================
+ * Independent resolver functions with proper TypeScript types
+ * Each resolver is defined as a standalone function then wrapped with middleware
+ */
+
+import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
+import { QueryResolvers } from "@/server/graphql/types/generated";
 import { stripNulls } from "@/server/utils/cleaners/cleaners";
 import { handleError } from "@/server/utils/errors/errors";
 import { logger } from "@/server/utils/logger/logger";
 
-import { QueryResolvers } from "../../types/generated";
+// ==================== MIDDLEWARE CONFIGURATIONS ====================
+// Reusable middleware for user queries
 
-export const me: QueryResolvers["me"] = async (
+/** Require authentication + user:read permission */
+const userReadMiddleware = composeMiddleware(
+  { requireAuth: true },
+  { requiredPermissions: ["user:read"] },
+);
+
+/** Require authentication (no permissions needed for self) */
+const userSelfMiddleware = composeMiddleware({ requireAuth: true });
+
+// ==================== RESOLVER FUNCTIONS ====================
+// Independent functions with explicit type signatures
+
+/**
+ * Get the currently authenticated user
+ * Returns null if not authenticated
+ */
+const meResolver: QueryResolvers["me"] = async (
   _parent,
   _args,
   ctx,
@@ -25,10 +51,16 @@ export const me: QueryResolvers["me"] = async (
   }
 };
 
-export const users: QueryResolvers["users"] = async (_parent, args, ctx) => {
+/**
+ * List users with filtering and pagination
+ * Supports searching, sorting, and filtering by status, email verification status, and creation date
+ */
+const usersResolver: QueryResolvers["users"] = async (
+  _parent,
+  { input },
+  ctx,
+): Promise<any> => {
   try {
-    const input = args.input;
-
     if (!input || typeof input !== "object") {
       throw new Error("Invalid input parameters");
     }
@@ -85,8 +117,11 @@ export const users: QueryResolvers["users"] = async (_parent, args, ctx) => {
   }
 };
 
-export const userActivitySummary: QueryResolvers["userActivitySummary"] =
-  async (_parent, { userId, dateRange }, ctx) => {
+/**
+ * Get user activity summary for a specific date range
+ */
+const userActivitySummaryResolver: QueryResolvers["userActivitySummary"] =
+  async (_parent, { userId, dateRange }, ctx): Promise<any> => {
     try {
       const user = await ctx.services.user.getCurrentUser(userId);
       if (!user) throw new Error("User not found");
@@ -99,7 +134,7 @@ export const userActivitySummary: QueryResolvers["userActivitySummary"] =
         loginCount: 0,
         activityCount: 0,
         lastActive: null,
-        actions: [],
+        actions: [] as any[],
       };
     } catch (error) {
       logger.error("Error in userActivitySummary resolver", error);
@@ -107,8 +142,27 @@ export const userActivitySummary: QueryResolvers["userActivitySummary"] =
     }
   };
 
-export const userQueryResolvers: Partial<QueryResolvers> = {
-  me,
-  users,
-  userActivitySummary,
+// ==================== WRAPPED RESOLVERS ====================
+// Apply middleware wrappers to resolver functions
+
+const wrappedMe = withMiddleware(meResolver, userSelfMiddleware);
+
+const wrappedUsers = withMiddleware(usersResolver, userReadMiddleware);
+
+const wrappedUserActivitySummary = withMiddleware(
+  userActivitySummaryResolver,
+  userReadMiddleware,
+);
+
+// ==================== EXPORTED RESOLVER MAP ====================
+
+export const userQueries: Pick<
+  QueryResolvers,
+  "me" | "users" | "userActivitySummary"
+> = {
+  me: wrappedMe,
+  users: wrappedUsers,
+  userActivitySummary: wrappedUserActivitySummary,
 };
+
+export default userQueries;

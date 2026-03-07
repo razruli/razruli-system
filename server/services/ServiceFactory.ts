@@ -7,6 +7,7 @@
 
 import type { ServiceContext } from "@/server/types/context";
 
+import { ActorService } from "./actor/Actor.service";
 import { GapAnalysisService } from "./analytics/gapAnalysis";
 import { LoadSnapshotService } from "./analytics/loadSnapshot";
 import { AuditLogService } from "./audit/auditLog";
@@ -39,6 +40,7 @@ export class ServiceFactory {
   // Lazy-loaded service instances (memoized)
   private _services: {
     user?: UserService;
+    actor?: ActorService;
     company?: CompanyService;
     department?: DepartmentService;
     employee?: EmployeeService;
@@ -73,6 +75,24 @@ export class ServiceFactory {
     }
     return this._services.user;
   }
+
+  /**
+   * Actor services (Business User Identity)
+   * Location: services/user/Actor.service.ts
+   *
+   * Handles:
+   * - Actor CRUD operations (business user representation)
+   * - Role and permission management
+   * - Authorization checks
+   * - Actor-company relationships
+   */
+  getActorService(): ActorService {
+    if (!this._services.actor) {
+      this._services.actor = new ActorService(this.context);
+    }
+    return this._services.actor;
+  }
+
   // ==================== CORE DOMAIN ====================
 
   /**

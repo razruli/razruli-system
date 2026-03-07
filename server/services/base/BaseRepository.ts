@@ -8,6 +8,12 @@
 import type { PrismaClient } from "@/server/db/generated/prisma/client";
 
 import { FiniteStateMachine } from "./fsm/FiniteStateMachine";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "./pagination";
+import { toPrismaOptions, buildWhereClause } from "./pagination";
 
 export abstract class BaseRepository<T extends { id: string }> {
   protected abstract readonly modelName: keyof PrismaClient;
@@ -49,6 +55,45 @@ export abstract class BaseRepository<T extends { id: string }> {
     return model.findMany({
       orderBy: orderBy || { createdAt: "desc" },
     });
+  }
+
+  /**
+   * Find with pagination, filtering, and sorting
+   * Returns paginated results with total count for connection objects
+   */
+  async findWithPagination(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<T>> {
+    const model = this.prisma[this.modelName] as any;
+
+    // Build where clause from filter
+    const where = buildWhereClause(filter);
+
+    // Get total count (for hasMore calculation)
+    const total = await model.count({ where });
+
+    // Get paginated options from input
+    const options = toPrismaOptions(pagination);
+
+    // Fetch paginated data
+    const data = await model.findMany({
+      where,
+      skip: options.skip,
+      take: options.take,
+      orderBy: options.orderBy || { createdAt: "desc" },
+    });
+
+    // Calculate hasMore
+    const hasMore = options.skip + data.length < total;
+
+    return {
+      data,
+      total,
+      hasMore,
+      skip: options.skip,
+      take: options.take,
+    };
   }
 
   // ==================== WRITE OPERATIONS ====================

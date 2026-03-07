@@ -6,6 +6,11 @@
 
 import type { AuditLog, Prisma } from "@/server/db/generated/prisma/client";
 import { BaseRepository } from "@/server/services/base/BaseRepository";
+import type {
+  FilterInput,
+  PaginationInput,
+  PaginatedResult,
+} from "@/server/services/base/pagination";
 
 export class AuditLogRepository extends BaseRepository<AuditLog> {
   protected readonly modelName = "auditLog" as const;
@@ -26,6 +31,16 @@ export class AuditLogRepository extends BaseRepository<AuditLog> {
     return this.prisma.auditLog.findMany({
       orderBy: { changedAt: "desc" },
     });
+  }
+
+  /**
+   * Find audit logs with filtering and pagination
+   */
+  async find(
+    filter?: FilterInput,
+    pagination?: PaginationInput,
+  ): Promise<PaginatedResult<AuditLog>> {
+    return this.findWithPagination(filter, pagination);
   }
 
   // ==================== WRITE OPERATIONS ====================
