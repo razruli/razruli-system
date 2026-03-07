@@ -8,6 +8,7 @@ import DataLoader from "dataloader";
 
 import { User } from "../db/generated/prisma/browser";
 import type {
+  Actor,
   Company,
   Department,
   Employee,
@@ -19,6 +20,8 @@ import type {
   EmployeeHistory,
   AuditLog,
   PrismaClient,
+  Role,
+  Permission,
 } from "../db/generated/prisma/client";
 
 /**
@@ -28,6 +31,7 @@ import type {
 export interface DataLoaders {
   // Single entity loaders
   user: DataLoader<string, User | null>;
+  actor: DataLoader<string, Actor | null>;
   company: DataLoader<string, Company | null>;
   department: DataLoader<string, Department | null>;
   employee: DataLoader<string, Employee | null>;
@@ -38,11 +42,15 @@ export interface DataLoaders {
   gapAnalysis: DataLoader<string, GapAnalysisResult | null>;
   employeeHistory: DataLoader<string, EmployeeHistory | null>;
   auditLog: DataLoader<string, AuditLog | null>;
+  role: DataLoader<string, Role | null>;
+  permission: DataLoader<string, Permission | null>;
 
   // Batch collection loaders
   employeesByDepartment: DataLoader<string, Employee[]>;
   tasksByEmployee: DataLoader<string, TaskAssignment[]>;
   snapshotsByEmployee: DataLoader<string, LoadSnapshot[]>;
+  actorsByCompany: DataLoader<string, Actor[]>;
+  actorsByDepartment: DataLoader<string, Actor[]>;
 }
 
 /**
@@ -72,8 +80,11 @@ export interface ServiceContext {
   /** User ID from JWT or session - null if unauthenticated */
   userId: string | null;
 
-  /** Authenticated user object - undefined if unauthenticated */
+  /** Authenticated user object (auth only) - undefined if unauthenticated */
   user?: User;
+
+  /** Business actor object - undefined if not authenticated as business user */
+  actor?: Actor;
 
   /** Request is from authenticated user */
   isAuthenticated: boolean;

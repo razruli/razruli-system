@@ -66,6 +66,36 @@ export type EmployeeHistory = Prisma.EmployeeHistoryModel
  */
 export type AuditLog = Prisma.AuditLogModel
 /**
+ * Model Actor
+ * 
+ */
+export type Actor = Prisma.ActorModel
+/**
+ * Model Role
+ * 
+ */
+export type Role = Prisma.RoleModel
+/**
+ * Model Permission
+ * 
+ */
+export type Permission = Prisma.PermissionModel
+/**
+ * Model ActorRole
+ * 
+ */
+export type ActorRole = Prisma.ActorRoleModel
+/**
+ * Model RolePermission
+ * 
+ */
+export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model ActorPermission
+ * 
+ */
+export type ActorPermission = Prisma.ActorPermissionModel
+/**
  * Model User
  * 
  */

@@ -1,0 +1,14 @@
+# server/graphql/fragments/user.graphql
+"""
+Reusable User fields fragment
+Use this in all queries that return User data
+"""
+fragment UserFields on User {
+  id
+  name
+  email
+  emailVerified
+  image
+  createdAt
+  updatedAt
+}

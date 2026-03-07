@@ -30,7 +30,8 @@ export type EmployeeHistoryMinAggregateOutputType = {
   fieldName: string | null
   oldValue: string | null
   newValue: string | null
-  changedBy: string | null
+  changedById: string | null
+  approvedById: string | null
   changedAt: Date | null
   reason: string | null
 }
@@ -41,7 +42,8 @@ export type EmployeeHistoryMaxAggregateOutputType = {
   fieldName: string | null
   oldValue: string | null
   newValue: string | null
-  changedBy: string | null
+  changedById: string | null
+  approvedById: string | null
   changedAt: Date | null
   reason: string | null
 }
@@ -52,7 +54,8 @@ export type EmployeeHistoryCountAggregateOutputType = {
   fieldName: number
   oldValue: number
   newValue: number
-  changedBy: number
+  changedById: number
+  approvedById: number
   changedAt: number
   reason: number
   _all: number
@@ -65,7 +68,8 @@ export type EmployeeHistoryMinAggregateInputType = {
   fieldName?: true
   oldValue?: true
   newValue?: true
-  changedBy?: true
+  changedById?: true
+  approvedById?: true
   changedAt?: true
   reason?: true
 }
@@ -76,7 +80,8 @@ export type EmployeeHistoryMaxAggregateInputType = {
   fieldName?: true
   oldValue?: true
   newValue?: true
-  changedBy?: true
+  changedById?: true
+  approvedById?: true
   changedAt?: true
   reason?: true
 }
@@ -87,7 +92,8 @@ export type EmployeeHistoryCountAggregateInputType = {
   fieldName?: true
   oldValue?: true
   newValue?: true
-  changedBy?: true
+  changedById?: true
+  approvedById?: true
   changedAt?: true
   reason?: true
   _all?: true
@@ -171,7 +177,8 @@ export type EmployeeHistoryGroupByOutputType = {
   fieldName: string
   oldValue: string | null
   newValue: string | null
-  changedBy: string
+  changedById: string | null
+  approvedById: string | null
   changedAt: Date
   reason: string | null
   _count: EmployeeHistoryCountAggregateOutputType | null
@@ -203,10 +210,13 @@ export type EmployeeHistoryWhereInput = {
   fieldName?: Prisma.StringFilter<"EmployeeHistory"> | string
   oldValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   newValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
-  changedBy?: Prisma.StringFilter<"EmployeeHistory"> | string
+  changedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  approvedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   changedAt?: Prisma.DateTimeFilter<"EmployeeHistory"> | Date | string
   reason?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
+  changedBy?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
+  approvedBy?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
 }
 
 export type EmployeeHistoryOrderByWithRelationInput = {
@@ -215,10 +225,13 @@ export type EmployeeHistoryOrderByWithRelationInput = {
   fieldName?: Prisma.SortOrder
   oldValue?: Prisma.SortOrderInput | Prisma.SortOrder
   newValue?: Prisma.SortOrderInput | Prisma.SortOrder
-  changedBy?: Prisma.SortOrder
+  changedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   changedAt?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
   employee?: Prisma.EmployeeOrderByWithRelationInput
+  changedBy?: Prisma.ActorOrderByWithRelationInput
+  approvedBy?: Prisma.ActorOrderByWithRelationInput
 }
 
 export type EmployeeHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -230,10 +243,13 @@ export type EmployeeHistoryWhereUniqueInput = Prisma.AtLeast<{
   fieldName?: Prisma.StringFilter<"EmployeeHistory"> | string
   oldValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   newValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
-  changedBy?: Prisma.StringFilter<"EmployeeHistory"> | string
+  changedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  approvedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   changedAt?: Prisma.DateTimeFilter<"EmployeeHistory"> | Date | string
   reason?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
+  changedBy?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
+  approvedBy?: Prisma.XOR<Prisma.ActorNullableScalarRelationFilter, Prisma.ActorWhereInput> | null
 }, "id">
 
 export type EmployeeHistoryOrderByWithAggregationInput = {
@@ -242,7 +258,8 @@ export type EmployeeHistoryOrderByWithAggregationInput = {
   fieldName?: Prisma.SortOrder
   oldValue?: Prisma.SortOrderInput | Prisma.SortOrder
   newValue?: Prisma.SortOrderInput | Prisma.SortOrder
-  changedBy?: Prisma.SortOrder
+  changedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  approvedById?: Prisma.SortOrderInput | Prisma.SortOrder
   changedAt?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EmployeeHistoryCountOrderByAggregateInput
@@ -259,7 +276,8 @@ export type EmployeeHistoryScalarWhereWithAggregatesInput = {
   fieldName?: Prisma.StringWithAggregatesFilter<"EmployeeHistory"> | string
   oldValue?: Prisma.StringNullableWithAggregatesFilter<"EmployeeHistory"> | string | null
   newValue?: Prisma.StringNullableWithAggregatesFilter<"EmployeeHistory"> | string | null
-  changedBy?: Prisma.StringWithAggregatesFilter<"EmployeeHistory"> | string
+  changedById?: Prisma.StringNullableWithAggregatesFilter<"EmployeeHistory"> | string | null
+  approvedById?: Prisma.StringNullableWithAggregatesFilter<"EmployeeHistory"> | string | null
   changedAt?: Prisma.DateTimeWithAggregatesFilter<"EmployeeHistory"> | Date | string
   reason?: Prisma.StringNullableWithAggregatesFilter<"EmployeeHistory"> | string | null
 }
@@ -269,10 +287,11 @@ export type EmployeeHistoryCreateInput = {
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
   changedAt?: Date | string
   reason?: string | null
   employee: Prisma.EmployeeCreateNestedOneWithoutHistoryInput
+  changedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryCreatedInput
+  approvedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryApprovedInput
 }
 
 export type EmployeeHistoryUncheckedCreateInput = {
@@ -281,7 +300,8 @@ export type EmployeeHistoryUncheckedCreateInput = {
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
+  changedById?: string | null
+  approvedById?: string | null
   changedAt?: Date | string
   reason?: string | null
 }
@@ -291,10 +311,11 @@ export type EmployeeHistoryUpdateInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutHistoryNestedInput
+  changedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryCreatedNestedInput
+  approvedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryApprovedNestedInput
 }
 
 export type EmployeeHistoryUncheckedUpdateInput = {
@@ -303,7 +324,8 @@ export type EmployeeHistoryUncheckedUpdateInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -314,7 +336,8 @@ export type EmployeeHistoryCreateManyInput = {
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
+  changedById?: string | null
+  approvedById?: string | null
   changedAt?: Date | string
   reason?: string | null
 }
@@ -324,7 +347,6 @@ export type EmployeeHistoryUpdateManyMutationInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -335,7 +357,8 @@ export type EmployeeHistoryUncheckedUpdateManyInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -346,7 +369,8 @@ export type EmployeeHistoryCountOrderByAggregateInput = {
   fieldName?: Prisma.SortOrder
   oldValue?: Prisma.SortOrder
   newValue?: Prisma.SortOrder
-  changedBy?: Prisma.SortOrder
+  changedById?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   changedAt?: Prisma.SortOrder
   reason?: Prisma.SortOrder
 }
@@ -357,7 +381,8 @@ export type EmployeeHistoryMaxOrderByAggregateInput = {
   fieldName?: Prisma.SortOrder
   oldValue?: Prisma.SortOrder
   newValue?: Prisma.SortOrder
-  changedBy?: Prisma.SortOrder
+  changedById?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   changedAt?: Prisma.SortOrder
   reason?: Prisma.SortOrder
 }
@@ -368,7 +393,8 @@ export type EmployeeHistoryMinOrderByAggregateInput = {
   fieldName?: Prisma.SortOrder
   oldValue?: Prisma.SortOrder
   newValue?: Prisma.SortOrder
-  changedBy?: Prisma.SortOrder
+  changedById?: Prisma.SortOrder
+  approvedById?: Prisma.SortOrder
   changedAt?: Prisma.SortOrder
   reason?: Prisma.SortOrder
 }
@@ -381,6 +407,90 @@ export type EmployeeHistoryListRelationFilter = {
 
 export type EmployeeHistoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type EmployeeHistoryCreateNestedManyWithoutChangedByInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput> | Prisma.EmployeeHistoryCreateWithoutChangedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyChangedByInputEnvelope
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+}
+
+export type EmployeeHistoryCreateNestedManyWithoutApprovedByInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput> | Prisma.EmployeeHistoryCreateWithoutApprovedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyApprovedByInputEnvelope
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+}
+
+export type EmployeeHistoryUncheckedCreateNestedManyWithoutChangedByInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput> | Prisma.EmployeeHistoryCreateWithoutChangedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyChangedByInputEnvelope
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+}
+
+export type EmployeeHistoryUncheckedCreateNestedManyWithoutApprovedByInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput> | Prisma.EmployeeHistoryCreateWithoutApprovedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyApprovedByInputEnvelope
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+}
+
+export type EmployeeHistoryUpdateManyWithoutChangedByNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput> | Prisma.EmployeeHistoryCreateWithoutChangedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput[]
+  upsert?: Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutChangedByInput | Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyChangedByInputEnvelope
+  set?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  delete?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  update?: Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutChangedByInput | Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
+  updateMany?: Prisma.EmployeeHistoryUpdateManyWithWhereWithoutChangedByInput | Prisma.EmployeeHistoryUpdateManyWithWhereWithoutChangedByInput[]
+  deleteMany?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
+}
+
+export type EmployeeHistoryUpdateManyWithoutApprovedByNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput> | Prisma.EmployeeHistoryCreateWithoutApprovedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput[]
+  upsert?: Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutApprovedByInput | Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutApprovedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyApprovedByInputEnvelope
+  set?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  delete?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  update?: Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutApprovedByInput | Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutApprovedByInput[]
+  updateMany?: Prisma.EmployeeHistoryUpdateManyWithWhereWithoutApprovedByInput | Prisma.EmployeeHistoryUpdateManyWithWhereWithoutApprovedByInput[]
+  deleteMany?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
+}
+
+export type EmployeeHistoryUncheckedUpdateManyWithoutChangedByNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput> | Prisma.EmployeeHistoryCreateWithoutChangedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutChangedByInput[]
+  upsert?: Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutChangedByInput | Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutChangedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyChangedByInputEnvelope
+  set?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  delete?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  update?: Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutChangedByInput | Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutChangedByInput[]
+  updateMany?: Prisma.EmployeeHistoryUpdateManyWithWhereWithoutChangedByInput | Prisma.EmployeeHistoryUpdateManyWithWhereWithoutChangedByInput[]
+  deleteMany?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
+}
+
+export type EmployeeHistoryUncheckedUpdateManyWithoutApprovedByNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput> | Prisma.EmployeeHistoryCreateWithoutApprovedByInput[] | Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput[]
+  connectOrCreate?: Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput | Prisma.EmployeeHistoryCreateOrConnectWithoutApprovedByInput[]
+  upsert?: Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutApprovedByInput | Prisma.EmployeeHistoryUpsertWithWhereUniqueWithoutApprovedByInput[]
+  createMany?: Prisma.EmployeeHistoryCreateManyApprovedByInputEnvelope
+  set?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  disconnect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  delete?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  connect?: Prisma.EmployeeHistoryWhereUniqueInput | Prisma.EmployeeHistoryWhereUniqueInput[]
+  update?: Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutApprovedByInput | Prisma.EmployeeHistoryUpdateWithWhereUniqueWithoutApprovedByInput[]
+  updateMany?: Prisma.EmployeeHistoryUpdateManyWithWhereWithoutApprovedByInput | Prisma.EmployeeHistoryUpdateManyWithWhereWithoutApprovedByInput[]
+  deleteMany?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
 }
 
 export type EmployeeHistoryCreateNestedManyWithoutEmployeeInput = {
@@ -425,14 +535,126 @@ export type EmployeeHistoryUncheckedUpdateManyWithoutEmployeeNestedInput = {
   deleteMany?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
 }
 
+export type EmployeeHistoryCreateWithoutChangedByInput = {
+  id?: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+  employee: Prisma.EmployeeCreateNestedOneWithoutHistoryInput
+  approvedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryApprovedInput
+}
+
+export type EmployeeHistoryUncheckedCreateWithoutChangedByInput = {
+  id?: string
+  employeeId: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  approvedById?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+}
+
+export type EmployeeHistoryCreateOrConnectWithoutChangedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput>
+}
+
+export type EmployeeHistoryCreateManyChangedByInputEnvelope = {
+  data: Prisma.EmployeeHistoryCreateManyChangedByInput | Prisma.EmployeeHistoryCreateManyChangedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type EmployeeHistoryCreateWithoutApprovedByInput = {
+  id?: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+  employee: Prisma.EmployeeCreateNestedOneWithoutHistoryInput
+  changedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryCreatedInput
+}
+
+export type EmployeeHistoryUncheckedCreateWithoutApprovedByInput = {
+  id?: string
+  employeeId: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  changedById?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+}
+
+export type EmployeeHistoryCreateOrConnectWithoutApprovedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput>
+}
+
+export type EmployeeHistoryCreateManyApprovedByInputEnvelope = {
+  data: Prisma.EmployeeHistoryCreateManyApprovedByInput | Prisma.EmployeeHistoryCreateManyApprovedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type EmployeeHistoryUpsertWithWhereUniqueWithoutChangedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.EmployeeHistoryUpdateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedUpdateWithoutChangedByInput>
+  create: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutChangedByInput>
+}
+
+export type EmployeeHistoryUpdateWithWhereUniqueWithoutChangedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.EmployeeHistoryUpdateWithoutChangedByInput, Prisma.EmployeeHistoryUncheckedUpdateWithoutChangedByInput>
+}
+
+export type EmployeeHistoryUpdateManyWithWhereWithoutChangedByInput = {
+  where: Prisma.EmployeeHistoryScalarWhereInput
+  data: Prisma.XOR<Prisma.EmployeeHistoryUpdateManyMutationInput, Prisma.EmployeeHistoryUncheckedUpdateManyWithoutChangedByInput>
+}
+
+export type EmployeeHistoryScalarWhereInput = {
+  AND?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
+  OR?: Prisma.EmployeeHistoryScalarWhereInput[]
+  NOT?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
+  id?: Prisma.StringFilter<"EmployeeHistory"> | string
+  employeeId?: Prisma.StringFilter<"EmployeeHistory"> | string
+  fieldName?: Prisma.StringFilter<"EmployeeHistory"> | string
+  oldValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  newValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  changedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  approvedById?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+  changedAt?: Prisma.DateTimeFilter<"EmployeeHistory"> | Date | string
+  reason?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+}
+
+export type EmployeeHistoryUpsertWithWhereUniqueWithoutApprovedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.EmployeeHistoryUpdateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedUpdateWithoutApprovedByInput>
+  create: Prisma.XOR<Prisma.EmployeeHistoryCreateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedCreateWithoutApprovedByInput>
+}
+
+export type EmployeeHistoryUpdateWithWhereUniqueWithoutApprovedByInput = {
+  where: Prisma.EmployeeHistoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.EmployeeHistoryUpdateWithoutApprovedByInput, Prisma.EmployeeHistoryUncheckedUpdateWithoutApprovedByInput>
+}
+
+export type EmployeeHistoryUpdateManyWithWhereWithoutApprovedByInput = {
+  where: Prisma.EmployeeHistoryScalarWhereInput
+  data: Prisma.XOR<Prisma.EmployeeHistoryUpdateManyMutationInput, Prisma.EmployeeHistoryUncheckedUpdateManyWithoutApprovedByInput>
+}
+
 export type EmployeeHistoryCreateWithoutEmployeeInput = {
   id?: string
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
   changedAt?: Date | string
   reason?: string | null
+  changedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryCreatedInput
+  approvedBy?: Prisma.ActorCreateNestedOneWithoutEmployeeHistoryApprovedInput
 }
 
 export type EmployeeHistoryUncheckedCreateWithoutEmployeeInput = {
@@ -440,7 +662,8 @@ export type EmployeeHistoryUncheckedCreateWithoutEmployeeInput = {
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
+  changedById?: string | null
+  approvedById?: string | null
   changedAt?: Date | string
   reason?: string | null
 }
@@ -471,18 +694,92 @@ export type EmployeeHistoryUpdateManyWithWhereWithoutEmployeeInput = {
   data: Prisma.XOR<Prisma.EmployeeHistoryUpdateManyMutationInput, Prisma.EmployeeHistoryUncheckedUpdateManyWithoutEmployeeInput>
 }
 
-export type EmployeeHistoryScalarWhereInput = {
-  AND?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
-  OR?: Prisma.EmployeeHistoryScalarWhereInput[]
-  NOT?: Prisma.EmployeeHistoryScalarWhereInput | Prisma.EmployeeHistoryScalarWhereInput[]
-  id?: Prisma.StringFilter<"EmployeeHistory"> | string
-  employeeId?: Prisma.StringFilter<"EmployeeHistory"> | string
-  fieldName?: Prisma.StringFilter<"EmployeeHistory"> | string
-  oldValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
-  newValue?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
-  changedBy?: Prisma.StringFilter<"EmployeeHistory"> | string
-  changedAt?: Prisma.DateTimeFilter<"EmployeeHistory"> | Date | string
-  reason?: Prisma.StringNullableFilter<"EmployeeHistory"> | string | null
+export type EmployeeHistoryCreateManyChangedByInput = {
+  id?: string
+  employeeId: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  approvedById?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+}
+
+export type EmployeeHistoryCreateManyApprovedByInput = {
+  id?: string
+  employeeId: string
+  fieldName: string
+  oldValue?: string | null
+  newValue?: string | null
+  changedById?: string | null
+  changedAt?: Date | string
+  reason?: string | null
+}
+
+export type EmployeeHistoryUpdateWithoutChangedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employee?: Prisma.EmployeeUpdateOneRequiredWithoutHistoryNestedInput
+  approvedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryApprovedNestedInput
+}
+
+export type EmployeeHistoryUncheckedUpdateWithoutChangedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type EmployeeHistoryUncheckedUpdateManyWithoutChangedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type EmployeeHistoryUpdateWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employee?: Prisma.EmployeeUpdateOneRequiredWithoutHistoryNestedInput
+  changedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryCreatedNestedInput
+}
+
+export type EmployeeHistoryUncheckedUpdateWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
+export type EmployeeHistoryUncheckedUpdateManyWithoutApprovedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeId?: Prisma.StringFieldUpdateOperationsInput | string
+  fieldName?: Prisma.StringFieldUpdateOperationsInput | string
+  oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type EmployeeHistoryCreateManyEmployeeInput = {
@@ -490,7 +787,8 @@ export type EmployeeHistoryCreateManyEmployeeInput = {
   fieldName: string
   oldValue?: string | null
   newValue?: string | null
-  changedBy: string
+  changedById?: string | null
+  approvedById?: string | null
   changedAt?: Date | string
   reason?: string | null
 }
@@ -500,9 +798,10 @@ export type EmployeeHistoryUpdateWithoutEmployeeInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  changedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryCreatedNestedInput
+  approvedBy?: Prisma.ActorUpdateOneWithoutEmployeeHistoryApprovedNestedInput
 }
 
 export type EmployeeHistoryUncheckedUpdateWithoutEmployeeInput = {
@@ -510,7 +809,8 @@ export type EmployeeHistoryUncheckedUpdateWithoutEmployeeInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -520,7 +820,8 @@ export type EmployeeHistoryUncheckedUpdateManyWithoutEmployeeInput = {
   fieldName?: Prisma.StringFieldUpdateOperationsInput | string
   oldValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   newValue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  changedBy?: Prisma.StringFieldUpdateOperationsInput | string
+  changedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   changedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -533,10 +834,13 @@ export type EmployeeHistorySelect<ExtArgs extends runtime.Types.Extensions.Inter
   fieldName?: boolean
   oldValue?: boolean
   newValue?: boolean
-  changedBy?: boolean
+  changedById?: boolean
+  approvedById?: boolean
   changedAt?: boolean
   reason?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["employeeHistory"]>
 
 export type EmployeeHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -545,10 +849,13 @@ export type EmployeeHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   fieldName?: boolean
   oldValue?: boolean
   newValue?: boolean
-  changedBy?: boolean
+  changedById?: boolean
+  approvedById?: boolean
   changedAt?: boolean
   reason?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["employeeHistory"]>
 
 export type EmployeeHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -557,10 +864,13 @@ export type EmployeeHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   fieldName?: boolean
   oldValue?: boolean
   newValue?: boolean
-  changedBy?: boolean
+  changedById?: boolean
+  approvedById?: boolean
   changedAt?: boolean
   reason?: boolean
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }, ExtArgs["result"]["employeeHistory"]>
 
 export type EmployeeHistorySelectScalar = {
@@ -569,26 +879,35 @@ export type EmployeeHistorySelectScalar = {
   fieldName?: boolean
   oldValue?: boolean
   newValue?: boolean
-  changedBy?: boolean
+  changedById?: boolean
+  approvedById?: boolean
   changedAt?: boolean
   reason?: boolean
 }
 
-export type EmployeeHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "fieldName" | "oldValue" | "newValue" | "changedBy" | "changedAt" | "reason", ExtArgs["result"]["employeeHistory"]>
+export type EmployeeHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "employeeId" | "fieldName" | "oldValue" | "newValue" | "changedById" | "approvedById" | "changedAt" | "reason", ExtArgs["result"]["employeeHistory"]>
 export type EmployeeHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }
 export type EmployeeHistoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }
 export type EmployeeHistoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
+  changedBy?: boolean | Prisma.EmployeeHistory$changedByArgs<ExtArgs>
+  approvedBy?: boolean | Prisma.EmployeeHistory$approvedByArgs<ExtArgs>
 }
 
 export type $EmployeeHistoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "EmployeeHistory"
   objects: {
     employee: Prisma.$EmployeePayload<ExtArgs>
+    changedBy: Prisma.$ActorPayload<ExtArgs> | null
+    approvedBy: Prisma.$ActorPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -596,7 +915,8 @@ export type $EmployeeHistoryPayload<ExtArgs extends runtime.Types.Extensions.Int
     fieldName: string
     oldValue: string | null
     newValue: string | null
-    changedBy: string
+    changedById: string | null
+    approvedById: string | null
     changedAt: Date
     reason: string | null
   }, ExtArgs["result"]["employeeHistory"]>
@@ -994,6 +1314,8 @@ readonly fields: EmployeeHistoryFieldRefs;
 export interface Prisma__EmployeeHistoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   employee<T extends Prisma.EmployeeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeDefaultArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  changedBy<T extends Prisma.EmployeeHistory$changedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeHistory$changedByArgs<ExtArgs>>): Prisma.Prisma__ActorClient<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  approvedBy<T extends Prisma.EmployeeHistory$approvedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EmployeeHistory$approvedByArgs<ExtArgs>>): Prisma.Prisma__ActorClient<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1028,7 +1350,8 @@ export interface EmployeeHistoryFieldRefs {
   readonly fieldName: Prisma.FieldRef<"EmployeeHistory", 'String'>
   readonly oldValue: Prisma.FieldRef<"EmployeeHistory", 'String'>
   readonly newValue: Prisma.FieldRef<"EmployeeHistory", 'String'>
-  readonly changedBy: Prisma.FieldRef<"EmployeeHistory", 'String'>
+  readonly changedById: Prisma.FieldRef<"EmployeeHistory", 'String'>
+  readonly approvedById: Prisma.FieldRef<"EmployeeHistory", 'String'>
   readonly changedAt: Prisma.FieldRef<"EmployeeHistory", 'DateTime'>
   readonly reason: Prisma.FieldRef<"EmployeeHistory", 'String'>
 }
@@ -1424,6 +1747,44 @@ export type EmployeeHistoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensio
    * Limit how many EmployeeHistories to delete.
    */
   limit?: number
+}
+
+/**
+ * EmployeeHistory.changedBy
+ */
+export type EmployeeHistory$changedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Actor
+   */
+  select?: Prisma.ActorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Actor
+   */
+  omit?: Prisma.ActorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActorInclude<ExtArgs> | null
+  where?: Prisma.ActorWhereInput
+}
+
+/**
+ * EmployeeHistory.approvedBy
+ */
+export type EmployeeHistory$approvedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Actor
+   */
+  select?: Prisma.ActorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Actor
+   */
+  omit?: Prisma.ActorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActorInclude<ExtArgs> | null
+  where?: Prisma.ActorWhereInput
 }
 
 /**

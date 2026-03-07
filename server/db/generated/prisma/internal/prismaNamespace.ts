@@ -389,6 +389,12 @@ export const ModelName = {
   LoadSnapshot: 'LoadSnapshot',
   EmployeeHistory: 'EmployeeHistory',
   AuditLog: 'AuditLog',
+  Actor: 'Actor',
+  Role: 'Role',
+  Permission: 'Permission',
+  ActorRole: 'ActorRole',
+  RolePermission: 'RolePermission',
+  ActorPermission: 'ActorPermission',
   User: 'User',
   Session: 'Session',
   Account: 'Account',
@@ -414,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "gapAnalysisResult" | "hiringRequest" | "loadSnapshot" | "employeeHistory" | "auditLog" | "user" | "session" | "account" | "verification" | "company" | "department" | "employee" | "grade" | "process" | "taskAssignment"
+    modelProps: "gapAnalysisResult" | "hiringRequest" | "loadSnapshot" | "employeeHistory" | "auditLog" | "actor" | "role" | "permission" | "actorRole" | "rolePermission" | "actorPermission" | "user" | "session" | "account" | "verification" | "company" | "department" | "employee" | "grade" | "process" | "taskAssignment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -785,6 +791,450 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AuditLogCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AuditLogCountAggregateOutputType> | number
+        }
+      }
+    }
+    Actor: {
+      payload: Prisma.$ActorPayload<ExtArgs>
+      fields: Prisma.ActorFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActorFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActorFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        findFirst: {
+          args: Prisma.ActorFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActorFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        findMany: {
+          args: Prisma.ActorFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>[]
+        }
+        create: {
+          args: Prisma.ActorCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        createMany: {
+          args: Prisma.ActorCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActorCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>[]
+        }
+        delete: {
+          args: Prisma.ActorDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        update: {
+          args: Prisma.ActorUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActorDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActorUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActorUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActorUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPayload>
+        }
+        aggregate: {
+          args: Prisma.ActorAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActor>
+        }
+        groupBy: {
+          args: Prisma.ActorGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActorCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorCountAggregateOutputType> | number
+        }
+      }
+    }
+    Role: {
+      payload: Prisma.$RolePayload<ExtArgs>
+      fields: Prisma.RoleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RoleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RoleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        findFirst: {
+          args: Prisma.RoleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RoleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        findMany: {
+          args: Prisma.RoleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
+        }
+        create: {
+          args: Prisma.RoleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        createMany: {
+          args: Prisma.RoleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RoleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
+        }
+        delete: {
+          args: Prisma.RoleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        update: {
+          args: Prisma.RoleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        deleteMany: {
+          args: Prisma.RoleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RoleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RoleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
+        }
+        upsert: {
+          args: Prisma.RoleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
+        }
+        aggregate: {
+          args: Prisma.RoleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRole>
+        }
+        groupBy: {
+          args: Prisma.RoleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RoleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleCountAggregateOutputType> | number
+        }
+      }
+    }
+    Permission: {
+      payload: Prisma.$PermissionPayload<ExtArgs>
+      fields: Prisma.PermissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PermissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PermissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        findFirst: {
+          args: Prisma.PermissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PermissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        findMany: {
+          args: Prisma.PermissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>[]
+        }
+        create: {
+          args: Prisma.PermissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        createMany: {
+          args: Prisma.PermissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PermissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>[]
+        }
+        delete: {
+          args: Prisma.PermissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        update: {
+          args: Prisma.PermissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.PermissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PermissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PermissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.PermissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PermissionPayload>
+        }
+        aggregate: {
+          args: Prisma.PermissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePermission>
+        }
+        groupBy: {
+          args: Prisma.PermissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PermissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PermissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PermissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActorRole: {
+      payload: Prisma.$ActorRolePayload<ExtArgs>
+      fields: Prisma.ActorRoleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActorRoleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActorRoleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        findFirst: {
+          args: Prisma.ActorRoleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActorRoleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        findMany: {
+          args: Prisma.ActorRoleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>[]
+        }
+        create: {
+          args: Prisma.ActorRoleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        createMany: {
+          args: Prisma.ActorRoleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActorRoleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>[]
+        }
+        delete: {
+          args: Prisma.ActorRoleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        update: {
+          args: Prisma.ActorRoleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        deleteMany: {
+          args: Prisma.ActorRoleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActorRoleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActorRoleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>[]
+        }
+        upsert: {
+          args: Prisma.ActorRoleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorRolePayload>
+        }
+        aggregate: {
+          args: Prisma.ActorRoleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActorRole>
+        }
+        groupBy: {
+          args: Prisma.ActorRoleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorRoleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActorRoleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorRoleCountAggregateOutputType> | number
+        }
+      }
+    }
+    RolePermission: {
+      payload: Prisma.$RolePermissionPayload<ExtArgs>
+      fields: Prisma.RolePermissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RolePermissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RolePermissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        findFirst: {
+          args: Prisma.RolePermissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RolePermissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        findMany: {
+          args: Prisma.RolePermissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>[]
+        }
+        create: {
+          args: Prisma.RolePermissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        createMany: {
+          args: Prisma.RolePermissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RolePermissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>[]
+        }
+        delete: {
+          args: Prisma.RolePermissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        update: {
+          args: Prisma.RolePermissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.RolePermissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RolePermissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RolePermissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.RolePermissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePermissionPayload>
+        }
+        aggregate: {
+          args: Prisma.RolePermissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRolePermission>
+        }
+        groupBy: {
+          args: Prisma.RolePermissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RolePermissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RolePermissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RolePermissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActorPermission: {
+      payload: Prisma.$ActorPermissionPayload<ExtArgs>
+      fields: Prisma.ActorPermissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActorPermissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActorPermissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        findFirst: {
+          args: Prisma.ActorPermissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActorPermissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        findMany: {
+          args: Prisma.ActorPermissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>[]
+        }
+        create: {
+          args: Prisma.ActorPermissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        createMany: {
+          args: Prisma.ActorPermissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActorPermissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>[]
+        }
+        delete: {
+          args: Prisma.ActorPermissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        update: {
+          args: Prisma.ActorPermissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActorPermissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActorPermissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActorPermissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActorPermissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActorPermissionPayload>
+        }
+        aggregate: {
+          args: Prisma.ActorPermissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActorPermission>
+        }
+        groupBy: {
+          args: Prisma.ActorPermissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorPermissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActorPermissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActorPermissionCountAggregateOutputType> | number
         }
       }
     }
@@ -1635,7 +2085,8 @@ export const EmployeeHistoryScalarFieldEnum = {
   fieldName: 'fieldName',
   oldValue: 'oldValue',
   newValue: 'newValue',
-  changedBy: 'changedBy',
+  changedById: 'changedById',
+  approvedById: 'approvedById',
   changedAt: 'changedAt',
   reason: 'reason'
 } as const
@@ -1651,11 +2102,97 @@ export const AuditLogScalarFieldEnum = {
   action: 'action',
   oldValues: 'oldValues',
   newValues: 'newValues',
-  changedBy: 'changedBy',
+  createdById: 'createdById',
   changedAt: 'changedAt'
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const ActorScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  avatar: 'avatar',
+  phone: 'phone',
+  bio: 'bio',
+  companyId: 'companyId',
+  departmentId: 'departmentId',
+  status: 'status',
+  metadata: 'metadata',
+  lastLoginAt: 'lastLoginAt',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ActorScalarFieldEnum = (typeof ActorScalarFieldEnum)[keyof typeof ActorScalarFieldEnum]
+
+
+export const RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  slug: 'slug',
+  scope: 'scope',
+  companyId: 'companyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  slug: 'slug',
+  resource: 'resource',
+  action: 'action',
+  scope: 'scope',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const ActorRoleScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  roleId: 'roleId',
+  assignedAt: 'assignedAt',
+  expiresAt: 'expiresAt',
+  assignedBy: 'assignedBy',
+  reason: 'reason'
+} as const
+
+export type ActorRoleScalarFieldEnum = (typeof ActorRoleScalarFieldEnum)[keyof typeof ActorRoleScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  permissionId: 'permissionId',
+  assignedAt: 'assignedAt'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const ActorPermissionScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  permissionId: 'permissionId',
+  grant: 'grant',
+  reason: 'reason',
+  assignedAt: 'assignedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type ActorPermissionScalarFieldEnum = (typeof ActorPermissionScalarFieldEnum)[keyof typeof ActorPermissionScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
@@ -1938,6 +2475,48 @@ export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
 
 
 /**
+ * Reference to a field of type 'ActorStatus'
+ */
+export type EnumActorStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActorStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ActorStatus[]'
+ */
+export type ListEnumActorStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ActorStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RoleScope'
+ */
+export type EnumRoleScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScope'>
+    
+
+
+/**
+ * Reference to a field of type 'RoleScope[]'
+ */
+export type ListEnumRoleScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScope[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionScope'
+ */
+export type EnumPermissionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionScope'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionScope[]'
+ */
+export type ListEnumPermissionScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionScope[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -2043,6 +2622,12 @@ export type GlobalOmitConfig = {
   loadSnapshot?: Prisma.LoadSnapshotOmit
   employeeHistory?: Prisma.EmployeeHistoryOmit
   auditLog?: Prisma.AuditLogOmit
+  actor?: Prisma.ActorOmit
+  role?: Prisma.RoleOmit
+  permission?: Prisma.PermissionOmit
+  actorRole?: Prisma.ActorRoleOmit
+  rolePermission?: Prisma.RolePermissionOmit
+  actorPermission?: Prisma.ActorPermissionOmit
   user?: Prisma.UserOmit
   session?: Prisma.SessionOmit
   account?: Prisma.AccountOmit

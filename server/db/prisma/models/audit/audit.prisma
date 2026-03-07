@@ -16,13 +16,20 @@ model EmployeeHistory {
   newValue          String?      @db.Text
 
   // Audit Trail
-  changedBy         String       @db.VarChar(255)
+  changedById       String?
+  changedBy         Actor?       @relation("CreatedByActor", fields: [changedById], references: [id], onDelete: SetNull)
+  
+  approvedById      String?
+  approvedBy        Actor?       @relation("ApprovedByActor", fields: [approvedById], references: [id], onDelete: SetNull)
+  
   changedAt         DateTime     @default(now()) @db.Timestamp(3)
   reason            String?      @db.Text
 
   @@index([employeeId])
   @@index([changedAt])
   @@index([fieldName])
+  @@index([changedById])
+  @@index([approvedById])
   @@map("employee_history")
 }
 
@@ -41,12 +48,15 @@ model AuditLog {
   newValues         Json?        @db.JsonB
 
   // Audit Trail
-  changedBy         String       @db.VarChar(255)
+  createdById       String
+  createdBy         Actor        @relation("CreatedByActor", fields: [createdById], references: [id], onDelete: Restrict)
+  
   changedAt         DateTime     @default(now()) @db.Timestamp(3)
 
   @@index([companyId])
   @@index([entityType, entityId])
   @@index([action])
   @@index([changedAt])
+  @@index([createdById])
   @@map("audit_log")
 }

@@ -18,6 +18,12 @@ model Company {
   processes         Process[]
   taskAssignments   TaskAssignment[]
   loadSnapshots     LoadSnapshot[]
+  
+  /**
+   * Business users (Actors) in this company
+   */
+  actors            Actor[]
+  roles             Role[]
 
   createdAt         DateTime     @default(now()) @db.Timestamp(3)
   updatedAt         DateTime     @updatedAt @db.Timestamp(3)
@@ -40,6 +46,11 @@ model Department {
   processes         Process[]
   taskAssignments   TaskAssignment[]
   loadSnapshots     LoadSnapshot[]
+  
+  /**
+   * Business users (Actors) in this department
+   */
+  actors            Actor[]
 
   createdAt         DateTime     @default(now()) @db.Timestamp(3)
   updatedAt         DateTime     @updatedAt @db.Timestamp(3)

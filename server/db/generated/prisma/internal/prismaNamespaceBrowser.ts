@@ -56,6 +56,12 @@ export const ModelName = {
   LoadSnapshot: 'LoadSnapshot',
   EmployeeHistory: 'EmployeeHistory',
   AuditLog: 'AuditLog',
+  Actor: 'Actor',
+  Role: 'Role',
+  Permission: 'Permission',
+  ActorRole: 'ActorRole',
+  RolePermission: 'RolePermission',
+  ActorPermission: 'ActorPermission',
   User: 'User',
   Session: 'Session',
   Account: 'Account',
@@ -152,7 +158,8 @@ export const EmployeeHistoryScalarFieldEnum = {
   fieldName: 'fieldName',
   oldValue: 'oldValue',
   newValue: 'newValue',
-  changedBy: 'changedBy',
+  changedById: 'changedById',
+  approvedById: 'approvedById',
   changedAt: 'changedAt',
   reason: 'reason'
 } as const
@@ -168,11 +175,97 @@ export const AuditLogScalarFieldEnum = {
   action: 'action',
   oldValues: 'oldValues',
   newValues: 'newValues',
-  changedBy: 'changedBy',
+  createdById: 'createdById',
   changedAt: 'changedAt'
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const ActorScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  avatar: 'avatar',
+  phone: 'phone',
+  bio: 'bio',
+  companyId: 'companyId',
+  departmentId: 'departmentId',
+  status: 'status',
+  metadata: 'metadata',
+  lastLoginAt: 'lastLoginAt',
+  lastActivityAt: 'lastActivityAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ActorScalarFieldEnum = (typeof ActorScalarFieldEnum)[keyof typeof ActorScalarFieldEnum]
+
+
+export const RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  slug: 'slug',
+  scope: 'scope',
+  companyId: 'companyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  slug: 'slug',
+  resource: 'resource',
+  action: 'action',
+  scope: 'scope',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const ActorRoleScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  roleId: 'roleId',
+  assignedAt: 'assignedAt',
+  expiresAt: 'expiresAt',
+  assignedBy: 'assignedBy',
+  reason: 'reason'
+} as const
+
+export type ActorRoleScalarFieldEnum = (typeof ActorRoleScalarFieldEnum)[keyof typeof ActorRoleScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  permissionId: 'permissionId',
+  assignedAt: 'assignedAt'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const ActorPermissionScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  permissionId: 'permissionId',
+  grant: 'grant',
+  reason: 'reason',
+  assignedAt: 'assignedAt',
+  expiresAt: 'expiresAt'
+} as const
+
+export type ActorPermissionScalarFieldEnum = (typeof ActorPermissionScalarFieldEnum)[keyof typeof ActorPermissionScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

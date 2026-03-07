@@ -1,0 +1,13 @@
+# server/graphql/fragments/usersResult.graphql
+"""
+Reusable UsersResult fragment combining User and PageInfo fragments
+Use this in all queries that return paginated user lists
+"""
+fragment UsersResultFields on UsersResult {
+  items {
+    ...UserFields
+  }
+  pageInfo {
+    ...PageInfoFields
+  }
+}

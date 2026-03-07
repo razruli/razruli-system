@@ -196,6 +196,7 @@ export type DepartmentWhereInput = {
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  actors?: Prisma.ActorListRelationFilter
 }
 
 export type DepartmentOrderByWithRelationInput = {
@@ -211,6 +212,7 @@ export type DepartmentOrderByWithRelationInput = {
   processes?: Prisma.ProcessOrderByRelationAggregateInput
   taskAssignments?: Prisma.TaskAssignmentOrderByRelationAggregateInput
   loadSnapshots?: Prisma.LoadSnapshotOrderByRelationAggregateInput
+  actors?: Prisma.ActorOrderByRelationAggregateInput
 }
 
 export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
@@ -230,6 +232,7 @@ export type DepartmentWhereUniqueInput = Prisma.AtLeast<{
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  actors?: Prisma.ActorListRelationFilter
 }, "id" | "headId" | "companyId_name">
 
 export type DepartmentOrderByWithAggregationInput = {
@@ -267,6 +270,7 @@ export type DepartmentCreateInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateInput = {
@@ -280,6 +284,7 @@ export type DepartmentUncheckedCreateInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUpdateInput = {
@@ -293,6 +298,7 @@ export type DepartmentUpdateInput = {
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateInput = {
@@ -306,6 +312,7 @@ export type DepartmentUncheckedUpdateInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateManyInput = {
@@ -399,6 +406,22 @@ export type DepartmentUpdateOneWithoutLoadSnapshotsNestedInput = {
   delete?: Prisma.DepartmentWhereInput | boolean
   connect?: Prisma.DepartmentWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentUpdateToOneWithWhereWithoutLoadSnapshotsInput, Prisma.DepartmentUpdateWithoutLoadSnapshotsInput>, Prisma.DepartmentUncheckedUpdateWithoutLoadSnapshotsInput>
+}
+
+export type DepartmentCreateNestedOneWithoutActorsInput = {
+  create?: Prisma.XOR<Prisma.DepartmentCreateWithoutActorsInput, Prisma.DepartmentUncheckedCreateWithoutActorsInput>
+  connectOrCreate?: Prisma.DepartmentCreateOrConnectWithoutActorsInput
+  connect?: Prisma.DepartmentWhereUniqueInput
+}
+
+export type DepartmentUpdateOneWithoutActorsNestedInput = {
+  create?: Prisma.XOR<Prisma.DepartmentCreateWithoutActorsInput, Prisma.DepartmentUncheckedCreateWithoutActorsInput>
+  connectOrCreate?: Prisma.DepartmentCreateOrConnectWithoutActorsInput
+  upsert?: Prisma.DepartmentUpsertWithoutActorsInput
+  disconnect?: Prisma.DepartmentWhereInput | boolean
+  delete?: Prisma.DepartmentWhereInput | boolean
+  connect?: Prisma.DepartmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DepartmentUpdateToOneWithWhereWithoutActorsInput, Prisma.DepartmentUpdateWithoutActorsInput>, Prisma.DepartmentUncheckedUpdateWithoutActorsInput>
 }
 
 export type DepartmentCreateNestedManyWithoutCompanyInput = {
@@ -527,6 +550,7 @@ export type DepartmentCreateWithoutLoadSnapshotsInput = {
   employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutLoadSnapshotsInput = {
@@ -539,6 +563,7 @@ export type DepartmentUncheckedCreateWithoutLoadSnapshotsInput = {
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutLoadSnapshotsInput = {
@@ -567,6 +592,7 @@ export type DepartmentUpdateWithoutLoadSnapshotsInput = {
   employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutLoadSnapshotsInput = {
@@ -579,6 +605,75 @@ export type DepartmentUncheckedUpdateWithoutLoadSnapshotsInput = {
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
+}
+
+export type DepartmentCreateWithoutActorsInput = {
+  id?: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutDepartmentsInput
+  head?: Prisma.EmployeeCreateNestedOneWithoutManagedDepartmentInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
+  processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
+  loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+}
+
+export type DepartmentUncheckedCreateWithoutActorsInput = {
+  id?: string
+  companyId: string
+  name: string
+  headId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
+  processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+}
+
+export type DepartmentCreateOrConnectWithoutActorsInput = {
+  where: Prisma.DepartmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.DepartmentCreateWithoutActorsInput, Prisma.DepartmentUncheckedCreateWithoutActorsInput>
+}
+
+export type DepartmentUpsertWithoutActorsInput = {
+  update: Prisma.XOR<Prisma.DepartmentUpdateWithoutActorsInput, Prisma.DepartmentUncheckedUpdateWithoutActorsInput>
+  create: Prisma.XOR<Prisma.DepartmentCreateWithoutActorsInput, Prisma.DepartmentUncheckedCreateWithoutActorsInput>
+  where?: Prisma.DepartmentWhereInput
+}
+
+export type DepartmentUpdateToOneWithWhereWithoutActorsInput = {
+  where?: Prisma.DepartmentWhereInput
+  data: Prisma.XOR<Prisma.DepartmentUpdateWithoutActorsInput, Prisma.DepartmentUncheckedUpdateWithoutActorsInput>
+}
+
+export type DepartmentUpdateWithoutActorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDepartmentsNestedInput
+  head?: Prisma.EmployeeUpdateOneWithoutManagedDepartmentNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
+  processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+}
+
+export type DepartmentUncheckedUpdateWithoutActorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  headId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
+  processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateWithoutCompanyInput = {
@@ -591,6 +686,7 @@ export type DepartmentCreateWithoutCompanyInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutCompanyInput = {
@@ -603,6 +699,7 @@ export type DepartmentUncheckedCreateWithoutCompanyInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutCompanyInput = {
@@ -653,6 +750,7 @@ export type DepartmentCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutEmployeesInput = {
@@ -665,6 +763,7 @@ export type DepartmentUncheckedCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutEmployeesInput = {
@@ -682,6 +781,7 @@ export type DepartmentCreateWithoutHeadInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutHeadInput = {
@@ -694,6 +794,7 @@ export type DepartmentUncheckedCreateWithoutHeadInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutHeadInput = {
@@ -722,6 +823,7 @@ export type DepartmentUpdateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutEmployeesInput = {
@@ -734,6 +836,7 @@ export type DepartmentUncheckedUpdateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUpsertWithoutHeadInput = {
@@ -757,6 +860,7 @@ export type DepartmentUpdateWithoutHeadInput = {
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutHeadInput = {
@@ -769,6 +873,7 @@ export type DepartmentUncheckedUpdateWithoutHeadInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateWithoutProcessesInput = {
@@ -781,6 +886,7 @@ export type DepartmentCreateWithoutProcessesInput = {
   employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutProcessesInput = {
@@ -793,6 +899,7 @@ export type DepartmentUncheckedCreateWithoutProcessesInput = {
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutProcessesInput = {
@@ -821,6 +928,7 @@ export type DepartmentUpdateWithoutProcessesInput = {
   employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutProcessesInput = {
@@ -833,6 +941,7 @@ export type DepartmentUncheckedUpdateWithoutProcessesInput = {
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateWithoutTaskAssignmentsInput = {
@@ -845,6 +954,7 @@ export type DepartmentCreateWithoutTaskAssignmentsInput = {
   employees?: Prisma.EmployeeCreateNestedManyWithoutDepartmentInput
   processes?: Prisma.ProcessCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentUncheckedCreateWithoutTaskAssignmentsInput = {
@@ -857,6 +967,7 @@ export type DepartmentUncheckedCreateWithoutTaskAssignmentsInput = {
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutDepartmentInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutDepartmentInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutDepartmentInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutDepartmentInput
 }
 
 export type DepartmentCreateOrConnectWithoutTaskAssignmentsInput = {
@@ -885,6 +996,7 @@ export type DepartmentUpdateWithoutTaskAssignmentsInput = {
   employees?: Prisma.EmployeeUpdateManyWithoutDepartmentNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutTaskAssignmentsInput = {
@@ -897,6 +1009,7 @@ export type DepartmentUncheckedUpdateWithoutTaskAssignmentsInput = {
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentCreateManyCompanyInput = {
@@ -917,6 +1030,7 @@ export type DepartmentUpdateWithoutCompanyInput = {
   processes?: Prisma.ProcessUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateWithoutCompanyInput = {
@@ -929,6 +1043,7 @@ export type DepartmentUncheckedUpdateWithoutCompanyInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutDepartmentNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutDepartmentNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutDepartmentNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutDepartmentNestedInput
 }
 
 export type DepartmentUncheckedUpdateManyWithoutCompanyInput = {
@@ -949,6 +1064,7 @@ export type DepartmentCountOutputType = {
   processes: number
   taskAssignments: number
   loadSnapshots: number
+  actors: number
 }
 
 export type DepartmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -956,6 +1072,7 @@ export type DepartmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   processes?: boolean | DepartmentCountOutputTypeCountProcessesArgs
   taskAssignments?: boolean | DepartmentCountOutputTypeCountTaskAssignmentsArgs
   loadSnapshots?: boolean | DepartmentCountOutputTypeCountLoadSnapshotsArgs
+  actors?: boolean | DepartmentCountOutputTypeCountActorsArgs
 }
 
 /**
@@ -996,6 +1113,13 @@ export type DepartmentCountOutputTypeCountLoadSnapshotsArgs<ExtArgs extends runt
   where?: Prisma.LoadSnapshotWhereInput
 }
 
+/**
+ * DepartmentCountOutputType without action
+ */
+export type DepartmentCountOutputTypeCountActorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActorWhereInput
+}
+
 
 export type DepartmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1010,6 +1134,7 @@ export type DepartmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   processes?: boolean | Prisma.Department$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Department$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Department$loadSnapshotsArgs<ExtArgs>
+  actors?: boolean | Prisma.Department$actorsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["department"]>
 
@@ -1052,6 +1177,7 @@ export type DepartmentInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   processes?: boolean | Prisma.Department$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Department$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Department$loadSnapshotsArgs<ExtArgs>
+  actors?: boolean | Prisma.Department$actorsArgs<ExtArgs>
   _count?: boolean | Prisma.DepartmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DepartmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1072,6 +1198,11 @@ export type $DepartmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     processes: Prisma.$ProcessPayload<ExtArgs>[]
     taskAssignments: Prisma.$TaskAssignmentPayload<ExtArgs>[]
     loadSnapshots: Prisma.$LoadSnapshotPayload<ExtArgs>[]
+    /**
+     * *
+     *    * Business users (Actors) in this department
+     */
+    actors: Prisma.$ActorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1480,6 +1611,7 @@ export interface Prisma__DepartmentClient<T, Null = never, ExtArgs extends runti
   processes<T extends Prisma.Department$processesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$processesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   taskAssignments<T extends Prisma.Department$taskAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$taskAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loadSnapshots<T extends Prisma.Department$loadSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$loadSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoadSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actors<T extends Prisma.Department$actorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Department$actorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2023,6 +2155,30 @@ export type Department$loadSnapshotsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.LoadSnapshotScalarFieldEnum | Prisma.LoadSnapshotScalarFieldEnum[]
+}
+
+/**
+ * Department.actors
+ */
+export type Department$actorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Actor
+   */
+  select?: Prisma.ActorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Actor
+   */
+  omit?: Prisma.ActorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActorInclude<ExtArgs> | null
+  where?: Prisma.ActorWhereInput
+  orderBy?: Prisma.ActorOrderByWithRelationInput | Prisma.ActorOrderByWithRelationInput[]
+  cursor?: Prisma.ActorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActorScalarFieldEnum | Prisma.ActorScalarFieldEnum[]
 }
 
 /**

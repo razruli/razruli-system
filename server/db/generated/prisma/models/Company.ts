@@ -241,6 +241,8 @@ export type CompanyWhereInput = {
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  actors?: Prisma.ActorListRelationFilter
+  roles?: Prisma.RoleListRelationFilter
 }
 
 export type CompanyOrderByWithRelationInput = {
@@ -256,6 +258,8 @@ export type CompanyOrderByWithRelationInput = {
   processes?: Prisma.ProcessOrderByRelationAggregateInput
   taskAssignments?: Prisma.TaskAssignmentOrderByRelationAggregateInput
   loadSnapshots?: Prisma.LoadSnapshotOrderByRelationAggregateInput
+  actors?: Prisma.ActorOrderByRelationAggregateInput
+  roles?: Prisma.RoleOrderByRelationAggregateInput
 }
 
 export type CompanyWhereUniqueInput = Prisma.AtLeast<{
@@ -274,6 +278,8 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  actors?: Prisma.ActorListRelationFilter
+  roles?: Prisma.RoleListRelationFilter
 }, "id">
 
 export type CompanyOrderByWithAggregationInput = {
@@ -317,6 +323,8 @@ export type CompanyCreateInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateInput = {
@@ -332,6 +340,8 @@ export type CompanyUncheckedCreateInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUpdateInput = {
@@ -347,6 +357,8 @@ export type CompanyUpdateInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateInput = {
@@ -362,6 +374,8 @@ export type CompanyUncheckedUpdateInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateManyInput = {
@@ -397,6 +411,11 @@ export type CompanyUncheckedUpdateManyInput = {
 export type CompanyScalarRelationFilter = {
   is?: Prisma.CompanyWhereInput
   isNot?: Prisma.CompanyWhereInput
+}
+
+export type CompanyNullableScalarRelationFilter = {
+  is?: Prisma.CompanyWhereInput | null
+  isNot?: Prisma.CompanyWhereInput | null
 }
 
 export type CompanyCountOrderByAggregateInput = {
@@ -451,6 +470,36 @@ export type CompanyUpdateOneRequiredWithoutLoadSnapshotsNestedInput = {
   upsert?: Prisma.CompanyUpsertWithoutLoadSnapshotsInput
   connect?: Prisma.CompanyWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutLoadSnapshotsInput, Prisma.CompanyUpdateWithoutLoadSnapshotsInput>, Prisma.CompanyUncheckedUpdateWithoutLoadSnapshotsInput>
+}
+
+export type CompanyCreateNestedOneWithoutActorsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActorsInput, Prisma.CompanyUncheckedCreateWithoutActorsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActorsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutActorsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActorsInput, Prisma.CompanyUncheckedCreateWithoutActorsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActorsInput
+  upsert?: Prisma.CompanyUpsertWithoutActorsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutActorsInput, Prisma.CompanyUpdateWithoutActorsInput>, Prisma.CompanyUncheckedUpdateWithoutActorsInput>
+}
+
+export type CompanyCreateNestedOneWithoutRolesInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutRolesInput, Prisma.CompanyUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutRolesInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneWithoutRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutRolesInput, Prisma.CompanyUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutRolesInput
+  upsert?: Prisma.CompanyUpsertWithoutRolesInput
+  disconnect?: Prisma.CompanyWhereInput | boolean
+  delete?: Prisma.CompanyWhereInput | boolean
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutRolesInput, Prisma.CompanyUpdateWithoutRolesInput>, Prisma.CompanyUncheckedUpdateWithoutRolesInput>
 }
 
 export type CompanyCreateNestedOneWithoutDepartmentsInput = {
@@ -521,6 +570,8 @@ export type CompanyCreateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutLoadSnapshotsInput = {
@@ -535,6 +586,8 @@ export type CompanyUncheckedCreateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyCreateOrConnectWithoutLoadSnapshotsInput = {
@@ -565,6 +618,8 @@ export type CompanyUpdateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutLoadSnapshotsInput = {
@@ -579,6 +634,168 @@ export type CompanyUncheckedUpdateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutActorsInput = {
+  id?: string
+  name: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutActorsInput = {
+  id?: string
+  name: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutActorsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutActorsInput, Prisma.CompanyUncheckedCreateWithoutActorsInput>
+}
+
+export type CompanyUpsertWithoutActorsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutActorsInput, Prisma.CompanyUncheckedUpdateWithoutActorsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutActorsInput, Prisma.CompanyUncheckedCreateWithoutActorsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutActorsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutActorsInput, Prisma.CompanyUncheckedUpdateWithoutActorsInput>
+}
+
+export type CompanyUpdateWithoutActorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUpdateManyWithoutCompanyNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutActorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutRolesInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutRolesInput, Prisma.CompanyUncheckedCreateWithoutRolesInput>
+}
+
+export type CompanyUpsertWithoutRolesInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutRolesInput, Prisma.CompanyUncheckedUpdateWithoutRolesInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutRolesInput, Prisma.CompanyUncheckedCreateWithoutRolesInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutRolesInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutRolesInput, Prisma.CompanyUncheckedUpdateWithoutRolesInput>
+}
+
+export type CompanyUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUpdateManyWithoutCompanyNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutDepartmentsInput = {
@@ -593,6 +810,8 @@ export type CompanyCreateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutDepartmentsInput = {
@@ -607,6 +826,8 @@ export type CompanyUncheckedCreateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyCreateOrConnectWithoutDepartmentsInput = {
@@ -637,6 +858,8 @@ export type CompanyUpdateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutDepartmentsInput = {
@@ -651,6 +874,8 @@ export type CompanyUncheckedUpdateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutEmployeesInput = {
@@ -665,6 +890,8 @@ export type CompanyCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutEmployeesInput = {
@@ -679,6 +906,8 @@ export type CompanyUncheckedCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyCreateOrConnectWithoutEmployeesInput = {
@@ -709,6 +938,8 @@ export type CompanyUpdateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutEmployeesInput = {
@@ -723,6 +954,8 @@ export type CompanyUncheckedUpdateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutProcessesInput = {
@@ -737,6 +970,8 @@ export type CompanyCreateWithoutProcessesInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutProcessesInput = {
@@ -751,6 +986,8 @@ export type CompanyUncheckedCreateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyCreateOrConnectWithoutProcessesInput = {
@@ -781,6 +1018,8 @@ export type CompanyUpdateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutProcessesInput = {
@@ -795,6 +1034,8 @@ export type CompanyUncheckedUpdateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutTaskAssignmentsInput = {
@@ -809,6 +1050,8 @@ export type CompanyCreateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutTaskAssignmentsInput = {
@@ -823,6 +1066,8 @@ export type CompanyUncheckedCreateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyCreateOrConnectWithoutTaskAssignmentsInput = {
@@ -853,6 +1098,8 @@ export type CompanyUpdateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutTaskAssignmentsInput = {
@@ -867,6 +1114,8 @@ export type CompanyUncheckedUpdateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 
@@ -880,6 +1129,8 @@ export type CompanyCountOutputType = {
   processes: number
   taskAssignments: number
   loadSnapshots: number
+  actors: number
+  roles: number
 }
 
 export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -888,6 +1139,8 @@ export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   processes?: boolean | CompanyCountOutputTypeCountProcessesArgs
   taskAssignments?: boolean | CompanyCountOutputTypeCountTaskAssignmentsArgs
   loadSnapshots?: boolean | CompanyCountOutputTypeCountLoadSnapshotsArgs
+  actors?: boolean | CompanyCountOutputTypeCountActorsArgs
+  roles?: boolean | CompanyCountOutputTypeCountRolesArgs
 }
 
 /**
@@ -935,6 +1188,20 @@ export type CompanyCountOutputTypeCountLoadSnapshotsArgs<ExtArgs extends runtime
   where?: Prisma.LoadSnapshotWhereInput
 }
 
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountActorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActorWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RoleWhereInput
+}
+
 
 export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -949,6 +1216,8 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   processes?: boolean | Prisma.Company$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Company$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Company$loadSnapshotsArgs<ExtArgs>
+  actors?: boolean | Prisma.Company$actorsArgs<ExtArgs>
+  roles?: boolean | Prisma.Company$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["company"]>
 
@@ -989,6 +1258,8 @@ export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   processes?: boolean | Prisma.Company$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Company$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Company$loadSnapshotsArgs<ExtArgs>
+  actors?: boolean | Prisma.Company$actorsArgs<ExtArgs>
+  roles?: boolean | Prisma.Company$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CompanyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1002,6 +1273,12 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     processes: Prisma.$ProcessPayload<ExtArgs>[]
     taskAssignments: Prisma.$TaskAssignmentPayload<ExtArgs>[]
     loadSnapshots: Prisma.$LoadSnapshotPayload<ExtArgs>[]
+    /**
+     * *
+     *    * Business users (Actors) in this company
+     */
+    actors: Prisma.$ActorPayload<ExtArgs>[]
+    roles: Prisma.$RolePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1410,6 +1687,8 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   processes<T extends Prisma.Company$processesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$processesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   taskAssignments<T extends Prisma.Company$taskAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$taskAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loadSnapshots<T extends Prisma.Company$loadSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$loadSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoadSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actors<T extends Prisma.Company$actorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$actorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  roles<T extends Prisma.Company$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1951,6 +2230,54 @@ export type Company$loadSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.LoadSnapshotScalarFieldEnum | Prisma.LoadSnapshotScalarFieldEnum[]
+}
+
+/**
+ * Company.actors
+ */
+export type Company$actorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Actor
+   */
+  select?: Prisma.ActorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Actor
+   */
+  omit?: Prisma.ActorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActorInclude<ExtArgs> | null
+  where?: Prisma.ActorWhereInput
+  orderBy?: Prisma.ActorOrderByWithRelationInput | Prisma.ActorOrderByWithRelationInput[]
+  cursor?: Prisma.ActorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActorScalarFieldEnum | Prisma.ActorScalarFieldEnum[]
+}
+
+/**
+ * Company.roles
+ */
+export type Company$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Role
+   */
+  select?: Prisma.RoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Role
+   */
+  omit?: Prisma.RoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoleInclude<ExtArgs> | null
+  where?: Prisma.RoleWhereInput
+  orderBy?: Prisma.RoleOrderByWithRelationInput | Prisma.RoleOrderByWithRelationInput[]
+  cursor?: Prisma.RoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RoleScalarFieldEnum | Prisma.RoleScalarFieldEnum[]
 }
 
 /**
