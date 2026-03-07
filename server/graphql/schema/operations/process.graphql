@@ -104,6 +104,7 @@ input CreateProcessInput {
   kMultiplier: Float!
   estimatedDurationDays: Int
   priority: ProcessPriority
+  status: ProcessStatus
 }
 
 """

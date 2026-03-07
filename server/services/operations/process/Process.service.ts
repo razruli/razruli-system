@@ -57,21 +57,75 @@ export class ProcessService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
-  //   async create(data: { title: string; departmentId: string }): Promise<Process> {
-  //     this.validate(data.title, 'Title required');
-  //     this.validate(data.departmentId, 'Department ID required');
+  // ==================== WRITE OPERATIONS ====================
 
-  //     const item = await this.repository.create({
-  //       title: data.title,
-  //       department: { connect: { id: data.departmentId } },
-  //       company: { connect: { id: 'default-company-id' } },
-  //       plannedHours: 0,
-  //       targetGrade: 1,
-  //     });
+  async create(data: {
+    companyId: string;
+    departmentId: string;
+    title: string;
+    description?: string;
+    plannedHours: number;
+    priority?: string;
+    status?: string;
+  }): Promise<Process> {
+    this.log("info", `Creating process`, { title: data.title });
 
-  //     this.invalidateAll();
-  //     return item;
-  //   }
+    // Validation
+    this.validate(data.title, "Process title required");
+    this.validate(data.companyId, "Company ID required");
+    this.validate(data.departmentId, "Department ID required");
+    this.validate(data.plannedHours, "Planned hours required");
+
+    const process = await this.repository.create({
+      title: data.title,
+      description: data.description,
+      company: { connect: { id: data.companyId } },
+      department: { connect: { id: data.departmentId } },
+      plannedHours: data.plannedHours,
+      priority: data.priority || "medium",
+      status: data.status || "open",
+      targetGrade: { connect: { id: 1 } }, // Default to grade 1
+    });
+
+    this.log("info", `Process created`, {
+      id: process.id,
+      title: process.title,
+    });
+    this.invalidateAll();
+
+    return process;
+  }
+
+  async update(
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      status: string;
+      priority: string;
+      plannedHours: number;
+    }>,
+  ): Promise<Process> {
+    this.log("info", `Updating process`, { id });
+
+    const updated = await this.repository.update(id, data);
+
+    this.log("info", `Process updated`, { id });
+    this.invalidate(id);
+
+    return updated;
+  }
+
+  async delete(id: string): Promise<Process> {
+    this.log("info", `Deleting process`, { id });
+
+    const deleted = await this.repository.delete(id);
+
+    this.log("info", `Process deleted`, { id });
+    this.invalidateAll();
+
+    return deleted;
+  }
 
   async getWithStats(id: string) {
     const item = await this.getByIdOrThrow(id);
