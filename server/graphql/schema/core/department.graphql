@@ -76,11 +76,12 @@ input DepartmentFilterInput {
 }
 
 """
-Response with department list
+Department connection with pagination
 """
-type DepartmentListResponse {
-  items: [Department!]!
-  total: Int!
+type DepartmentConnection {
+  nodes: [Department!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
 }
 
 extend type Query {
@@ -92,7 +93,7 @@ extend type Query {
   """
   Get all departments for company
   """
-  departments(filter: DepartmentFilterInput!): DepartmentListResponse!
+  departments(filter: DepartmentFilterInput!): DepartmentConnection!
 
   """
   Get department with all employees and load metrics
