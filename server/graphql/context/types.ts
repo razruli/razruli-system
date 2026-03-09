@@ -34,6 +34,7 @@ import type { EmployeeService } from "@/server/services/core/employee/Employee.s
 import type { GradeService } from "@/server/services/core/grade/Grade.service";
 import type { ProcessService } from "@/server/services/operations/process/Process.service";
 import type { TaskAssignmentService } from "@/server/services/operations/taskAssignment/TaskAssignment.service";
+import { PermissionService, RoleService } from "@/server/services/user";
 import type { UserService } from "@/server/services/user/user.service";
 
 // ============================================================================
@@ -89,6 +90,10 @@ export interface ServicesRegistry {
   department: DepartmentService;
   employee: EmployeeService;
   grade: GradeService;
+
+  // User domain
+  role: RoleService;
+  permission: PermissionService;
 
   // Operations domain
   process: ProcessService;

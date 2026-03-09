@@ -1,10 +1,3 @@
-// ============================================================================
-// Service Factory (Dependency Injection Container)
-// ============================================================================
-// Central place to instantiate and wire all services
-// Services are created with the context, giving them access to dataloaders, cache, etc.
-// ============================================================================
-
 import type { ServiceContext } from "@/server/types/context";
 
 import { ActorService } from "./actor/Actor.service";
@@ -18,6 +11,8 @@ import { EmployeeService } from "./core/employee";
 import { GradeService } from "./core/grade";
 import { ProcessService } from "./operations/process";
 import { TaskAssignmentService } from "./operations/taskAssignment";
+import { PermissionService } from "./user/permission.service";
+import { RoleService } from "./user/role.service";
 import { UserService } from "./user/user.service";
 
 /**
@@ -51,7 +46,30 @@ export class ServiceFactory {
     gapAnalysis?: GapAnalysisService;
     employeeHistory?: EmployeeHistoryService;
     auditLog?: AuditLogService;
+    role?: RoleService;
+    permission?: PermissionService;
   } = {};
+  /**
+   * Role services
+   * Location: services/user/role.service.ts
+   */
+  getRoleService(): RoleService {
+    if (!this._services.role) {
+      this._services.role = new RoleService(this.context);
+    }
+    return this._services.role;
+  }
+
+  /**
+   * Permission services
+   * Location: services/user/permission.service.ts
+   */
+  getPermissionService(): PermissionService {
+    if (!this._services.permission) {
+      this._services.permission = new PermissionService(this.context);
+    }
+    return this._services.permission;
+  }
 
   constructor(private context: ServiceContext) {
     if (!context) {
@@ -277,6 +295,12 @@ export class ServiceFactory {
     return {
       // Auth & User
       user: this.getUserService(),
+      actor: this.getActorService(),
+
+      // User domain
+      role: this.getRoleService(),
+      permission: this.getPermissionService(),
+
       // Core
       company: this.getCompanyService(),
       department: this.getDepartmentService(),
@@ -286,11 +310,9 @@ export class ServiceFactory {
       // Operations
       process: this.getProcessService(),
       taskAssignment: this.getTaskAssignmentService(),
-
       // Analytics
       loadSnapshot: this.getLoadSnapshotService(),
       gapAnalysis: this.getGapAnalysisService(),
-
       // Audit
       employeeHistory: this.getEmployeeHistoryService(),
       auditLog: this.getAuditLogService(),
