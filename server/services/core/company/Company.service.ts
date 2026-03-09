@@ -40,6 +40,45 @@ export class CompanyService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
+  async find(
+    filters?: {
+      search?: string;
+    },
+    pagination?: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    },
+  ): Promise<{
+    data: Company[];
+    total: number;
+    hasMore: boolean;
+  }> {
+    this.log("info", `Finding companies with filters`, { filters, pagination });
+
+    const offset = pagination?.offset || 0;
+    const limit = pagination?.limit || 20;
+
+    let data = await this.repository.findAll();
+
+    // Apply search filter
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      data = data.filter((c) => c.name.toLowerCase().includes(searchLower));
+    }
+
+    const total = data.length;
+    const paginatedData = data.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return {
+      data: paginatedData,
+      total,
+      hasMore,
+    };
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: {

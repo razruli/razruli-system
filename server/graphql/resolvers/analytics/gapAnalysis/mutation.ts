@@ -62,6 +62,9 @@ const updateGapAnalysisResolver: MutationResolvers["updateGapAnalysis"] =
     try {
       // Get old values
       const oldAnalysis = await context.services.gapAnalysis.getById(id);
+      if (!oldAnalysis) {
+        throw new Error(`Gap analysis not found: ${id}`);
+      }
 
       // Build update data from provided fields
       const updateData: Record<string, unknown> = {};
@@ -81,7 +84,7 @@ const updateGapAnalysisResolver: MutationResolvers["updateGapAnalysis"] =
         updateData,
       );
 
-      return updatedAnalysis;
+      return updatedAnalysis || oldAnalysis;
     } catch (error) {
       throw new Error(`Failed to update gap analysis: ${error}`);
     }

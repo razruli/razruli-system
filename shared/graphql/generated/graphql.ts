@@ -368,6 +368,20 @@ export type CreateGapAnalysisInput = {
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+/** Grade input for creation */
+export type CreateGradeInput = {
+  /** Description */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** Grade level/seniority */
+  level?: InputMaybe<Scalars['Int']['input']>;
+  /** Maximum salary for this grade */
+  maxSalary?: InputMaybe<Scalars['Float']['input']>;
+  /** Minimum salary for this grade */
+  minSalary?: InputMaybe<Scalars['Float']['input']>;
+  /** Human readable name */
+  name: Scalars['String']['input'];
+};
+
 /** Input for creating a permission */
 export type CreatePermissionInput = {
   action: Scalars['String']['input'];
@@ -1231,6 +1245,8 @@ export type Mutation = {
   createEmployee: Employee;
   /** Create new gap analysis */
   createGapAnalysis: GapAnalysis;
+  /** Create a new grade (requires grade:create permission) */
+  createGrade: Grade;
   /** Create a load snapshot */
   createLoadSnapshot: LoadSnapshot;
   /** Create a new permission (admin only) */
@@ -1245,6 +1261,8 @@ export type Mutation = {
   deactivateActor: Actor;
   /** Delete department */
   deleteDepartment: Scalars['Boolean']['output'];
+  /** Delete a grade (requires grade:delete permission) */
+  deleteGrade: Grade;
   /** Delete a permission (admin only) */
   deletePermission: Scalars['Boolean']['output'];
   /** Delete a process */
@@ -1297,6 +1315,8 @@ export type Mutation = {
   updateEmployeeEfficiency: Employee;
   /** Update existing gap analysis */
   updateGapAnalysis: GapAnalysis;
+  /** Update an existing grade (requires grade:update permission) */
+  updateGrade: Grade;
   /** Update hiring plan */
   updateHiringPlan: HiringPlan;
   /** Track hiring progress */
@@ -1489,6 +1509,15 @@ export type MutationCreateGapAnalysisArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationCreateGradeArgs = {
+  input: CreateGradeInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationCreateLoadSnapshotArgs = {
   employeeId: Scalars['String']['input'];
   snapshotType: SnapshotType;
@@ -1547,6 +1576,15 @@ export type MutationDeactivateActorArgs = {
  */
 export type MutationDeleteDepartmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeleteGradeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -1801,6 +1839,16 @@ export type MutationUpdateEmployeeEfficiencyArgs = {
 export type MutationUpdateGapAnalysisArgs = {
   id: Scalars['String']['input'];
   input: UpdateGapAnalysisInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateGradeArgs = {
+  id: Scalars['Int']['input'];
+  input: UpdateGradeInput;
 };
 
 
@@ -2981,6 +3029,7 @@ export type RolePermission = Node & {
 /** Role scope enumeration */
 export enum RoleScope {
   Company = 'COMPANY',
+  Guest = 'GUEST',
   System = 'SYSTEM'
 }
 
@@ -3491,6 +3540,20 @@ export type UpdateGapAnalysisInput = {
   confidenceLevel?: InputMaybe<Scalars['String']['input']>;
   forecastAccuracy?: InputMaybe<Scalars['Float']['input']>;
   forecastedWorkloadUnits?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Grade input for updates */
+export type UpdateGradeInput = {
+  /** Description */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** Grade level/seniority */
+  level?: InputMaybe<Scalars['Int']['input']>;
+  /** Maximum salary for this grade */
+  maxSalary?: InputMaybe<Scalars['Float']['input']>;
+  /** Minimum salary for this grade */
+  minSalary?: InputMaybe<Scalars['Float']['input']>;
+  /** Human readable name */
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Update hiring plan input */

@@ -371,6 +371,20 @@ export type CreateGapAnalysisInput = {
   startDate: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+/** Grade input for creation */
+export type CreateGradeInput = {
+  /** Description */
+  description: InputMaybe<Scalars['String']['input']>;
+  /** Grade level/seniority */
+  level: InputMaybe<Scalars['Int']['input']>;
+  /** Maximum salary for this grade */
+  maxSalary: InputMaybe<Scalars['Float']['input']>;
+  /** Minimum salary for this grade */
+  minSalary: InputMaybe<Scalars['Float']['input']>;
+  /** Human readable name */
+  name: Scalars['String']['input'];
+};
+
 /** Input for creating a permission */
 export type CreatePermissionInput = {
   action: Scalars['String']['input'];
@@ -1234,6 +1248,8 @@ export type Mutation = {
   createEmployee: Employee;
   /** Create new gap analysis */
   createGapAnalysis: GapAnalysis;
+  /** Create a new grade (requires grade:create permission) */
+  createGrade: Grade;
   /** Create a load snapshot */
   createLoadSnapshot: LoadSnapshot;
   /** Create a new permission (admin only) */
@@ -1248,6 +1264,8 @@ export type Mutation = {
   deactivateActor: Actor;
   /** Delete department */
   deleteDepartment: Scalars['Boolean']['output'];
+  /** Delete a grade (requires grade:delete permission) */
+  deleteGrade: Grade;
   /** Delete a permission (admin only) */
   deletePermission: Scalars['Boolean']['output'];
   /** Delete a process */
@@ -1300,6 +1318,8 @@ export type Mutation = {
   updateEmployeeEfficiency: Employee;
   /** Update existing gap analysis */
   updateGapAnalysis: GapAnalysis;
+  /** Update an existing grade (requires grade:update permission) */
+  updateGrade: Grade;
   /** Update hiring plan */
   updateHiringPlan: HiringPlan;
   /** Track hiring progress */
@@ -1492,6 +1512,15 @@ export type MutationCreateGapAnalysisArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
+export type MutationCreateGradeArgs = {
+  input: CreateGradeInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
 export type MutationCreateLoadSnapshotArgs = {
   employeeId: Scalars['String']['input'];
   snapshotType: SnapshotType;
@@ -1550,6 +1579,15 @@ export type MutationDeactivateActorArgs = {
  */
 export type MutationDeleteDepartmentArgs = {
   id: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationDeleteGradeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -1804,6 +1842,16 @@ export type MutationUpdateEmployeeEfficiencyArgs = {
 export type MutationUpdateGapAnalysisArgs = {
   id: Scalars['String']['input'];
   input: UpdateGapAnalysisInput;
+};
+
+
+/**
+ * Root Mutation type
+ * Extended by each domain module
+ */
+export type MutationUpdateGradeArgs = {
+  id: Scalars['Int']['input'];
+  input: UpdateGradeInput;
 };
 
 
@@ -2984,6 +3032,7 @@ export type RolePermission = Node & {
 /** Role scope enumeration */
 export enum RoleScope {
   Company = 'COMPANY',
+  Guest = 'GUEST',
   System = 'SYSTEM'
 }
 
@@ -3496,6 +3545,20 @@ export type UpdateGapAnalysisInput = {
   forecastedWorkloadUnits: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** Grade input for updates */
+export type UpdateGradeInput = {
+  /** Description */
+  description: InputMaybe<Scalars['String']['input']>;
+  /** Grade level/seniority */
+  level: InputMaybe<Scalars['Int']['input']>;
+  /** Maximum salary for this grade */
+  maxSalary: InputMaybe<Scalars['Float']['input']>;
+  /** Minimum salary for this grade */
+  minSalary: InputMaybe<Scalars['Float']['input']>;
+  /** Human readable name */
+  name: InputMaybe<Scalars['String']['input']>;
+};
+
 /** Update hiring plan input */
 export type UpdateHiringPlanInput = {
   hiringStartDate: InputMaybe<Scalars['DateTime']['input']>;
@@ -3733,6 +3796,7 @@ export type ResolversTypes = {
   CreateDepartmentInput: CreateDepartmentInput;
   CreateEmployeeInput: CreateEmployeeInput;
   CreateGapAnalysisInput: CreateGapAnalysisInput;
+  CreateGradeInput: CreateGradeInput;
   CreatePermissionInput: CreatePermissionInput;
   CreateProcessInput: CreateProcessInput;
   CreateRoleInput: CreateRoleInput;
@@ -3865,6 +3929,7 @@ export type ResolversTypes = {
   UpdateDepartmentInput: UpdateDepartmentInput;
   UpdateEmployeeInput: UpdateEmployeeInput;
   UpdateGapAnalysisInput: UpdateGapAnalysisInput;
+  UpdateGradeInput: UpdateGradeInput;
   UpdateHiringPlanInput: UpdateHiringPlanInput;
   UpdatePermissionInput: UpdatePermissionInput;
   UpdateProcessInput: UpdateProcessInput;
@@ -3906,6 +3971,7 @@ export type ResolversParentTypes = {
   CreateDepartmentInput: CreateDepartmentInput;
   CreateEmployeeInput: CreateEmployeeInput;
   CreateGapAnalysisInput: CreateGapAnalysisInput;
+  CreateGradeInput: CreateGradeInput;
   CreatePermissionInput: CreatePermissionInput;
   CreateProcessInput: CreateProcessInput;
   CreateRoleInput: CreateRoleInput;
@@ -4009,6 +4075,7 @@ export type ResolversParentTypes = {
   UpdateDepartmentInput: UpdateDepartmentInput;
   UpdateEmployeeInput: UpdateEmployeeInput;
   UpdateGapAnalysisInput: UpdateGapAnalysisInput;
+  UpdateGradeInput: UpdateGradeInput;
   UpdateHiringPlanInput: UpdateHiringPlanInput;
   UpdatePermissionInput: UpdatePermissionInput;
   UpdateProcessInput: UpdateProcessInput;
@@ -4578,6 +4645,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createDepartment: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationCreateDepartmentArgs, 'input'>>;
   createEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationCreateEmployeeArgs, 'input'>>;
   createGapAnalysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType, RequireFields<MutationCreateGapAnalysisArgs, 'input'>>;
+  createGrade: Resolver<ResolversTypes['Grade'], ParentType, ContextType, RequireFields<MutationCreateGradeArgs, 'input'>>;
   createLoadSnapshot: Resolver<ResolversTypes['LoadSnapshot'], ParentType, ContextType, RequireFields<MutationCreateLoadSnapshotArgs, 'employeeId' | 'snapshotType'>>;
   createPermission: Resolver<ResolversTypes['Permission'], ParentType, ContextType, RequireFields<MutationCreatePermissionArgs, 'input'>>;
   createProcess: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCreateProcessArgs, 'input'>>;
@@ -4585,6 +4653,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   createTaskAssignment: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationCreateTaskAssignmentArgs, 'input'>>;
   deactivateActor: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationDeactivateActorArgs, 'id'>>;
   deleteDepartment: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteDepartmentArgs, 'id'>>;
+  deleteGrade: Resolver<ResolversTypes['Grade'], ParentType, ContextType, RequireFields<MutationDeleteGradeArgs, 'id'>>;
   deletePermission: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePermissionArgs, 'id'>>;
   deleteProcess: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteProcessArgs, 'id'>>;
   deleteRole: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteRoleArgs, 'id'>>;
@@ -4611,6 +4680,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   updateEmployee: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationUpdateEmployeeArgs, 'id' | 'input'>>;
   updateEmployeeEfficiency: Resolver<ResolversTypes['Employee'], ParentType, ContextType, RequireFields<MutationUpdateEmployeeEfficiencyArgs, 'id' | 'kEfficiency'>>;
   updateGapAnalysis: Resolver<ResolversTypes['GapAnalysis'], ParentType, ContextType, RequireFields<MutationUpdateGapAnalysisArgs, 'id' | 'input'>>;
+  updateGrade: Resolver<ResolversTypes['Grade'], ParentType, ContextType, RequireFields<MutationUpdateGradeArgs, 'id' | 'input'>>;
   updateHiringPlan: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationUpdateHiringPlanArgs, 'id' | 'input'>>;
   updateHiringProgress: Resolver<ResolversTypes['HiringPlan'], ParentType, ContextType, RequireFields<MutationUpdateHiringProgressArgs, 'actualHires' | 'hiringPlanId'>>;
   updatePermission: Resolver<ResolversTypes['Permission'], ParentType, ContextType, RequireFields<MutationUpdatePermissionArgs, 'id' | 'input'>>;

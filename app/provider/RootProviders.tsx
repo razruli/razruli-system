@@ -1,6 +1,7 @@
 import { LocaleLayout } from "@/shared/i18n";
 import { ApolloClientProvider } from "@/shared/lib";
 import { ThemeProvider } from "@/shared/theme";
+import { TooltipProvider } from "@/shared/ui";
 
 export function RootProviders({
   children,
@@ -12,7 +13,9 @@ export function RootProviders({
   return (
     <ApolloClientProvider>
       <LocaleLayout params={params}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
       </LocaleLayout>
     </ApolloClientProvider>
   );

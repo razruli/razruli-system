@@ -40,6 +40,37 @@ export class GradeRepository {
     });
   }
 
+  async find(
+    filter: Record<string, any>,
+    options: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    } = {},
+  ): Promise<{ data: Grade[]; total: number }> {
+    const {
+      offset = 0,
+      limit = 10,
+      sortBy = "id",
+      sortOrder = "ASC",
+    } = options;
+
+    const where: Prisma.GradeWhereInput = filter;
+
+    const [data, total] = await Promise.all([
+      this.prisma.grade.findMany({
+        where,
+        skip: offset,
+        take: limit,
+        orderBy: { [sortBy]: sortOrder.toLowerCase() },
+      }),
+      this.prisma.grade.count({ where }),
+    ]);
+
+    return { data, total };
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: Prisma.GradeCreateInput): Promise<Grade> {

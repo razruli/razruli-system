@@ -42,6 +42,7 @@ Role scope enumeration
 enum RoleScope {
   SYSTEM
   COMPANY
+  GUEST
 }
 
 """

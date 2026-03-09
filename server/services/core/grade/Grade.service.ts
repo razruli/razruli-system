@@ -46,38 +46,56 @@ export class GradeService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
+  async find(
+    filter: Record<string, any>,
+    options: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    } = {},
+  ): Promise<{ data: Grade[]; total: number }> {
+    this.log("info", `Finding grades`, { filter, options });
+
+    const cacheKey = this.listCacheKey(filter);
+
+    return this.getOrFetch(cacheKey, () =>
+      this.repository.find(filter, options),
+    );
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
-  //   async create(data: {
-  //     name: string;
-  //     description?: string;
-  //     kGrade: number;
-  //   }): Promise<Grade> {
-  //     this.log("info", `Creating grade`, { name: data.name });
+  async create(data: {
+    name: string;
+    description?: string;
+    kGrade: number;
+  }): Promise<Grade> {
+    this.log("info", `Creating grade`, { name: data.name });
 
-  //     this.validate(data.name, "Grade name required");
-  //     this.validateCondition(data.kGrade > 0, "kGrade must be positive");
+    this.validate(data.name, "Grade name required");
+    this.validateCondition(data.kGrade > 0, "kGrade must be positive");
 
-  //     // Check for duplicate name
-  //     const existing = await this.repository.findByName(data.name);
+    // Check for duplicate name
+    const existing = await this.repository.findByName(data.name);
 
-  //     if (existing) {
-  //       throw new this.ValidationError(`Grade "${data.name}" already exists`);
-  //     }
+    if (existing) {
+      throw new Error(`Grade "${data.name}" already exists`);
+    }
 
-  //     const grade = await this.repository.create({
+    const grade = await this.repository.create({
+      id: 1000, // Temporary ID for audit log, will be replaced by DB-generated ID
+      name: data.name,
+      description: data.description,
+      kGrade: data.kGrade,
+    });
 
-  //       name: data.name,
-  //       description: undefined,
-  //       kGrade: data.kGrade,
-  //     });
+    this.log("info", `Grade created`, { id: grade.id });
 
-  //     this.log("info", `Grade created`, { id: grade.id });
+    this.invalidateAll();
 
-  //     this.invalidateAll();
-
-  //     return grade;
-  //   }
+    return grade;
+  }
 
   async update(
     id: string,
@@ -97,6 +115,19 @@ export class GradeService extends BaseService {
     this.invalidateAll();
 
     return updated;
+  }
+
+  async delete(id: string): Promise<Grade> {
+    this.log("info", `Deleting grade`, { id });
+
+    await this.getByIdOrThrow(id);
+
+    const deleted = await this.repository.delete(String(id));
+
+    this.invalidate(id);
+    this.invalidateAll();
+
+    return deleted;
   }
 
   // ==================== BUSINESS LOGIC ====================

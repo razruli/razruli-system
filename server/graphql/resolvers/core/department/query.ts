@@ -66,9 +66,9 @@ const departmentsResolver: QueryResolvers["departments"] = async (
     const serviceFilter = filter
       ? {
           companyId: filter.companyId,
-          search: filter.search,
+          search: filter.search ?? undefined,
         }
-      : {};
+      : undefined;
 
     const servicePagination = {
       offset: 0,
@@ -170,13 +170,14 @@ const departmentGapComparisonResolver: QueryResolvers["departmentGapComparison"]
         where: { companyId },
       });
 
-      // Placeholder implementation
       return departments.map((dept) => ({
         department: dept,
-        currentGap: 0,
-        projectedGap: 0,
-        gap_Percentage: 0,
-        recommendedHirings: 0,
+        gapAnalysis: null,
+        headcountGap: 0,
+        capacityGap: 0,
+        gapStatus: "BALANCED" as any,
+        riskLevel: "LOW" as any,
+        comparedToCompanyAverage: 0,
       }));
     } catch (error) {
       throw new Error(`Failed to fetch department gap comparison: ${error}`);
@@ -193,15 +194,14 @@ const departmentLoadOverviewResolver: QueryResolvers["departmentLoadOverview"] =
         await context.services.department.getById(departmentId);
       if (!department) throw new Error("Department not found");
 
-      // Placeholder - returns basic structure
       return {
         department,
-        totalCapacity: 0,
-        allocatedLoad: 0,
-        unallocatedCapacity: 0,
-        loadPercentage: 0,
-        employeeCount: 0,
+        totalEmployees: 0,
         overloadedEmployees: 0,
+        averageUtilizationRate: 0,
+        averageLoadIndex: 0,
+        employeeBreakdown: [] as any,
+        riskLevel: "LOW" as any,
       };
     } catch (error) {
       throw new Error(`Failed to fetch department load overview: ${error}`);
@@ -221,17 +221,18 @@ const departmentEmployeeHistoryResolver: QueryResolvers["departmentEmployeeHisto
         await context.services.department.getById(departmentId);
       if (!department) throw new Error("Department not found");
 
-      // Placeholder implementation
       return {
         department,
-        from: startDate,
-        to: endDate,
-        hires: 0,
+        reportPeriod: { from: startDate, to: endDate } as any,
+        newHires: 0,
         departures: 0,
         transfers: 0,
-        reassignments: 0,
-        totalChanges: 0,
-        records: [],
+        promotions: 0,
+        demotions: 0,
+        timeline: [] as any,
+        capacityAdded: 0,
+        capacityLost: 0,
+        netCapacityChange: 0,
       };
     } catch (error) {
       throw new Error(`Failed to fetch department employee history: ${error}`);

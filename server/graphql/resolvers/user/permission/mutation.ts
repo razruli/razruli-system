@@ -18,8 +18,7 @@ const createPermissionResolver: MutationResolvers["createPermission"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement permission service
-    throw new Error("Create permission not yet implemented");
+    return await context.services.permission.create(input);
   } catch (error) {
     throw new Error(`Failed to create permission: ${error}`);
   }
@@ -34,8 +33,7 @@ const updatePermissionResolver: MutationResolvers["updatePermission"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement permission service
-    throw new Error("Update permission not yet implemented");
+    return await context.services.permission.update(id, input);
   } catch (error) {
     throw new Error(`Failed to update permission: ${error}`);
   }
@@ -50,8 +48,8 @@ const deletePermissionResolver: MutationResolvers["deletePermission"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement permission service
-    throw new Error("Delete permission not yet implemented");
+    await context.services.permission.delete(id);
+    return true;
   } catch (error) {
     throw new Error(`Failed to delete permission: ${error}`);
   }

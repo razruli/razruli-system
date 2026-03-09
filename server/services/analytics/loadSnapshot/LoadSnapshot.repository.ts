@@ -38,6 +38,8 @@ export class LoadSnapshotRepository extends BaseRepository<LoadSnapshot> {
   }
 
   // ==================== SPECIFIC QUERIES ====================
+
+  async findByEmployee(employeeId: string): Promise<LoadSnapshot[]> {
     return this.prisma.loadSnapshot.findMany({
       where: { employeeId },
       orderBy: { periodStart: "desc" },

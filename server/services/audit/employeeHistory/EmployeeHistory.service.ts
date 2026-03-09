@@ -5,12 +5,12 @@
 // ============================================================================
 
 import { BaseService } from "@/server/services/base";
-import type { ServiceContext } from "@/server/types/context";
 import type {
   FilterInput,
   PaginationInput,
   PaginatedResult,
 } from "@/server/services/base/pagination";
+import type { ServiceContext } from "@/server/types/context";
 
 import { EmployeeHistoryRepository } from "./EmployeeHistory.repository";
 
@@ -79,8 +79,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "status",
       oldValue: null,
       newValue: "active",
-      changedBy: this.context.userId || "system",
-      changedAt: new Date(),
       reason: "Hire",
     });
 
@@ -100,8 +98,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "gradeId",
       oldValue: oldGradeId.toString(),
       newValue: newGradeId.toString(),
-      changedBy: this.context.userId || "system",
-      changedAt: new Date(),
       reason: `Grade change from ${oldGradeId} to ${newGradeId}`,
     });
 
@@ -123,8 +119,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "departmentId",
       oldValue: oldDepartmentId,
       newValue: newDepartmentId,
-      changedBy: this.context.userId || "system",
-      changedAt: new Date(),
       reason: `Transfer from department ${oldDepartmentId} to ${newDepartmentId}`,
     });
 
@@ -144,8 +138,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "status",
       oldValue: "active",
       newValue: "dismissed",
-      changedBy: this.context.userId || "system",
-      changedAt: dismissalDate,
       reason: reason || "Dismissal",
     });
 
@@ -159,7 +151,7 @@ export class EmployeeHistoryService extends BaseService {
     gradeId: number,
     fireDate: Date,
     reason: string,
-    changedBy: string,
+    _changedBy: string,
   ) {
     this.log("info", `Recording fire/dismissal for employee`, { employeeId });
 
@@ -168,8 +160,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "fireDate",
       oldValue: null,
       newValue: fireDate.toISOString(),
-      changedBy: changedBy || "system",
-      changedAt: fireDate,
       reason: reason || "Employee termination",
     });
 
@@ -181,7 +171,7 @@ export class EmployeeHistoryService extends BaseService {
     employeeId: string,
     oldValue: number,
     newValue: number,
-    changedBy: string,
+    _changedBy: string,
   ) {
     this.log("info", `Recording efficiency update for employee`, {
       employeeId,
@@ -192,8 +182,6 @@ export class EmployeeHistoryService extends BaseService {
       fieldName: "kEfficiency",
       oldValue: oldValue.toString(),
       newValue: newValue.toString(),
-      changedBy: changedBy || "system",
-      changedAt: new Date(),
       reason: `Efficiency coefficient updated from ${oldValue} to ${newValue}`,
     });
 
@@ -212,5 +200,51 @@ export class EmployeeHistoryService extends BaseService {
 
   async findByEmployee(employeeId: string) {
     return this.getEmployeeHistory(employeeId);
+  }
+
+  /**
+   * Record an employee history event
+   */
+  async record(input: any) {
+    return this.recordGradeChange(
+      input.employeeId,
+      input.oldGradeId || 0,
+      input.newGradeId || 0,
+    );
+  }
+
+  /**
+   * Approve a pending employee history change
+   */
+  async approve(id: string) {
+    const history = await this.repository.findById(id);
+    if (!history) {
+      throw new Error(`Employee history record not found: ${id}`);
+    }
+
+    const updated = await this.repository.update(id, {
+      approvedAt: new Date(),
+      approvedBy: this.context.userId || "system",
+    });
+    this.invalidateAll();
+    return updated;
+  }
+
+  /**
+   * Reject a pending employee history change
+   */
+  async reject(id: string, rejectionReason: string) {
+    const history = await this.repository.findById(id);
+    if (!history) {
+      throw new Error(`Employee history record not found: ${id}`);
+    }
+
+    const updated = await this.repository.update(id, {
+      rejectedAt: new Date(),
+      rejectedBy: this.context.userId || "system",
+      rejectionReason: rejectionReason || "",
+    });
+    this.invalidateAll();
+    return updated;
   }
 }

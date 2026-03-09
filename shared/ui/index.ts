@@ -2,5 +2,3 @@
 // Public API for UI segment
 // Re-export all public APIs from sub-segments
 export * from "./shadcn";
-export * from "./table";
-export * from "./form";

@@ -1,4 +1,5 @@
-import { AppSidebar, SidebarInset, SidebarProvider } from "@/shared/ui";
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
+import { SidebarInset, SidebarProvider } from "@/shared/ui";
 
 export default function DashboardLayout({
   children,
@@ -6,8 +7,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <SidebarProvider defaultOpen>
+      <DashboardSidebar />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
   );

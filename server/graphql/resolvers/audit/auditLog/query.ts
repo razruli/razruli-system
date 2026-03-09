@@ -121,18 +121,19 @@ const dataAccessAuditResolver: QueryResolvers["dataAccessAudit"] = async (
 const securityIncidentReportResolver: QueryResolvers["securityIncidentReport"] =
   async (_parent, { companyId, dateRange }, context) => {
     try {
-      const company = await context.services.company.getById(companyId);
+      const company = await context.services.company.getByIdOrThrow(companyId);
       return {
         company,
-        from: new Date(dateRange.from),
-        to: new Date(dateRange.to),
-        failedAuthAttempts: 0,
-        blockedAttempts: 0,
-        incidents: [],
+        period: {
+          from: new Date(dateRange.from),
+          to: new Date(dateRange.to),
+        } as any,
         generatedAt: new Date(),
-        period: dateRange,
-        suspiciousBehavior: 0,
         totalIncidents: 0,
+        incidents: [] as any,
+        blockedAttempts: 0,
+        failedAuthAttempts: 0,
+        suspiciousBehavior: 0,
       };
     } catch (error) {
       throw new Error(`Failed to fetch security incident report: ${error}`);
@@ -182,14 +183,38 @@ const entityAuditTrailResolver: QueryResolvers["entityAuditTrail"] = async (
         entityType,
         entityId,
       },
-      // orderBy: { createdAt: "desc" },
     });
+
+    // Group changes by user
+    const changesByUserMap = new Map<string, { count: number; data: any }>();
+    logs.forEach((log) => {
+      const userId = log.createdById;
+      if (!changesByUserMap.has(userId)) {
+        changesByUserMap.set(userId, {
+          count: 0,
+          data: { id: userId, name: "User", email: "" },
+        });
+      }
+      const entry = changesByUserMap.get(userId)!;
+      entry.count++;
+    });
+
+    const changesByUser = Array.from(changesByUserMap.values()).map(
+      (entry) => ({
+        user: entry.data as any,
+        changeCount: entry.count,
+        timestamp: new Date(),
+      }),
+    ) as any;
 
     return {
       entityType,
       entityId,
+      timeline: logs as any,
+      currentState: null,
+      previousState: null,
       totalChanges: logs.length,
-      changes: logs,
+      changesByUser,
     };
   } catch (error) {
     throw new Error(`Failed to fetch entity audit trail: ${error}`);

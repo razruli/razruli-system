@@ -26,21 +26,20 @@ const loadSnapshotCreateMiddleware = composeMiddleware(
  * Requires authentication - captures current load state
  */
 const createLoadSnapshotResolver: MutationResolvers["createLoadSnapshot"] =
-  async (_parent, { input }, context) => {
+  async (_parent, { employeeId, snapshotType, sourceId }, context) => {
     try {
       // Validate required fields
-      if (!input.employeeId) {
+      if (!employeeId) {
         throw new Error("Missing required field: employeeId");
       }
 
       // Create load snapshot with input data
       const loadSnapshot = await context.services.loadSnapshot.create({
-        employeeId: input.employeeId,
-        totalCapacityHours: input.totalCapacityHours,
-        allocatedHours: input.allocatedHours,
-        freeloadsHours: input.freeloadsHours,
-        loadIndex: input.loadIndex,
-        snapshotDate: input.snapshotDate,
+        employeeId,
+        snapshotType,
+        sourceId,
+        periodStart: new Date(),
+        periodEnd: new Date(),
       });
 
       // TODO: Implement event emitter

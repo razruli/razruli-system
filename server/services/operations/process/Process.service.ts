@@ -57,6 +57,53 @@ export class ProcessService extends BaseService {
     return this.getOrFetch(cacheKey, () => this.repository.findAll());
   }
 
+  async find(
+    filters?: {
+      companyId?: string;
+      status?: string;
+      search?: string;
+    },
+    pagination?: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    },
+  ): Promise<{
+    data: Process[];
+    total: number;
+    hasMore: boolean;
+  }> {
+    this.log("info", `Finding processes with filters`, { filters, pagination });
+
+    const offset = pagination?.offset || 0;
+    const limit = pagination?.limit || 20;
+
+    let data = await this.repository.findAll();
+
+    // Apply filters
+    if (filters?.companyId) {
+      data = data.filter((p) => p.companyId === filters.companyId);
+    }
+    if (filters?.status) {
+      data = data.filter((p) => p.status === filters.status);
+    }
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      data = data.filter((p) => p.title.toLowerCase().includes(searchLower));
+    }
+
+    const total = data.length;
+    const paginatedData = data.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return {
+      data: paginatedData,
+      total,
+      hasMore,
+    };
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: {

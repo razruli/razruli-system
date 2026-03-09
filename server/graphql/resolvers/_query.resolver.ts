@@ -26,7 +26,6 @@ import { userResolvers } from "./user";
 export const queryResolver: QueryResolvers = {
   // Health check
   health: () => "OK",
-
   // Auth & User domain queries
   ...userResolvers.Query,
 

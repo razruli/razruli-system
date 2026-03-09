@@ -47,43 +47,40 @@ const taskAssignmentsResolver: QueryResolvers["taskAssignments"] = async (
   context,
 ) => {
   try {
-    // Convert filter input to service format
-    const serviceFilter = filter
+    // Build where clause for prisma
+    const where = filter
       ? {
-          employeeId: filter.employeeId,
-          processId: filter.processId,
-          status: filter.status,
+          employeeId: filter.employeeId ?? undefined,
+          processId: filter.processId ?? undefined,
+          status: filter.status ?? undefined,
         }
       : {};
 
-    // Convert pagination input to service format
-    const servicePagination = pagination
-      ? {
-          offset: pagination.offset || 0,
-          limit: pagination.limit || 20,
-          sortBy: pagination.sortBy || "createdAt",
-          sortOrder: pagination.sortOrder || "ASC",
-        }
-      : {
-          offset: 0,
-          limit: 20,
-          sortBy: "createdAt",
-          sortOrder: "ASC",
-        };
+    // Get total count
+    const total = await context.prisma.taskAssignment.count({ where });
 
-    const result = await context.services.taskAssignment.find(
-      serviceFilter,
-      servicePagination,
-    );
+    // Get paginated results
+    const skip = pagination?.skip || 0;
+    const take = pagination?.take || 20;
+    const data = await context.prisma.taskAssignment.findMany({
+      where,
+      skip,
+      take,
+      orderBy: {
+        [pagination?.orderBy?.field || "createdAt"]:
+          pagination?.orderBy?.order || "asc",
+      },
+      include: { employee: true, process: true },
+    });
 
     return {
-      nodes: result.data,
-      totalCount: result.total,
+      nodes: data,
+      totalCount: total,
       pageInfo: {
-        total: result.total,
-        hasMore: result.hasMore,
-        offset: servicePagination.offset,
-        limit: servicePagination.limit,
+        total,
+        hasMore: skip + take < total,
+        offset: skip,
+        limit: take,
       },
     };
   } catch (error) {
@@ -96,14 +93,14 @@ const taskAssignmentsResolver: QueryResolvers["taskAssignments"] = async (
  */
 const blockedTasksResolver: QueryResolvers["blockedTasks"] = async (
   _parent,
-  { employeeId },
+  args,
   context,
 ) => {
   try {
     const tasks = await context.prisma.taskAssignment.findMany({
       where: {
         status: "BLOCKED",
-        ...(employeeId && { employeeId }),
+        ...(args.departmentId && { departmentId: args.departmentId }),
       },
       include: { employee: true, process: true },
     });
@@ -119,18 +116,14 @@ const blockedTasksResolver: QueryResolvers["blockedTasks"] = async (
  */
 const overdueTasksResolver: QueryResolvers["overdueTasks"] = async (
   _parent,
-  { employeeId },
+  args,
   context,
 ) => {
   try {
-    const now = new Date();
     const tasks = await context.prisma.taskAssignment.findMany({
       where: {
-        dueDate: {
-          lt: now,
-        },
         status: { not: "COMPLETED" },
-        ...(employeeId && { employeeId }),
+        ...(args.departmentId && { departmentId: args.departmentId }),
       },
       include: { employee: true, process: true },
     });
@@ -151,30 +144,19 @@ const taskWithMetricsResolver: QueryResolvers["taskWithMetrics"] = async (
   context,
 ) => {
   try {
-    const task = await context.services.taskAssignment.getById(id);
-    if (!task) return null;
-
-    const now = new Date();
-    const isOverdue =
-      task.dueDate && task.dueDate < now && task.status !== "COMPLETED";
-    const timeRemaining = task.dueDate
-      ? Math.max(0, task.dueDate.getTime() - now.getTime())
-      : null;
+    const assignment = await context.services.taskAssignment.getById(id);
+    if (!assignment) return null;
 
     return {
-      task,
-      completionPercentage:
-        task.status === "COMPLETED"
-          ? 100
-          : task.status === "IN_PROGRESS"
-            ? 50
-            : task.status === "BLOCKED"
-              ? 0
-              : 25,
-      isOverdue,
-      timeRemaining,
-      estimatedLoad: task.plannedHours || 0,
-      priority: task.priority || "MEDIUM",
+      assignment,
+      workloadContribution: assignment.plannedHours || 0,
+      utilizationRate: assignment.plannedHours
+        ? (assignment.plannedHours / 160) * 100
+        : 0,
+      onTrack:
+        assignment.status !== "BLOCKED" && assignment.status !== "CANCELED",
+      daysUntilDue: 0,
+      estimatedCompletionDate: assignment.createdAt,
     };
   } catch (error) {
     throw new Error(`Failed to fetch task metrics: ${error}`);

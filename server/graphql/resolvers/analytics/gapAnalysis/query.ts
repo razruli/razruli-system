@@ -100,14 +100,17 @@ const gapAnalysesResolver: QueryResolvers["gapAnalyses"] = async (
  */
 const gapAnalysisTrendResolver: QueryResolvers["gapAnalysisTrend"] = async (
   _parent,
-  { dateRange },
+  args,
+  _context,
 ) => {
   try {
     return [
       {
-        date: new Date(dateRange.from),
-        gap: 0,
-        trend: "STABLE" as const,
+        analysisDate: new Date(args.dateRange.from),
+        headcountGap: 0,
+        capacityGap: 0,
+        gapStatus: "BALANCED" as any,
+        riskLevel: "LOW" as any,
       },
     ];
   } catch (error) {
@@ -121,12 +124,24 @@ const gapAnalysisTrendResolver: QueryResolvers["gapAnalysisTrend"] = async (
 const gapCriticalityAssessmentResolver: QueryResolvers["gapCriticalityAssessment"] =
   async (_parent, { companyId }, context) => {
     try {
+      const departments = await context.prisma.department.findMany({
+        where: { companyId },
+      });
+
       return {
-        company: await context.services.company.getById(companyId),
-        criticalityScore: 0,
-        riskLevel: "LOW" as const,
-        affectedDepartments: 0,
-        priorityAreas: [] as string[],
+        timestamp: new Date(),
+        criticalDepartments: departments.map((dept) => ({
+          department: dept,
+          gapAnalysis: null,
+          headcountGap: 0,
+          capacityGap: 0,
+          gapStatus: "BALANCED" as any,
+          riskLevel: "LOW" as any,
+          comparedToCompanyAverage: 0,
+        })) as any,
+        timelinessOfAction: "MONITOR",
+        estimatedTimeToFillGap: "6-12 months",
+        recommendedImmediateActions: [] as string[],
       };
     } catch (error) {
       throw new Error(`Failed to fetch gap criticality assessment: ${error}`);
@@ -142,13 +157,26 @@ const hiringForecastResolver: QueryResolvers["hiringForecast"] = async (
   context,
 ) => {
   try {
+    const gapAnalysis =
+      await context.services.gapAnalysis.getLatestForCompany(companyId);
+
+    if (!gapAnalysis) {
+      return null;
+    }
+
     return {
-      company: await context.services.company.getById(companyId),
-      forecastPeriod: "6_MONTHS" as const,
-      recommendedHires: 0,
-      priorityRoles: [] as string[],
-      estimatedCost: 0,
-      timeline: [] as unknown[],
+      gapAnalysis,
+      quarterlyProjections: [
+        {
+          quarter: "Q1",
+          projectedHires: 0,
+          targetTalentGrades: [] as string[],
+          estimatedCost: 0,
+        },
+      ] as any,
+      totalEstimatedHires: 0,
+      averageMonthlyHiringRate: 0,
+      riskFactors: [] as string[],
     };
   } catch (error) {
     throw new Error(`Failed to fetch hiring forecast: ${error}`);

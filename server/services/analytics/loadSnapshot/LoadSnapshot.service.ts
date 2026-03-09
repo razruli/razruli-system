@@ -5,12 +5,12 @@
 // ============================================================================
 
 import { BaseService } from "@/server/services/base";
-import type { ServiceContext } from "@/server/types/context";
 import type {
   FilterInput,
   PaginationInput,
   PaginatedResult,
 } from "@/server/services/base/pagination";
+import type { ServiceContext } from "@/server/types/context";
 
 import { LoadSnapshotRepository } from "./LoadSnapshot.repository";
 
@@ -52,6 +52,8 @@ export class LoadSnapshotService extends BaseService {
   }
 
   // ==================== SPECIFIC QUERIES ====================
+
+  async findByEmployee(employeeId: string) {
     const cacheKey = this.listCacheKey({ employeeId });
     return this.getOrFetch(cacheKey, () =>
       this.repository.findByEmployee(employeeId),

@@ -51,6 +51,55 @@ export class DepartmentService extends BaseService {
   }
 
   /**
+   * Find departments with filtering and pagination
+   */
+  async find(
+    filters?: {
+      companyId?: string;
+      search?: string;
+    },
+    pagination?: {
+      offset?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: "ASC" | "DESC";
+    },
+  ): Promise<{
+    data: Department[];
+    total: number;
+    hasMore: boolean;
+  }> {
+    this.log("info", `Finding departments with filters`, {
+      filters,
+      pagination,
+    });
+
+    const offset = pagination?.offset || 0;
+    const limit = pagination?.limit || 20;
+
+    let data = await this.repository.findAll();
+
+    // Apply filters
+    if (filters?.companyId) {
+      data = data.filter((d) => d.companyId === filters.companyId);
+    }
+    if (filters?.search) {
+      const searchLower = filters.search.toLowerCase();
+      data = data.filter((d) => d.name.toLowerCase().includes(searchLower));
+    }
+
+    const total = data.length;
+    const paginatedData = data.slice(offset, offset + limit);
+    const hasMore = offset + limit < total;
+
+    return {
+      data: paginatedData,
+      total,
+      hasMore,
+    };
+  }
+
+  /**
    * Get departments by company
    */
   async getByCompanyId(companyId: string): Promise<Department[]> {

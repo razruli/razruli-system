@@ -1,49 +1,75 @@
-// filepath: /home/dictator/Desktop/gruzin/gruzin/app/[locale]/dashboard/page.tsx
+"use client";
+
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  Separator,
-  SidebarTrigger,
-} from "@/shared/ui";
+  WorkloadChart,
+  HiringTrendChart,
+  ProcessDistributionChart,
+  SkillGapChart,
+} from "@/components/dashboard/charts";
+import { EmployeeTable } from "@/components/dashboard/eployee-table";
+import { HiringRequestForm } from "@/components/dashboard/hiring-form";
+import { DashboardHeader } from "@/components/dashboard/sidebar";
+import {
+  StatsCards,
+  DepartmentWorkloadCards,
+} from "@/components/dashboard/stats";
+import { ScrollArea } from "@/shared/ui/shadcn/scroll-area";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/ui/shadcn/tabs";
 
 export default function DashboardPage() {
   return (
     <>
-      <p>Gago</p>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="#">
-                  Building Your Application
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+      <DashboardHeader />
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col gap-6 p-6">
+          {/* KPI cards */}
+          <StatsCards />
+
+          {/* Main tabbed area */}
+          <Tabs defaultValue="overview" className="flex flex-col gap-4">
+            <TabsList className="w-fit">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="employees">Employees</TabsTrigger>
+              <TabsTrigger value="hiring">Hiring</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="flex flex-col gap-6 mt-0">
+              {/* Charts row 1 */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <WorkloadChart />
+                <div className="grid gap-6">
+                  <ProcessDistributionChart />
+                </div>
+              </div>
+
+              {/* Charts row 2 */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                <HiringTrendChart />
+                <div className="grid gap-6">
+                  <SkillGapChart />
+                </div>
+              </div>
+
+              {/* Department workload */}
+              <DepartmentWorkloadCards />
+            </TabsContent>
+
+            <TabsContent value="employees" className="mt-0">
+              <EmployeeTable />
+            </TabsContent>
+
+            <TabsContent value="hiring" className="mt-0">
+              <HiringRequestForm />
+            </TabsContent>
+          </Tabs>
         </div>
-      </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-        </div>
-        <div className="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min" />
-      </div>
+      </ScrollArea>
+      {/* <Toaster /> */}
     </>
   );
 }

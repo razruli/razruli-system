@@ -257,6 +257,7 @@ enum ActorStatus {
 enum RoleScope {
   SYSTEM  // Global system role
   COMPANY // Company-specific role
+  GUEST // Guest role (limited access)
 }
 
 enum PermissionScope {

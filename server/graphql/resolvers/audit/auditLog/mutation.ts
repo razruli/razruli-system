@@ -82,7 +82,9 @@ const exportAuditLogsResolver: MutationResolvers["exportAuditLogs"] = async (
   context,
 ) => {
   try {
-    return await context.services.auditLog.export(filter, format);
+    const result = await context.services.auditLog.export(filter, format);
+    // Return exported data as JSON string
+    return result.data;
   } catch (error) {
     throw new Error(`Failed to export audit logs: ${error}`);
   }

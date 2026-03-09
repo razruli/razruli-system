@@ -18,8 +18,7 @@ const roleResolver: QueryResolvers["role"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement role service
-    throw new Error("Role queries not yet implemented");
+    return await context.services.role.getById(id);
   } catch (error) {
     throw new Error(`Failed to fetch role: ${error}`);
   }
@@ -34,14 +33,19 @@ const rolesResolver: QueryResolvers["roles"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement role service
+    const { data, total } = await context.services.role.find(filter || {}, {
+      offset: pagination?.skip || 0,
+      limit: pagination?.take || 20,
+      sortBy: pagination?.sortBy || "name",
+      sortOrder: pagination?.sortOrder || "asc",
+    });
     return {
-      nodes: [],
-      totalCount: 0,
+      nodes: data,
+      totalCount: total,
       pageInfo: {
-        total: 0,
-        hasMore: false,
-        offset: 0,
+        total,
+        hasMore: total > (pagination?.skip || 0) + (pagination?.take || 20),
+        offset: pagination?.skip || 0,
         limit: pagination?.take || 20,
       },
     };

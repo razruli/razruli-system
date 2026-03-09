@@ -46,11 +46,11 @@ const myCompanyResolver: QueryResolvers["myCompany"] = async (
   context,
 ) => {
   try {
-    const user = context.client;
-    if (!user) {
+    const actor = context.actor;
+    if (!actor) {
       throw new Error("User not authenticated");
     }
-    return await context.services.company.getById(client.companyId);
+    return await context.services.company.getById(actor.companyId);
   } catch (error) {
     throw new Error(`Failed to fetch user company: ${error}`);
   }

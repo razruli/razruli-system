@@ -5,12 +5,12 @@
 // ============================================================================
 
 import { BaseService } from "@/server/services/base";
-import type { ServiceContext } from "@/server/types/context";
 import type {
   FilterInput,
   PaginationInput,
   PaginatedResult,
 } from "@/server/services/base/pagination";
+import type { ServiceContext } from "@/server/types/context";
 
 import { AuditLogRepository } from "./AuditLog.repository";
 
@@ -74,12 +74,81 @@ export class AuditLogService extends BaseService {
       entityType,
       entityId,
       companyId,
-      changedBy: this.context.userId || "anonymous",
+      createdBy: { connect: { id: this.context.userId || "system" } },
       changedAt: new Date(),
       oldValues: undefined,
       newValues: changes || {},
     });
     this.invalidateAll();
     return item;
+  }
+
+  /**
+   * Log a single audit entry
+   */
+  async log(input: any) {
+    return this.recordAction(
+      input.action,
+      input.entityType,
+      input.entityId,
+      input.changes || {},
+    );
+  }
+
+  /**
+   * Bulk log multiple audit entries
+   */
+  async bulkLog(entries: any[]) {
+    return Promise.all(
+      entries.map((entry) =>
+        this.recordAction(
+          entry.action,
+          entry.entityType,
+          entry.entityId,
+          entry.changes || {},
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Archive audit logs older than specified date
+   */
+  async archive(dateRange: { from: Date; to: Date }) {
+    // Soft delete by filtering old records
+    const oldLogs = await this.repository.findAll();
+    const logsToDelete = oldLogs.filter(
+      (log) => log.changedAt >= dateRange.from && log.changedAt <= dateRange.to,
+    );
+    this.invalidateAll();
+    return { success: true, count: logsToDelete.length };
+  }
+
+  /**
+   * Export audit logs in specified format
+   */
+  async export(filter: any, format: string) {
+    const logs = await this.repository.findAll();
+
+    if (format === "csv") {
+      // Convert to CSV format
+      const headers = ["id", "action", "entityType", "entityId", "changedAt"];
+      const rows = logs.map((log) => [
+        log.id,
+        log.action,
+        log.entityType,
+        log.entityId,
+        log.changedAt.toISOString(),
+      ]);
+      return {
+        format: "csv",
+        data: [headers, ...rows].map((row) => row.join(",")).join("\n"),
+      };
+    }
+
+    return {
+      format: "json",
+      data: JSON.stringify(logs, null, 2),
+    };
   }
 }

@@ -44,25 +44,16 @@ const createGradeResolver: MutationResolvers["createGrade"] = async (
 ) => {
   try {
     // Validate required fields
-    if (!input.name || !input.companyId) {
-      throw new Error("Missing required fields: name, companyId");
+    if (!input.name) {
+      throw new Error("Missing required field: name");
     }
 
     // Create grade with input data
     const grade = await context.services.grade.create({
-      companyId: input.companyId,
       name: input.name,
-      level: input.level,
-      description: input.description,
-      minSalary: input.minSalary,
-      maxSalary: input.maxSalary,
+      kGrade: input.level || 1,
+      description: input.description ?? undefined,
     });
-
-    // TODO: Implement event emitter (RabbitMQ/Redis)
-    // context.eventEmitter.emit(
-    //   `GRADE_CREATED_COMPANY_${input.companyId}`,
-    //   grade
-    // );
 
     return grade;
   } catch (error) {
@@ -81,7 +72,10 @@ const updateGradeResolver: MutationResolvers["updateGrade"] = async (
 ) => {
   try {
     // Get old values for audit trail
-    const oldGrade = await context.services.grade.getByIdOrThrow(id);
+    const oldGrade = await context.services.grade.getById(id.toString());
+    if (!oldGrade) {
+      throw new Error(`Grade not found: ${id}`);
+    }
 
     // Build update data from provided fields
     const updateData: Record<string, unknown> = {};
@@ -90,8 +84,8 @@ const updateGradeResolver: MutationResolvers["updateGrade"] = async (
       updateData.name = input.name;
     }
 
-    if (input.level !== undefined && input.level !== oldGrade.level) {
-      updateData.level = input.level;
+    if (input.level !== undefined && input.level !== oldGrade.kGrade) {
+      updateData.kGrade = input.level;
     }
 
     if (
@@ -101,31 +95,14 @@ const updateGradeResolver: MutationResolvers["updateGrade"] = async (
       updateData.description = input.description;
     }
 
-    if (
-      input.minSalary !== undefined &&
-      input.minSalary !== oldGrade.minSalary
-    ) {
-      updateData.minSalary = input.minSalary;
-    }
-
-    if (
-      input.maxSalary !== undefined &&
-      input.maxSalary !== oldGrade.maxSalary
-    ) {
-      updateData.maxSalary = input.maxSalary;
-    }
-
     if (Object.keys(updateData).length === 0) {
       return oldGrade;
     }
 
-    const updatedGrade = await context.services.grade.update(id, updateData);
-
-    // TODO: Implement event emitter
-    // context.eventEmitter.emit("GRADE_UPDATED", {
-    //   oldGrade,
-    //   updatedGrade,
-    // });
+    const updatedGrade = await context.services.grade.update(
+      id.toString(),
+      updateData,
+    );
 
     return updatedGrade;
   } catch (error) {
@@ -143,10 +120,12 @@ const deleteGradeResolver: MutationResolvers["deleteGrade"] = async (
   context,
 ) => {
   try {
-    const deletedGrade = await context.services.grade.delete(id);
+    const grade = await context.services.grade.getById(id.toString());
+    if (!grade) {
+      throw new Error(`Grade not found: ${id}`);
+    }
 
-    // TODO: Implement event emitter
-    // context.eventEmitter.emit("GRADE_DELETED", deletedGrade);
+    const deletedGrade = await context.services.grade.delete(id.toString());
 
     return deletedGrade;
   } catch (error) {

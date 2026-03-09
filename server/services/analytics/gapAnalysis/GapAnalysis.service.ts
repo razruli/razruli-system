@@ -81,6 +81,15 @@ export class GapAnalysisService extends BaseService {
     return item;
   }
 
+  /**
+   * Update an existing gap analysis
+   */
+  async update(id: string, data: any) {
+    const item = await this.repository.update(id, data);
+    this.invalidateAll();
+    return item;
+  }
+
   async analyzeDepartmentCapacityCoverage(departmentId: string) {
     this.log("info", `Analyzing capacity coverage for department`, {
       departmentId,

@@ -7,7 +7,7 @@
  */
 
 import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
-import { QueryResolvers } from "@/server/graphql/types/generated";
+import { QueryResolvers, SortOrder } from "@/server/graphql/types/generated";
 
 // ==================== MIDDLEWARE CONFIGURATIONS ====================
 // Reusable middleware for process queries
@@ -50,11 +50,11 @@ const processesResolver: QueryResolvers["processes"] = async (
     // Convert filter input to service format
     const serviceFilter = filter
       ? {
-          companyId: filter.companyId,
-          status: filter.status,
-          search: filter.search,
+          companyId: filter.companyId ?? undefined,
+          status: filter.status ?? undefined,
+          search: filter.search ?? undefined,
         }
-      : {};
+      : undefined;
 
     // Convert pagination input to service format
     const servicePagination = pagination
@@ -62,13 +62,13 @@ const processesResolver: QueryResolvers["processes"] = async (
           offset: pagination.skip || 0,
           limit: pagination.take || 20,
           sortBy: pagination.orderBy?.field || "createdAt",
-          sortOrder: pagination.orderBy?.order || "ASC",
+          sortOrder: pagination.orderBy?.order || ("ASC" as SortOrder),
         }
       : {
           offset: 0,
           limit: 20,
           sortBy: "createdAt",
-          sortOrder: "ASC",
+          sortOrder: "ASC" as SortOrder,
         };
 
     const result = await context.services.process.find(
@@ -124,19 +124,20 @@ const processWithMetricsResolver: QueryResolvers["processWithMetrics"] = async (
       (sum, task) => sum + (task.plannedHours || 0),
       0,
     );
+    const completedCount = tasks.filter((t) => t.status === "COMPLETED").length;
 
     return {
       process,
-      totalTasks: tasks.length,
-      completedTasks: tasks.filter((t) => t.status === "COMPLETED").length,
-      totalPlannedHours: totalLoad,
-      avgTaskLoad: tasks.length > 0 ? totalLoad / tasks.length : 0,
+      taskCount: tasks.length,
+      activeTaskCount: tasks.filter((t) => t.status !== "COMPLETED").length,
+      totalCapacityRequired: Math.round(totalLoad),
+      averageResourcesAllocated: Math.round(
+        tasks.length > 0 ? totalLoad / tasks.length : 0,
+      ),
       completionRate:
-        tasks.length > 0
-          ? (tasks.filter((t) => t.status === "COMPLETED").length /
-              tasks.length) *
-            100
-          : 0,
+        tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0,
+      utilizationRate:
+        tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0,
     };
   } catch (error) {
     throw new Error(`Failed to fetch process metrics: ${error}`);
@@ -149,9 +150,7 @@ const processWithMetricsResolver: QueryResolvers["processWithMetrics"] = async (
 const companyProcessMetricsResolver: QueryResolvers["companyProcessMetrics"] =
   async (_parent, { companyId }, context) => {
     try {
-      const processes = await context.prisma.process.findMany({
-        where: { companyId },
-      });
+      const processes = await context.services.process.findByCompany(companyId);
 
       const metrics = await Promise.all(
         processes.map(async (process) => {
@@ -162,20 +161,23 @@ const companyProcessMetricsResolver: QueryResolvers["companyProcessMetrics"] =
             (sum, task) => sum + (task.plannedHours || 0),
             0,
           );
+          const completedCount = tasks.filter(
+            (t) => t.status === "COMPLETED",
+          ).length;
 
           return {
             process,
-            totalTasks: tasks.length,
-            completedTasks: tasks.filter((t) => t.status === "COMPLETED")
+            taskCount: tasks.length,
+            activeTaskCount: tasks.filter((t) => t.status !== "COMPLETED")
               .length,
-            totalPlannedHours: totalLoad,
-            avgTaskLoad: tasks.length > 0 ? totalLoad / tasks.length : 0,
+            totalCapacityRequired: Math.round(totalLoad),
+            averageResourcesAllocated: Math.round(
+              tasks.length > 0 ? totalLoad / tasks.length : 0,
+            ),
             completionRate:
-              tasks.length > 0
-                ? (tasks.filter((t) => t.status === "COMPLETED").length /
-                    tasks.length) *
-                  100
-                : 0,
+              tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0,
+            utilizationRate:
+              tasks.length > 0 ? (completedCount / tasks.length) * 100 : 0,
           };
         }),
       );

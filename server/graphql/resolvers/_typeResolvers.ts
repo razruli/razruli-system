@@ -5,8 +5,8 @@ import { analyticsResolvers } from "./analytics";
 import { auditResolvers } from "./audit";
 import { coreResolvers } from "./core";
 import { operationsResolvers } from "./operations";
+import { pageFieldResolvers } from "./page";
 import { userResolvers } from "./user";
-import * as PageFields from "./page/fields";
 
 export const typeResolvers = {
   // ========== SCALAR RESOLVERS ==========
@@ -50,7 +50,7 @@ export const typeResolvers = {
   Role: userResolvers.Role,
 
   // ========== CUSTOM TYPE FIELD RESOLVERS ==========
-  PageInfo: PageFields.pageInfoResolver,
+  PageInfo: pageFieldResolvers.pageInfoResolver,
 };
 
 export default typeResolvers;

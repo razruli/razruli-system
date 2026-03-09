@@ -50,6 +50,83 @@ extend type Query {
   gradeWithStats(id: Int!): GradeStats
 }
 
+extend type Mutation {
+  """
+  Create a new grade (requires grade:create permission)
+  """
+  createGrade(input: CreateGradeInput!): Grade!
+
+  """
+  Update an existing grade (requires grade:update permission)
+  """
+  updateGrade(id: Int!, input: UpdateGradeInput!): Grade!
+
+  """
+  Delete a grade (requires grade:delete permission)
+  """
+  deleteGrade(id: Int!): Grade!
+}
+
+"""
+Grade input for creation
+"""
+input CreateGradeInput {
+  """
+  Human readable name
+  """
+  name: String!
+
+  """
+  Grade level/seniority
+  """
+  level: Int
+
+  """
+  Description
+  """
+  description: String
+
+  """
+  Minimum salary for this grade
+  """
+  minSalary: Float
+
+  """
+  Maximum salary for this grade
+  """
+  maxSalary: Float
+}
+
+"""
+Grade input for updates
+"""
+input UpdateGradeInput {
+  """
+  Human readable name
+  """
+  name: String
+
+  """
+  Grade level/seniority
+  """
+  level: Int
+
+  """
+  Description
+  """
+  description: String
+
+  """
+  Minimum salary for this grade
+  """
+  minSalary: Float
+
+  """
+  Maximum salary for this grade
+  """
+  maxSalary: Float
+}
+
 """
 Grade with statistics
 """

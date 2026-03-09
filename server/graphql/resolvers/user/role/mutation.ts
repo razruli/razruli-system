@@ -18,8 +18,7 @@ const createRoleResolver: MutationResolvers["createRole"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement role service
-    throw new Error("Create role not yet implemented");
+    return await context.services.role.create(input);
   } catch (error) {
     throw new Error(`Failed to create role: ${error}`);
   }
@@ -34,8 +33,7 @@ const updateRoleResolver: MutationResolvers["updateRole"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement role service
-    throw new Error("Update role not yet implemented");
+    return await context.services.role.update(id, input);
   } catch (error) {
     throw new Error(`Failed to update role: ${error}`);
   }
@@ -50,8 +48,8 @@ const deleteRoleResolver: MutationResolvers["deleteRole"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement role service
-    throw new Error("Delete role not yet implemented");
+    await context.services.role.delete(id);
+    return true;
   } catch (error) {
     throw new Error(`Failed to delete role: ${error}`);
   }
@@ -63,8 +61,7 @@ const deleteRoleResolver: MutationResolvers["deleteRole"] = async (
 const assignRolePermissionResolver: MutationResolvers["assignRolePermission"] =
   async (_parent, { roleId, permissionId }, context) => {
     try {
-      // TODO: Implement role service
-      throw new Error("Assign permission not yet implemented");
+      return await context.services.role.addPermission(roleId, permissionId);
     } catch (error) {
       throw new Error(`Failed to assign permission: ${error}`);
     }
@@ -76,8 +73,8 @@ const assignRolePermissionResolver: MutationResolvers["assignRolePermission"] =
 const removeRolePermissionResolver: MutationResolvers["removeRolePermission"] =
   async (_parent, { roleId, permissionId }, context) => {
     try {
-      // TODO: Implement role service
-      throw new Error("Remove permission not yet implemented");
+      await context.services.role.removePermission(roleId, permissionId);
+      return true;
     } catch (error) {
       throw new Error(`Failed to remove permission: ${error}`);
     }

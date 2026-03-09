@@ -49,7 +49,7 @@ const createEmployeeResolver: MutationResolvers["createEmployee"] = async (
     }
 
     // Use company from auth context if not provided
-    const companyId = input.companyId || context.client?.companyId;
+    const companyId = input.companyId || context.actor?.companyId;
     if (!companyId) {
       throw new Error("Company ID is required");
     }

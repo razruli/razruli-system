@@ -13,13 +13,11 @@ import { RoleResolvers } from "@/server/graphql/types/generated";
  * Resolve Role.permissions field
  */
 const permissionsResolver: RoleResolvers["permissions"] = async (
-  parent,
+  _parent,
   _args,
-  context,
 ) => {
   try {
-    // TODO: Implement role service
-    throw new Error("Permission resolvers not yet implemented");
+    return (await _parent.permissions) || [];
   } catch (error) {
     throw new Error(`Failed to resolve permissions: ${error}`);
   }

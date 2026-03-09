@@ -6,18 +6,18 @@
  * Handles: Query, Mutation, Subscription and field resolvers
  */
 
-import { usersResultFieldResolvers } from "./fields";
-import { userQueryResolvers } from "./query";
 import { actorResolvers } from "./actor";
-import { roleResolvers } from "./role";
+import { usersResultFieldResolvers } from "./fields";
 import { permissionResolvers } from "./permission";
+import { userQueries } from "./query";
+import { roleResolvers } from "./role";
 
 /**
  * Complete resolver set for User domain
  */
 export const userResolvers = {
   Query: {
-    ...userQueryResolvers,
+    ...userQueries,
     ...actorResolvers.Query,
     ...roleResolvers.Query,
     ...permissionResolvers.Query,
@@ -39,7 +39,7 @@ export const userResolvers = {
   Role: roleResolvers.Role,
 };
 
-export { userQueryResolvers } from "./query";
+export { userQueries } from "./query";
 export { usersResultFieldResolvers } from "./fields";
 export { actorResolvers } from "./actor";
 export { roleResolvers } from "./role";
