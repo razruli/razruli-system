@@ -17,12 +17,16 @@ import { analyticsResolvers } from "./analytics";
 import { auditResolvers } from "./audit";
 import { coreResolvers } from "./core";
 import { operationsResolvers } from "./operations";
+import { userResolvers } from "./user";
 
 /**
  * Unified Mutation resolver
  * Combines all domain-specific mutation resolvers
  */
 export const mutationResolver: MutationResolvers = {
+  // Auth & User domain mutations
+  ...userResolvers.Mutation,
+
   // Core domain mutations
   ...coreResolvers.Mutation,
 

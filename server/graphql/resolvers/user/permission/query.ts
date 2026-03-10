@@ -39,7 +39,7 @@ const permissionsResolver: QueryResolvers["permissions"] = async (
         offset: pagination?.skip || 0,
         limit: pagination?.take || 20,
         sortBy: pagination?.sortBy || "name",
-        sortOrder: pagination?.sortOrder || "asc",
+        sortOrder: pagination?.sortOrder as "asc" | "desc" | undefined,
       },
     );
     return {
@@ -57,9 +57,26 @@ const permissionsResolver: QueryResolvers["permissions"] = async (
   }
 };
 
+/**
+ * Get all system permissions
+ */
+const systemPermissionsResolver: QueryResolvers["systemPermissions"] = async (
+  _parent,
+  _args,
+  context,
+) => {
+  try {
+    // Get all system-wide permissions
+    return await context.services.permission.getByScope("SYSTEM");
+  } catch (error) {
+    throw new Error(`Failed to fetch system permissions: ${error}`);
+  }
+};
+
 export const permissionQueries = {
   permission: permissionResolver,
   permissions: permissionsResolver,
+  systemPermissions: systemPermissionsResolver,
 };
 
 export default permissionQueries;

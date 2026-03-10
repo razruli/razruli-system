@@ -167,16 +167,73 @@ export function createLoaders(prisma: PrismaClient): DataLoaderRegistry {
     /**
      * Batch load load snapshots by employee ID
      */
-    snapshotsByEmployee: new DataLoader<string, any>(
-      async (employeeIds) => {
-        return Promise.all(
-          employeeIds.map((empId) =>
-            prisma.loadSnapshot
-              .findMany({ where: { employeeId: empId } })
-              .catch(() => []),
-          ),
-        );
-      },
-    ),
+    snapshotsByEmployee: new DataLoader<string, any>(async (employeeIds) => {
+      return Promise.all(
+        employeeIds.map((empId) =>
+          prisma.loadSnapshot
+            .findMany({ where: { employeeId: empId } })
+            .catch(() => []),
+        ),
+      );
+    }),
+
+    /**
+     * Batch load actors by ID
+     */
+    actor: new DataLoader<string, any>(async (actorIds) => {
+      return Promise.all(
+        actorIds.map((id) =>
+          prisma.actor.findUnique({ where: { id } }).catch(() => null),
+        ),
+      );
+    }),
+
+    /**
+     * Batch load roles by ID
+     */
+    role: new DataLoader<string, any>(async (roleIds) => {
+      return Promise.all(
+        roleIds.map((id) =>
+          prisma.role.findUnique({ where: { id } }).catch(() => null),
+        ),
+      );
+    }),
+
+    /**
+     * Batch load permissions by ID
+     */
+    permission: new DataLoader<string, any>(async (permIds) => {
+      return Promise.all(
+        permIds.map((id) =>
+          prisma.permission.findUnique({ where: { id } }).catch(() => null),
+        ),
+      );
+    }),
+
+    /**
+     * Batch load actors by company ID
+     */
+    actorsByCompany: new DataLoader<string, any>(async (companyIds) => {
+      return Promise.all(
+        companyIds.map((compId) =>
+          prisma.actor
+            .findMany({ where: { companyId: compId } })
+            .catch(() => []),
+        ),
+      );
+    }),
+
+    /**
+     * Batch load actors by department ID
+     */
+    actorsByDepartment: new DataLoader<string, any>(async (departmentIds) => {
+      return Promise.all(
+        departmentIds.map((deptId) =>
+          prisma.actor
+            .findMany({ where: { departmentId: deptId } })
+            .catch(() => []),
+        ),
+      );
+    }),
   };
 }

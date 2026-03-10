@@ -5,7 +5,14 @@
  * Exports all audit log resolvers (query, mutation, fields, subscription)
  */
 
-import auditLogFieldResolvers from "./fields";
+import {
+  auditLogAllFieldResolvers,
+  changeByUserFieldResolvers,
+  userActivitySummaryFieldResolvers,
+  entityAuditTrailFieldResolvers,
+  complianceReportFieldResolvers,
+  securityIncidentReportFieldResolvers,
+} from "./fields";
 import auditLogMutations from "./mutation";
 import auditLogQueries from "./query";
 import auditLogSubscriptions from "./subscription";
@@ -26,14 +33,23 @@ export const auditLogResolvers = {
     ...auditLogSubscriptions,
   },
 
-  AuditLog: auditLogFieldResolvers,
+  EntityAuditTrail: entityAuditTrailFieldResolvers,
+  ChangeByUser: changeByUserFieldResolvers,
+  UserActivitySummary: userActivitySummaryFieldResolvers,
+  ComplianceReport: complianceReportFieldResolvers,
+  SecurityIncidentReport: securityIncidentReportFieldResolvers,
 };
 
 export {
   auditLogQueries,
   auditLogMutations,
   auditLogSubscriptions,
-  auditLogFieldResolvers,
+  auditLogAllFieldResolvers,
+  changeByUserFieldResolvers,
+  userActivitySummaryFieldResolvers,
+  entityAuditTrailFieldResolvers,
+  complianceReportFieldResolvers,
+  securityIncidentReportFieldResolvers,
 };
 
 export default auditLogResolvers;

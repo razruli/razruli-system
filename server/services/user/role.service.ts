@@ -5,7 +5,7 @@
 // Uses RoleRepository for all DB access
 // ============================================================================
 
-import type { Role } from "@/server/db/generated/prisma/client";
+import type { Role, RoleScope } from "@/server/db/generated/prisma/client";
 import { BaseService } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
 
@@ -102,7 +102,7 @@ export class RoleService extends BaseService {
     name: string;
     slug: string;
     description?: string;
-    scope: "SYSTEM" | "COMPANY";
+    scope: RoleScope;
     companyId?: string;
   }): Promise<Role> {
     this.log("info", `Creating role`, { name: data.name, scope: data.scope });

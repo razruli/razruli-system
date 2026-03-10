@@ -35,8 +35,12 @@ export const auditResolvers = {
     ...employeeHistoryResolvers.Subscription,
   },
 
-  // Type field resolvers
-  AuditLog: auditLogResolvers.AuditLog,
+  // Type field resolvers - only types with custom resolvers
+  EntityAuditTrail: auditLogResolvers.EntityAuditTrail,
+  ChangeByUser: auditLogResolvers.ChangeByUser,
+  ComplianceReport: auditLogResolvers.ComplianceReport,
+  SecurityIncidentReport: auditLogResolvers.SecurityIncidentReport,
+  UserActivitySummary: auditLogResolvers.UserActivitySummary,
   EmployeeHistory: employeeHistoryResolvers.EmployeeHistory,
   DepartmentEmployeeHistory: employeeHistoryResolvers.DepartmentEmployeeHistory,
   EmployeeAuditReport: employeeHistoryResolvers.EmployeeAuditReport,

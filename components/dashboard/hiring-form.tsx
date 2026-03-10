@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui/shadcn/card";
+import { Slider } from "@/shared/ui/shadcn/slider";
 import { Textarea } from "@/shared/ui/shadcn/textarea";
 
 const hiringRequestSchema = z.object({
@@ -38,13 +39,10 @@ const hiringRequestSchema = z.object({
     .min(2, "Position title must be at least 2 characters"),
   department: z.string().min(1, "Please select a department"),
   priority: z.string().min(1, "Please select a priority"),
-  headcount: z.preprocess(
-    (v) => Number(v),
-    z
-      .number()
-      .min(1, "At least 1 position required")
-      .max(50, "Maximum 50 per request"),
-  ),
+  headcount: z
+    .number()
+    .positive("At least 1 position required")
+    .max(50, "Maximum 50 per request"),
   workloadAllocation: z.number().min(10).max(100),
   justification: z
     .string()
@@ -71,9 +69,9 @@ export function HiringRequestForm() {
   });
 
   function onSubmit(data: HiringRequestValues) {
-    toast.success("Hiring request submitted", {
-      description: `${data.headcount}x ${data.positionTitle} for ${data.department}`,
-    });
+    // toast.success("Hiring request submitted", {
+    //   description: `${data.headcount}x ${data.positionTitle} for ${data.department}`,
+    // });
     form.reset();
   }
 

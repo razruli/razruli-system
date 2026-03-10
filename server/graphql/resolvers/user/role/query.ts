@@ -37,7 +37,7 @@ const rolesResolver: QueryResolvers["roles"] = async (
       offset: pagination?.skip || 0,
       limit: pagination?.take || 20,
       sortBy: pagination?.sortBy || "name",
-      sortOrder: pagination?.sortOrder || "asc",
+      sortOrder: pagination?.sortOrder as "asc" | "desc" | undefined,
     });
     return {
       nodes: data,
@@ -55,47 +55,6 @@ const rolesResolver: QueryResolvers["roles"] = async (
 };
 
 /**
- * Get permission by ID
- */
-const permissionResolver: QueryResolvers["permission"] = async (
-  _parent,
-  { id },
-  context,
-) => {
-  try {
-    // TODO: Implement permission service
-    throw new Error("Permission queries not yet implemented");
-  } catch (error) {
-    throw new Error(`Failed to fetch permission: ${error}`);
-  }
-};
-
-/**
- * List permissions with filtering
- */
-const permissionsResolver: QueryResolvers["permissions"] = async (
-  _parent,
-  { filter, pagination },
-  context,
-) => {
-  try {
-    // TODO: Implement permission service
-    return {
-      nodes: [],
-      totalCount: 0,
-      pageInfo: {
-        total: 0,
-        hasMore: false,
-        offset: 0,
-        limit: pagination?.take || 20,
-      },
-    };
-  } catch (error) {
-    throw new Error(`Failed to fetch permissions: ${error}`);
-  }
-};
-
-/**
  * Get all system permissions
  */
 const systemPermissionsResolver: QueryResolvers["systemPermissions"] = async (
@@ -104,8 +63,8 @@ const systemPermissionsResolver: QueryResolvers["systemPermissions"] = async (
   context,
 ) => {
   try {
-    // TODO: Implement permission service
-    return [];
+    // Get all system-wide permissions
+    return await context.services.permission.getByScope("SYSTEM");
   } catch (error) {
     throw new Error(`Failed to fetch system permissions: ${error}`);
   }
@@ -114,8 +73,6 @@ const systemPermissionsResolver: QueryResolvers["systemPermissions"] = async (
 export const roleQueries = {
   role: roleResolver,
   roles: rolesResolver,
-  permission: permissionResolver,
-  permissions: permissionsResolver,
   systemPermissions: systemPermissionsResolver,
 };
 

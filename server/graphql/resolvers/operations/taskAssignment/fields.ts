@@ -9,6 +9,8 @@ import {
   TaskAssignmentResolvers,
   TaskAssignmentMetricsResolvers,
   EmployeeTaskStatsResolvers,
+  TaskStatusCountResolvers,
+  TaskTypeCountResolvers,
 } from "@/server/graphql/types/generated";
 
 export const taskAssignmentFieldResolvers: Pick<
@@ -122,4 +124,20 @@ export const employeeTaskStatsFieldResolvers: Pick<
       throw new Error(`Failed to load employee: ${error}`);
     }
   },
+};
+
+export const taskStatusCountFieldResolvers: Pick<
+  TaskStatusCountResolvers,
+  "count" | "status"
+> = {
+  count: (parent) => parent.count,
+  status: (parent) => parent.status,
+};
+
+export const taskTypeCountFieldResolvers: Pick<
+  TaskTypeCountResolvers,
+  "count" | "taskType"
+> = {
+  count: (parent) => parent.count,
+  taskType: (parent) => parent.taskType,
 };

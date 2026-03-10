@@ -41,6 +41,8 @@ export const operationsResolvers = {
   TaskAssignment: taskAssignmentResolvers.TaskAssignment,
   TaskAssignmentMetrics: taskAssignmentResolvers.TaskAssignmentMetrics,
   EmployeeTaskStats: taskAssignmentResolvers.EmployeeTaskStats,
+  TaskStatusCount: taskAssignmentResolvers.TaskStatusCount,
+  TaskTypeCount: taskAssignmentResolvers.TaskTypeCount,
 };
 
 // Export individual entities for selective imports

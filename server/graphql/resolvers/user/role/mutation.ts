@@ -5,6 +5,7 @@
  * Mutations for role and permission management
  */
 
+import type { RoleScope as PrismaRoleScope } from "@/server/db/generated/prisma/client";
 import { MutationResolvers } from "@/server/graphql/types/generated";
 
 // ==================== RESOLVER FUNCTIONS ====================
@@ -18,7 +19,16 @@ const createRoleResolver: MutationResolvers["createRole"] = async (
   context,
 ) => {
   try {
-    return await context.services.role.create(input);
+    // Convert nullable fields to undefined and ensure all required fields are present
+    const cleanInput = {
+      name: input.name,
+      slug: input.slug,
+      scope: input.scope as PrismaRoleScope,
+      description: input.description ?? undefined,
+      companyId: input.companyId ?? undefined,
+      permissionIds: input.permissionIds ?? undefined,
+    };
+    return await context.services.role.create(cleanInput);
   } catch (error) {
     throw new Error(`Failed to create role: ${error}`);
   }
@@ -33,7 +43,14 @@ const updateRoleResolver: MutationResolvers["updateRole"] = async (
   context,
 ) => {
   try {
-    return await context.services.role.update(id, input);
+    // Convert nullable fields to undefined and ensure all updatable fields are present
+    const cleanInput = {
+      name: input.name ?? undefined,
+      slug: input.slug ?? undefined,
+      description: input.description ?? undefined,
+      permissionIds: input.permissionIds ?? undefined,
+    };
+    return await context.services.role.update(id, cleanInput);
   } catch (error) {
     throw new Error(`Failed to update role: ${error}`);
   }

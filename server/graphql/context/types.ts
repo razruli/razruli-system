@@ -1,3 +1,5 @@
+import DataLoader from "dataloader";
+
 /**
  * ============================================================================
  * GraphQL Context Types - Strongly Typed
@@ -5,8 +7,6 @@
  * Complete DataLoader and Services Registry for all domain entities
  * ============================================================================
  */
-
-import DataLoader from "dataloader";
 
 import type {
   PrismaClient,
@@ -22,6 +22,8 @@ import type {
   GapAnalysisResult as PrismaGapAnalysisResult,
   EmployeeHistory as PrismaEmployeeHistory,
   AuditLog as PrismaAuditLog,
+  Role as PrismaRole,
+  Permission as PrismaPermission,
 } from "@/server/db/generated/prisma/client";
 import { ActorService } from "@/server/services/actor/Actor.service";
 import type { GapAnalysisService } from "@/server/services/analytics/gapAnalysis/GapAnalysis.service";
@@ -65,6 +67,10 @@ export interface DataLoaderRegistry {
   // Audit domain
   employeeHistory: DataLoader<string, PrismaEmployeeHistory | null>;
   auditLog: DataLoader<string, PrismaAuditLog | null>;
+
+  // User domain
+  role: DataLoader<string, PrismaRole | null>;
+  permission: DataLoader<string, PrismaPermission | null>;
 
   // Batch loaders for common patterns
   employeesByDepartment: DataLoader<string, PrismaEmployee[]>;

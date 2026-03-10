@@ -1,3 +1,7 @@
+import {
+  taskStatusCountFieldResolvers,
+  taskTypeCountFieldResolvers,
+} from "./fields";
 /**
  * ============================================================================
  * TaskAssignment Domain - Resolver Index
@@ -38,6 +42,8 @@ export const taskAssignmentResolvers = {
   TaskAssignment: taskAssignmentFieldResolvers,
   TaskAssignmentMetrics: taskAssignmentMetricsFieldResolvers,
   EmployeeTaskStats: employeeTaskStatsFieldResolvers,
+  TaskStatusCount: taskStatusCountFieldResolvers,
+  TaskTypeCount: taskTypeCountFieldResolvers,
 };
 
 export {
@@ -47,6 +53,7 @@ export {
   taskAssignmentFieldResolvers,
   taskAssignmentMetricsFieldResolvers,
   employeeTaskStatsFieldResolvers,
+  taskStatusCountFieldResolvers,
 };
 
 export default taskAssignmentResolvers;

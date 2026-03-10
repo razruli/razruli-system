@@ -5,6 +5,7 @@
  * Mutations for permission management (typically admin-only)
  */
 
+import type { PermissionScope as PrismaPermissionScope } from "@/server/db/generated/prisma/client";
 import { MutationResolvers } from "@/server/graphql/types/generated";
 
 // ==================== RESOLVER FUNCTIONS ====================
@@ -18,7 +19,16 @@ const createPermissionResolver: MutationResolvers["createPermission"] = async (
   context,
 ) => {
   try {
-    return await context.services.permission.create(input);
+    // Convert nullable fields to undefined and ensure all required fields are present
+    const cleanInput = {
+      name: input.name,
+      slug: input.slug,
+      resource: input.resource,
+      action: input.action,
+      scope: input.scope as PrismaPermissionScope,
+      description: input.description ?? undefined,
+    };
+    return await context.services.permission.create(cleanInput);
   } catch (error) {
     throw new Error(`Failed to create permission: ${error}`);
   }
@@ -33,7 +43,15 @@ const updatePermissionResolver: MutationResolvers["updatePermission"] = async (
   context,
 ) => {
   try {
-    return await context.services.permission.update(id, input);
+    // Convert nullable fields to undefined and ensure all updatable fields are present
+    const cleanInput = {
+      name: input.name ?? undefined,
+      slug: input.slug ?? undefined,
+      description: input.description ?? undefined,
+      resource: input.resource ?? undefined,
+      action: input.action ?? undefined,
+    };
+    return await context.services.permission.update(id, cleanInput);
   } catch (error) {
     throw new Error(`Failed to update permission: ${error}`);
   }

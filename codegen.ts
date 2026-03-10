@@ -31,7 +31,7 @@ const config: CodegenConfig = {
       plugins: ["typescript", "typescript-resolvers"],
       config: {
         contextType: "../context/context#GraphQLContext",
-        avoidOptionals: true,
+        avoidOptionals: false,
         resolverValidationOptions: {
           requireResolversForResolveType: false,
           requireResolversForAllFields: false,

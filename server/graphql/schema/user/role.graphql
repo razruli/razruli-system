@@ -116,6 +116,7 @@ Input for updating a role
 """
 input UpdateRoleInput {
   name: String
+  slug: String
   description: String
   permissionIds: [String!]
 }
@@ -137,6 +138,7 @@ Input for updating a permission
 """
 input UpdatePermissionInput {
   name: String
+  slug: String
   description: String
   resource: String
   action: String

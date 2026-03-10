@@ -39,6 +39,18 @@ export function createDataLoaders(prisma: PrismaClient): DataLoaderRegistry {
       return userIds.map((id) => users.find((u) => u.id === id) || null);
     }),
 
+    /**
+     * Actor Loader
+     * Batches actor lookups
+     */
+    actor: new DataLoader(async (actorIds: readonly string[]) => {
+      const actors = await prisma.actor.findMany({
+        where: { id: { in: actorIds as string[] } },
+      });
+
+      return actorIds.map((id) => actors.find((a) => a.id === id) || null);
+    }),
+
     // ==================== CORE DOMAIN ====================
     /**
      * Company Loader
@@ -197,6 +209,36 @@ export function createDataLoaders(prisma: PrismaClient): DataLoaderRegistry {
     ),
 
     /**
+     * Actors by Company Loader
+     * Load all actors for a company
+     */
+    actorsByCompany: new DataLoader(async (companyIds: readonly string[]) => {
+      const allActors = await prisma.actor.findMany({
+        where: { companyId: { in: companyIds as string[] } },
+      });
+
+      return companyIds.map((compId) =>
+        allActors.filter((a) => a.companyId === compId),
+      );
+    }),
+
+    /**
+     * Actors by Department Loader
+     * Load all actors for a department
+     */
+    actorsByDepartment: new DataLoader(
+      async (departmentIds: readonly string[]) => {
+        const allActors = await prisma.actor.findMany({
+          where: { departmentId: { in: departmentIds as string[] } },
+        });
+
+        return departmentIds.map((deptId) =>
+          allActors.filter((a) => a.departmentId === deptId),
+        );
+      },
+    ),
+
+    /**
      * Tasks by Employee Loader
      * Load all task assignments for an employee
      * Usage: context.loaders.tasksByEmployee.load(employeeId)
@@ -229,6 +271,31 @@ export function createDataLoaders(prisma: PrismaClient): DataLoaderRegistry {
         );
       },
     ),
+
+    // ==================== USER DOMAIN ====================
+    /**
+     * Role Loader
+     * Batches role lookups
+     */
+    role: new DataLoader(async (roleIds: readonly string[]) => {
+      const roles = await prisma.role.findMany({
+        where: { id: { in: roleIds as string[] } },
+      });
+
+      return roleIds.map((id) => roles.find((r) => r.id === id) || null);
+    }),
+
+    /**
+     * Permission Loader
+     * Batches permission lookups
+     */
+    permission: new DataLoader(async (permIds: readonly string[]) => {
+      const permissions = await prisma.permission.findMany({
+        where: { id: { in: permIds as string[] } },
+      });
+
+      return permIds.map((id) => permissions.find((p) => p.id === id) || null);
+    }),
   };
 }
 

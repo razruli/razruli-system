@@ -26,6 +26,8 @@ export const typeResolvers = {
   TaskAssignment: operationsResolvers.TaskAssignment,
   TaskAssignmentMetrics: operationsResolvers.TaskAssignmentMetrics,
   EmployeeTaskStats: operationsResolvers.EmployeeTaskStats,
+  TaskStatusCount: operationsResolvers.TaskStatusCount,
+  TaskTypeCount: operationsResolvers.TaskTypeCount,
 
   // ========== ANALYTICS DOMAIN TYPE FIELD RESOLVERS ==========
   GapAnalysis: analyticsResolvers.GapAnalysis,
@@ -39,7 +41,16 @@ export const typeResolvers = {
   EmployeeLoadHistory: analyticsResolvers.EmployeeLoadHistory,
 
   // ========== AUDIT DOMAIN TYPE FIELD RESOLVERS ==========
-  AuditLog: auditResolvers.AuditLog,
+  // Only include types with custom field resolvers
+  // Scalar-only types use `as any` for default resolution
+  // AuditLog: {} as any,
+  // ActionTypeSummary: {} as any,
+  // ChangeTypeSummary: {} as any,
+  EntityAuditTrail: auditResolvers.EntityAuditTrail,
+  ChangeByUser: auditResolvers.ChangeByUser,
+  ComplianceReport: auditResolvers.ComplianceReport,
+  SecurityIncidentReport: auditResolvers.SecurityIncidentReport,
+  UserActivitySummary: auditResolvers.UserActivitySummary,
   EmployeeHistory: auditResolvers.EmployeeHistory,
   DepartmentEmployeeHistory: auditResolvers.DepartmentEmployeeHistory,
   EmployeeAuditReport: auditResolvers.EmployeeAuditReport,
