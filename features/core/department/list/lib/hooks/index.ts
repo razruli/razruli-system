@@ -1,0 +1,1 @@
+export { useDepartmentList } from "./useDepartmentList";
