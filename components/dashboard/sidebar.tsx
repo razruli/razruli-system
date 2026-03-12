@@ -20,7 +20,7 @@ import {
   Building2,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 
 import {
   Avatar,
@@ -80,16 +80,23 @@ const workspaces = [
 ];
 
 const mainNav = [
-  { label: "Overview", icon: LayoutDashboard, href: "/dashboard" },
-  { label: "Departments", icon: Building2, href: "#" },
-  { label: "Employees", icon: Users, href: "#" },
-  { label: "Processes", icon: Workflow, href: "#" },
-  { label: "Workload Analysis", icon: BarChart3, href: "#" },
-  { label: "Hiring Strategy", icon: UserPlus, href: "#" },
+  { label: "Overview", icon: LayoutDashboard, href: "dashboard" },
+  { label: "Departments", icon: Building2, href: "dashboard/departments" },
+  { label: "Employees", icon: Users, href: "dashboard/employees" },
+  { label: "Processes", icon: Workflow, href: "dashboard/processes" },
+  { label: "Workload Analysis", icon: BarChart3, href: "dashboard/workload" },
+  { label: "Hiring Strategy", icon: UserPlus, href: "dashboard/hiring" },
 ];
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const params = useParams();
+  const tenantSlug = params.tenantSlug as string;
+
+  const getHref = (path: string) => `/${params.locale}/${tenantSlug}/${path}`;
+  const isActive = (path: string) =>
+    pathname.includes(path.split("/").pop() || "");
+
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
@@ -129,10 +136,10 @@ export function DashboardSidebar() {
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    isActive={pathname === item.href}
+                    isActive={isActive(item.href)}
                     tooltip={item.label}
                   >
-                    <Link href={item.href}>
+                    <Link href={getHref(item.href)}>
                       <item.icon className="size-4" />
                       <span>{item.label}</span>
                     </Link>
@@ -154,9 +161,9 @@ export function DashboardSidebar() {
                 <SidebarMenuButton
                   asChild
                   tooltip="AI Assistant"
-                  isActive={pathname === "/dashboard/assistant"}
+                  isActive={isActive("assistant")}
                 >
-                  <Link href="/dashboard/assistant">
+                  <Link href={getHref("dashboard/assistant")}>
                     <BrainCircuit className="size-4" />
                     <span>AI Assistant</span>
                   </Link>
@@ -190,15 +197,27 @@ export function DashboardSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Reports">
-              <FileText className="size-4" />
-              <span>Reports</span>
+            <SidebarMenuButton
+              asChild
+              tooltip="Reports"
+              isActive={isActive("reports")}
+            >
+              <Link href={getHref("dashboard/reports")}>
+                <FileText className="size-4" />
+                <span>Reports</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Settings">
-              <Settings className="size-4" />
-              <span>Settings</span>
+            <SidebarMenuButton
+              asChild
+              tooltip="Settings"
+              isActive={isActive("settings")}
+            >
+              <Link href={getHref("dashboard/settings")}>
+                <Settings className="size-4" />
+                <span>Settings</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -277,19 +296,44 @@ function WorkspaceFolder({ folder }: { folder: (typeof workspaces)[0] }) {
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Overview",
+  "/dashboard/departments": "Departments",
+  "/dashboard/employees": "Employees",
+  "/dashboard/processes": "Processes",
+  "/dashboard/workload": "Workload Analysis",
+  "/dashboard/hiring": "Hiring Strategy",
   "/dashboard/assistant": "AI Assistant",
+  "/dashboard/reports": "Reports",
+  "/dashboard/settings": "Settings",
 };
 
 export function DashboardHeader() {
   const pathname = usePathname();
-  const title = pageTitles[pathname] ?? "Dashboard";
+
+  // Extract the last meaningful part of the path for title lookup
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const lastSegment = pathSegments[pathSegments.length - 1];
+
+  const getTitleFromPath = () => {
+    if (!lastSegment || lastSegment === pathSegments[1]) return "Overview"; // dashboard page
+    if (lastSegment === "departments") return "Departments";
+    if (lastSegment === "employees") return "Employees";
+    if (lastSegment === "processes") return "Processes";
+    if (lastSegment === "workload") return "Workload Analysis";
+    if (lastSegment === "hiring") return "Hiring Strategy";
+    if (lastSegment === "assistant") return "AI Assistant";
+    if (lastSegment === "reports") return "Reports";
+    if (lastSegment === "settings") return "Settings";
+    return "Dashboard";
+  };
 
   return (
     <header className="flex h-14 items-center gap-4 border-b border-border px-6">
       <SidebarTrigger />
       <div className="flex flex-1 items-center gap-4">
         <div>
-          <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+          <h1 className="text-lg font-semibold text-foreground">
+            {getTitleFromPath()}
+          </h1>
         </div>
       </div>
       <ThemeToggle />
