@@ -1,0 +1,3 @@
+query GetEmployeeCapacity($id: String!) {
+  employeeCapacity(id: $id)
+}

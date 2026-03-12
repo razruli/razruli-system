@@ -1,0 +1,15 @@
+query GetDepartment($id: String!) {
+  department(id: $id) {
+    id
+    companyId
+    name
+    headId
+    head {
+      id
+      fio
+      gradeId
+    }
+    createdAt
+    updatedAt
+  }
+}

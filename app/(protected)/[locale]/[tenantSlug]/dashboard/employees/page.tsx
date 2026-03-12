@@ -1,20 +1,13 @@
 "use client";
 
-import { useSuspenseQuery } from "@apollo/client/react";
-
-import { EMPLOYEES_PAGE_QUERY } from "@/shared/graphql/client/dashboardQueries";
 import { ScrollArea } from "@/shared/ui/shadcn/scroll-area";
 
 // Employees page widgets
 // import { EmployeeStats, EmployeeFilters, EmployeeTable } from '@/widgets/dashboard/employees'
 
 export default function EmployeesPage() {
-  const { data } = useSuspenseQuery(EMPLOYEES_PAGE_QUERY, {
-    variables: {
-      first: 50,
-      offset: 0,
-    },
-  });
+  // TODO: Connect to entity hooks once available
+  // const { data } = useSuspenseQuery(EMPLOYEES_PAGE_QUERY, { ... });
 
   return (
     <ScrollArea className="flex-1">

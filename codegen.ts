@@ -21,7 +21,11 @@ const config: CodegenConfig = {
     "server/graphql/schema/user/actor.graphql",
     "server/graphql/schema/user/role.graphql",
   ],
-  documents: "shared/graphql/client/**/*.graphql",
+  documents: [
+    "shared/graphql/client/**/*.graphql",
+    "entities/**/api/queries/**/*.graphql",
+    "entities/**/api/mutations/**/*.graphql",
+  ],
 
   generates: {
     // =========================
@@ -87,6 +91,7 @@ const config: CodegenConfig = {
 
     // =========================
     // Client types (preset: client)
+    // Generates types and documents from ALL graphql documents
     // =========================
     "shared/graphql/generated/": {
       preset: "client",

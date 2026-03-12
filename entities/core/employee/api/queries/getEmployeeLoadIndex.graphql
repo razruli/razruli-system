@@ -1,0 +1,7 @@
+query GetEmployeeLoadIndex(
+  $id: String!
+  $periodStart: DateTime!
+  $periodEnd: DateTime!
+) {
+  employeeLoadIndex(id: $id, periodStart: $periodStart, periodEnd: $periodEnd)
+}

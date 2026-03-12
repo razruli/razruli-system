@@ -1,0 +1,10 @@
+mutation CreateDepartment($input: CreateDepartmentInput!) {
+  createDepartment(input: $input) {
+    id
+    companyId
+    name
+    headId
+    createdAt
+    updatedAt
+  }
+}

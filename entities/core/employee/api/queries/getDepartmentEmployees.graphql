@@ -1,0 +1,23 @@
+query GetDepartmentEmployees($departmentId: String!) {
+  departmentEmployees(departmentId: $departmentId) {
+    id
+    companyId
+    departmentId
+    fio
+    gradeId
+    grade {
+      id
+      name
+      kGrade
+    }
+    gender
+    hireDate
+    fireDate
+    kEfficiency
+    employmentType
+    status
+    workingHoursPerDay
+    createdAt
+    updatedAt
+  }
+}

@@ -1,0 +1,13 @@
+mutation AssignDepartmentHead($departmentId: String!, $employeeId: String!) {
+  assignDepartmentHead(departmentId: $departmentId, employeeId: $employeeId) {
+    id
+    name
+    headId
+    head {
+      id
+      fio
+      gradeId
+    }
+    updatedAt
+  }
+}

@@ -1,15 +1,14 @@
 "use client";
 
-import { useSuspenseQuery } from "@apollo/client/react";
 
-import { DASHBOARD_OVERVIEW_QUERY } from "@/shared/graphql/client/dashboardQueries";
 import { ScrollArea } from "@/shared/ui/shadcn/scroll-area";
 
 // Overview page widgets
 // import { StatsCards, CapacityOverview, DepartmentStatus, RecentActivity } from '@/widgets/dashboard/overview'
 
 export default function DashboardPage() {
-  const { data } = useSuspenseQuery(DASHBOARD_OVERVIEW_QUERY);
+  // TODO: Connect to entity hooks once available
+  // const { data } = useSuspenseQuery(DASHBOARD_OVERVIEW_QUERY);
 
   return (
     <ScrollArea className="flex-1">

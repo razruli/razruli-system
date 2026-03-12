@@ -1,0 +1,7 @@
+mutation UpdateEmployeeEfficiency($id: String!, $kEfficiency: Float!) {
+  updateEmployeeEfficiency(id: $id, kEfficiency: $kEfficiency) {
+    id
+    kEfficiency
+    updatedAt
+  }
+}

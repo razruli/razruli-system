@@ -1,21 +1,13 @@
 "use client";
 
-import { useSuspenseQuery } from "@apollo/client/react";
-
-import { PROCESSES_PAGE_QUERY } from "@/shared/graphql/client/dashboardQueries";
 import { ScrollArea } from "@/shared/ui/shadcn/scroll-area";
 
 // Processes page widgets
 // import { ProcessesList, ProcessStats, ProcessFilters } from '@/widgets/dashboard/processes'
 
 export default function ProcessesPage() {
-  const { data } = useSuspenseQuery(PROCESSES_PAGE_QUERY, {
-    variables: {
-      first: 50,
-      offset: 0,
-      filter: {},
-    },
-  });
+  // TODO: Connect to entity hooks once available
+  // const { data } = useSuspenseQuery(PROCESSES_PAGE_QUERY, { ... });
 
   return (
     <ScrollArea className="flex-1">

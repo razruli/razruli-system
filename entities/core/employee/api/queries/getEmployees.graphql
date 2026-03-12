@@ -1,0 +1,40 @@
+query GetEmployees(
+  $filter: EmployeeFilterInput
+  $pagination: EmployeePaginationInput
+) {
+  employees(filter: $filter, pagination: $pagination) {
+    nodes {
+      id
+      companyId
+      departmentId
+      department {
+        id
+        name
+      }
+      fio
+      gradeId
+      grade {
+        id
+        name
+        kGrade
+      }
+      gender
+      birthDate
+      hireDate
+      fireDate
+      kEfficiency
+      employmentType
+      status
+      workingHoursPerDay
+      createdAt
+      updatedAt
+    }
+    totalCount
+    pageInfo {
+      hasMore
+      offset
+      limit
+      total
+    }
+  }
+}

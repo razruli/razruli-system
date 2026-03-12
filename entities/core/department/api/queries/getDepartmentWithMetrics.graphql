@@ -1,0 +1,28 @@
+query GetDepartmentWithMetrics(
+  $id: String!
+  $periodStart: DateTime
+  $periodEnd: DateTime
+) {
+  departmentWithMetrics(
+    id: $id
+    periodStart: $periodStart
+    periodEnd: $periodEnd
+  ) {
+    department {
+      id
+      companyId
+      name
+      headId
+      head {
+        id
+        fio
+      }
+    }
+    totalEmployees
+    activeEmployees
+    overloadedCount
+    totalCapacity
+    totalLoad
+    loadIndex
+  }
+}

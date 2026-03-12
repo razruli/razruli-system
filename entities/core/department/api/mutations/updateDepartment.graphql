@@ -1,0 +1,13 @@
+mutation UpdateDepartment($id: String!, $input: UpdateDepartmentInput!) {
+  updateDepartment(id: $id, input: $input) {
+    id
+    companyId
+    name
+    headId
+    head {
+      id
+      fio
+    }
+    updatedAt
+  }
+}

@@ -1,14 +1,12 @@
 "use client";
 
-import { useSuspenseQuery } from "@apollo/client/react";
-
-import { HIRING_PAGE_QUERY } from "@/shared/graphql/client/dashboardQueries";
 import { ScrollArea } from "@/shared/ui/shadcn/scroll-area";
 // Hiring page widgets
 // import { HiringStats, OpenPositionsList, HiringTrend, DepartmentHiringPlans } from '@/widgets/dashboard/hiring'
 
 export default function HiringPage() {
-  const { data } = useSuspenseQuery(HIRING_PAGE_QUERY);
+  // TODO: Connect to entity hooks once available
+  // const { data } = useSuspenseQuery(HIRING_PAGE_QUERY);
 
   return (
     <ScrollArea className="flex-1">

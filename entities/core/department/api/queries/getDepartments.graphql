@@ -1,0 +1,24 @@
+query GetDepartments($filter: DepartmentFilterInput!) {
+  departments(filter: $filter) {
+    nodes {
+      id
+      companyId
+      name
+      headId
+      head {
+        id
+        fio
+        gradeId
+      }
+      createdAt
+      updatedAt
+    }
+    totalCount
+    pageInfo {
+      hasMore
+      offset
+      limit
+      total
+    }
+  }
+}

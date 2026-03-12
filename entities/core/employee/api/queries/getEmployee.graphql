@@ -1,0 +1,28 @@
+query GetEmployee($id: String!) {
+  employee(id: $id) {
+    id
+    companyId
+    departmentId
+    department {
+      id
+      name
+    }
+    fio
+    gradeId
+    grade {
+      id
+      name
+      kGrade
+    }
+    gender
+    birthDate
+    hireDate
+    fireDate
+    kEfficiency
+    employmentType
+    status
+    workingHoursPerDay
+    createdAt
+    updatedAt
+  }
+}

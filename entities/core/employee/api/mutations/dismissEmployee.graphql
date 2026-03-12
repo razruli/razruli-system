@@ -1,0 +1,8 @@
+mutation DismissEmployee($id: String!, $reason: String) {
+  dismissEmployee(id: $id, reason: $reason) {
+    id
+    status
+    fireDate
+    updatedAt
+  }
+}
