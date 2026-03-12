@@ -1,0 +1,9 @@
+export { AIAssistant } from "./ai-assistant";
+export { CTA } from "./cta";
+export { Features } from "./features";
+export { Footer } from "../footer/footer";
+export { Hero } from "./hero";
+export { HowItWorks } from "./how-it-works";
+export { Navbar } from "../navbar/navbar";
+export { Pricing } from "./pricing";
+export { Stats } from "./stats";
