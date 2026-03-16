@@ -1,7 +1,6 @@
 "use client";
 
-import { ChatInterface } from "@/widgets/ai-assistant/chat";
-import { ArtifactContainer } from "@/widgets/ai-assistant/artifacts";
+import { ChatWidget, ArtifactWidget } from "@/widgets/ai-assistant";
 
 /**
  * Assistant Page - Clean Orchestration
@@ -10,24 +9,22 @@ import { ArtifactContainer } from "@/widgets/ai-assistant/artifacts";
  * Page → Widgets → Features/Entities/Shared
  *
  * This page simply orchestrates two key widgets:
- * 1. ChatInterface - User conversation and message management
- * 2. ArtifactContainer - Display generated artifacts (analysis, reports, etc)
+ * 1. ChatWidget - User conversation and message management
+ * 2. ArtifactWidget - Display generated artifacts via modal
  *
  * All business logic, state management, and UI composition lives in widgets.
  * Pages are purely orchestrators.
  */
 export default function AssistantPage() {
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] gap-0">
-      {/* Main Chat Interface */}
+    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
+      {/* Main Chat Widget */}
       <div className="flex-1 min-w-0">
-        <ChatInterface />
+        <ChatWidget />
       </div>
 
-      {/* Artifacts Sidebar */}
-      <div className="w-96 hidden lg:flex border-l bg-background">
-        <ArtifactContainer />
-      </div>
+      {/* Artifact Modal (rendered globally) */}
+      <ArtifactWidget />
     </div>
   );
 }

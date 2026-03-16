@@ -1,9 +1,8 @@
 // shared/graphql/hooks/query/useUsersQuery.ts
 "use client";
 
-import { useQuery } from "@apollo/client/react";
-
-import { UsersDocument } from "../../generated/graphql";
+// TODO: Implement Users query in GraphQL schema
+// This hook needs the Users query to be added to the GraphQL schema
 
 export interface UseUsersQueryOptions {
   offset?: number;
@@ -19,35 +18,10 @@ export interface UseUsersQueryOptions {
 }
 
 export const useUsersQuery = (options: UseUsersQueryOptions = {}) => {
-  const {
-    offset = 0,
-    limit = 10,
-    sortBy,
-    sortOrder,
-    search,
-    status,
-    emailVerified,
-    createdAfter,
-    createdBefore,
-    skip = false,
-  } = options;
-
-  return useQuery(UsersDocument, {
-    variables: {
-      input: {
-        offset,
-        limit,
-        ...(sortBy && { sortBy }),
-        ...(sortOrder && { sortOrder }),
-        ...(search && { search }),
-        ...(status && { status }),
-        ...(emailVerified && { emailVerified }),
-        ...(createdAfter && { createdAfter: createdAfter }),
-        ...(createdBefore && { createdBefore: createdBefore }),
-      },
-    },
-    skip,
-    notifyOnNetworkStatusChange: true,
-    fetchPolicy: "cache-first",
-  });
+  // TODO: Implement once Users query is added to GraphQL schema
+  return {
+    data: { users: [] },
+    loading: false,
+    error: new Error("Users query not yet implemented in GraphQL schema"),
+  };
 };

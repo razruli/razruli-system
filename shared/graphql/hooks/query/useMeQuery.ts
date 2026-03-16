@@ -3,8 +3,15 @@
 
 import { useQuery } from "@apollo/client/react";
 
-import { MeDocument } from "../../generated/graphql";
+// TODO: Implement Me query in GraphQL schema
+// For now, this is a stub. The GraphQL schema doesn't have a Me query yet.
+// Once implemented, import MeDocument from "../../generated/graphql"
 
 export const useMeQuery = () => {
-  return useQuery(MeDocument);
+  // TODO: Return useQuery(MeDocument) once schema is implemented
+  return {
+    data: null,
+    loading: false,
+    error: new Error("Me query not yet implemented in GraphQL schema"),
+  };
 };

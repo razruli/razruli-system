@@ -1,10 +1,10 @@
 import { prisma } from "./lib/prisma";
 
 async function main() {
-  console.log("🌱 Seeding database...\n");
+  console.warn("🌱 Seeding database...\n");
 
   try {
-    const user = await prisma.user.upsert({
+    const _user = await prisma.user.upsert({
       where: { email: "admin@gruzin.com" },
       update: {},
       create: {
@@ -15,7 +15,7 @@ async function main() {
       },
     });
 
-    const company = await prisma.company.upsert({
+    const _company = await prisma.company.upsert({
       where: { id: "company-1" },
       update: {},
       create: {
@@ -44,13 +44,13 @@ async function main() {
       });
     }
 
-    console.log("✅ Base models: User, Company, Grades created");
-    console.log("\n✨ Database seeded successfully!");
+    console.warn("✅ Base models: User, Company, Grades created");
+    console.warn("\n✨ Database seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding database:", error);
   } finally {
     await prisma.$disconnect();
-    console.log("\n🌱 Seeding completed.");
+    console.warn("\n🌱 Seeding completed.");
   }
 }
 
