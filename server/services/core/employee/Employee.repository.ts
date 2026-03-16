@@ -4,7 +4,11 @@
 // Handles ALL database access for Employee domain
 // ============================================================================
 
-import type { Employee, Prisma } from "@/server/db/generated/prisma/client";
+import type {
+  Employee,
+  EmployeeStatus,
+  Prisma,
+} from "@/server/db/generated/prisma/client";
 import { BaseRepository } from "@/server/services/base/BaseRepository";
 
 export class EmployeeRepository extends BaseRepository<Employee> {
@@ -30,33 +34,35 @@ export class EmployeeRepository extends BaseRepository<Employee> {
   async findByDepartment(departmentId: string): Promise<Employee[]> {
     return this.prisma.employee.findMany({
       where: { departmentId },
-      orderBy: { fio: "asc" },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   }
 
   async findByCompany(companyId: string): Promise<Employee[]> {
     return this.prisma.employee.findMany({
       where: { companyId },
-      orderBy: { fio: "asc" },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   }
 
   async findByGrade(gradeId: number): Promise<Employee[]> {
     return this.prisma.employee.findMany({
       where: { gradeId },
-      orderBy: { fio: "asc" },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   }
 
   async findByCompanyAndName(
     companyId: string,
-    fio: string,
+    firstName: string,
+    lastName: string,
   ): Promise<Employee | null> {
     return this.prisma.employee.findUnique({
       where: {
-        companyId_fio: {
+        companyId_firstName_lastName: {
           companyId,
-          fio,
+          firstName,
+          lastName,
         },
       },
     });
@@ -64,7 +70,7 @@ export class EmployeeRepository extends BaseRepository<Employee> {
 
   async findAll(): Promise<Employee[]> {
     return this.prisma.employee.findMany({
-      orderBy: { fio: "asc" },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   }
 
@@ -72,12 +78,12 @@ export class EmployeeRepository extends BaseRepository<Employee> {
     const where: Prisma.EmployeeWhereInput = {};
 
     if (filters.status) {
-      where.status = filters.status;
+      where.status = filters.status as EmployeeStatus;
     }
 
     return this.prisma.employee.findMany({
       where,
-      orderBy: { fio: "asc" },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   }
 

@@ -6,6 +6,11 @@
 // ============================================================================
 
 import type { Employee } from "@/server/db/generated/prisma/client";
+import {
+  EmploymentType,
+  Gender,
+  EmployeeStatus,
+} from "@/server/db/generated/prisma/client";
 import { BaseService, ValidationError } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
 
@@ -125,7 +130,9 @@ export class EmployeeService extends BaseService {
     }
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      data = data.filter((e) => e.fio.toLowerCase().includes(searchLower));
+      data =
+        data.filter((e) => e.firstName.toLowerCase().includes(searchLower)) ||
+        data.filter((e) => e.lastName.toLowerCase().includes(searchLower));
     }
 
     const total = data.length;
@@ -144,7 +151,8 @@ export class EmployeeService extends BaseService {
   async create(data: {
     companyId: string;
     departmentId: string;
-    fio: string;
+    firstName: string;
+    lastName: string;
     gradeId: number;
     gender: string;
     birthDate?: Date | null;
@@ -153,34 +161,46 @@ export class EmployeeService extends BaseService {
     workingHoursPerDay?: number;
     kEfficiency?: number;
   }): Promise<Employee> {
-    this.log("info", `Creating employee`, { fio: data.fio });
+    this.log("info", `Creating employee`, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
 
     // Validation
     this.validate(data.companyId, "Company ID required");
     this.validate(data.departmentId, "Department ID required");
-    this.validate(data.fio, "Full name required");
+    this.validate(data.firstName, "First name required");
+    this.validate(data.lastName, "Last name required");
     this.validate(data.gradeId, "Grade ID required");
 
     // Check for duplicates
     const existing = await this.repository.findByCompanyAndName(
       data.companyId,
-      data.fio,
+      data.firstName,
+      data.lastName,
     );
 
     if (existing) {
       throw new ValidationError(
-        `Employee "${data.fio}" already exists in this company`,
+        `Employee "${data.firstName} ${data.lastName}" already exists in this company`,
       );
     }
 
     const employee = await this.repository.create({
-      fio: data.fio,
-      gender: data.gender,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      gender: (data.gender as Gender) || Gender.OTHER,
       hireDate: data.hireDate,
-      employmentType: data.employmentType || "full-time",
+      employmentType:
+        (data.employmentType as EmploymentType) ||
+        EmploymentType.LABOR_CONTRACT,
       company: { connect: { id: data.companyId } },
       department: { connect: { id: data.departmentId } },
       grade: { connect: { id: data.gradeId } },
+      workingHoursPerDay: data.workingHoursPerDay || 8,
+      kEfficiency: data.kEfficiency || 1.0,
+      birthDate: data.birthDate || null,
+      status: EmployeeStatus.ACTIVE,
     });
 
     this.log("info", `Employee created`, { id: employee.id });
@@ -193,14 +213,17 @@ export class EmployeeService extends BaseService {
   async update(
     id: string,
     data: Partial<{
-      fio: string;
-      gradeId: number;
-      departmentId: string;
-      gender: string;
+      firstName?: string;
+      lastName?: string;
+      gradeId?: number;
+      departmentId?: string;
+      gender?: string;
       status?: string;
       kEfficiency?: number;
       workingHoursPerDay?: number;
-      fireDate?: Date;
+      fireDate?: Date | null;
+      birthDate?: Date | null;
+      employmentType?: string;
     }>,
   ): Promise<Employee> {
     this.log("info", `Updating employee`, { id });
@@ -209,10 +232,12 @@ export class EmployeeService extends BaseService {
 
     const updateData: any = {};
 
-    if (data.fio) updateData.fio = data.fio;
-    if (data.gender) updateData.gender = data.gender;
-    if (data.gradeId) updateData.grade = { connect: { id: data.gradeId } };
-    if (data.departmentId)
+    if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.lastName !== undefined) updateData.lastName = data.lastName;
+    if (data.gender !== undefined) updateData.gender = data.gender;
+    if (data.gradeId !== undefined)
+      updateData.grade = { connect: { id: data.gradeId } };
+    if (data.departmentId !== undefined)
       updateData.department = { connect: { id: data.departmentId } };
     if (data.status !== undefined) updateData.status = data.status;
     if (data.kEfficiency !== undefined)
@@ -220,6 +245,9 @@ export class EmployeeService extends BaseService {
     if (data.workingHoursPerDay !== undefined)
       updateData.workingHoursPerDay = data.workingHoursPerDay;
     if (data.fireDate !== undefined) updateData.fireDate = data.fireDate;
+    if (data.birthDate !== undefined) updateData.birthDate = data.birthDate;
+    if (data.employmentType !== undefined)
+      updateData.employmentType = data.employmentType;
 
     const updated = await this.repository.update(id, updateData);
 
@@ -294,7 +322,7 @@ export class EmployeeService extends BaseService {
     await this.getByIdOrThrow(employeeId);
 
     const updated = await this.repository.update(employeeId, {
-      status: "dismissed",
+      status: EmployeeStatus.TERMINATED,
       fireDate: new Date(),
     });
 
@@ -302,5 +330,115 @@ export class EmployeeService extends BaseService {
     this.invalidateAll();
 
     return updated;
+  }
+
+  /**
+   * Create multiple employees in an atomic transaction
+   * All succeed together or all fail if any validation error occurs
+   * IMPORTANT: Validates ALL rows BEFORE transaction to ensure atomicity
+   */
+  async batchCreateFromRows(
+    companyId: string,
+    departmentMap: Map<string, string>, // departmentName -> departmentId
+    gradeMap: Map<string, number>, // gradeName -> gradeId
+    rows: Record<string, any>[],
+  ): Promise<{
+    created: number;
+    failed: number;
+    errors: Array<{ rowIndex: number; errors: string[] }>;
+    employees: Employee[];
+  }> {
+    this.log("info", `Batch creating employees`, {
+      companyId,
+      rowCount: rows.length,
+    });
+
+    const validationErrors: Array<{ rowIndex: number; errors: string[] }> = [];
+
+    try {
+      // STEP 1: Validate all rows BEFORE transaction
+      const validRows: Array<{ index: number; data: any }> = [];
+
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index];
+        const rowErrors: string[] = [];
+
+        const departmentId = departmentMap.get(row.department);
+        if (!departmentId) {
+          rowErrors.push(`Department not found: ${row.department}`);
+        }
+
+        const gradeId = gradeMap.get(row.grade);
+        if (!gradeId) {
+          rowErrors.push(`Grade not found: ${row.grade}`);
+        }
+
+        if (rowErrors.length > 0) {
+          validationErrors.push({ rowIndex: index, errors: rowErrors });
+        } else {
+          validRows.push({ index, data: row });
+        }
+      }
+
+      // If any validation errors, fail immediately without touching DB
+      if (validationErrors.length > 0) {
+        this.log("warn", `Batch validation failed`, {
+          failedCount: validationErrors.length,
+        });
+        return {
+          created: 0,
+          failed: validationErrors.length,
+          errors: validationErrors,
+          employees: [],
+        };
+      }
+
+      // STEP 2: Execute transaction with only valid rows
+      const employees = await this.context.prisma.$transaction(
+        validRows.map(({ data }) =>
+          this.context.prisma.employee.create({
+            data: {
+              companyId,
+              departmentId: departmentMap.get(data.department)!,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              gradeId: gradeMap.get(data.grade)!,
+              gender: (data.gender as Gender) || Gender.OTHER,
+              birthDate: data.birthDate ? new Date(data.birthDate) : null,
+              hireDate: new Date(data.hireDate),
+              employmentType:
+                (data.employmentType as EmploymentType) ||
+                EmploymentType.LABOR_CONTRACT,
+              status: (data.status as EmployeeStatus) || EmployeeStatus.ACTIVE,
+              workingHoursPerDay: data.workingHoursPerDay
+                ? parseInt(data.workingHoursPerDay, 10)
+                : 8,
+              kEfficiency: data.kEfficiency
+                ? parseFloat(data.kEfficiency)
+                : 1.0,
+            },
+          }),
+        ),
+      );
+
+      this.log("info", `Batch creation completed`, {
+        created: employees.length,
+      });
+
+      this.invalidateAll();
+
+      return {
+        created: employees.length,
+        failed: 0,
+        errors: [],
+        employees,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.log("error", `Batch creation failed`, { error: message });
+
+      // Transaction failed - all changes rolled back
+      throw new Error(`Batch creation failed: ${message}`);
+    }
   }
 }
