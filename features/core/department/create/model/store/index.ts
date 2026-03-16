@@ -1,1 +1,1 @@
-export { useDepartmentCreateStore } from "./useDepartmentCreateStore";
+export { useDepartmentCreateStore } from "./store";
