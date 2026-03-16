@@ -22,7 +22,8 @@ export type ActorStatus = (typeof ActorStatus)[keyof typeof ActorStatus]
 
 export const RoleScope = {
   SYSTEM: 'SYSTEM',
-  COMPANY: 'COMPANY'
+  COMPANY: 'COMPANY',
+  GUEST: 'GUEST'
 } as const
 
 export type RoleScope = (typeof RoleScope)[keyof typeof RoleScope]
@@ -34,3 +35,31 @@ export const PermissionScope = {
 } as const
 
 export type PermissionScope = (typeof PermissionScope)[keyof typeof PermissionScope]
+
+
+export const EmploymentType = {
+  LABOR_CONTRACT: 'LABOR_CONTRACT',
+  SERVICE_CONTRACT: 'SERVICE_CONTRACT',
+  SELF_EMPLOYED: 'SELF_EMPLOYED'
+} as const
+
+export type EmploymentType = (typeof EmploymentType)[keyof typeof EmploymentType]
+
+
+export const Gender = {
+  MALE: 'MALE',
+  FEMALE: 'FEMALE',
+  OTHER: 'OTHER'
+} as const
+
+export type Gender = (typeof Gender)[keyof typeof Gender]
+
+
+export const EmployeeStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  ON_LEAVE: 'ON_LEAVE',
+  TERMINATED: 'TERMINATED'
+} as const
+
+export type EmployeeStatus = (typeof EmployeeStatus)[keyof typeof EmployeeStatus]

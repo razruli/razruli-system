@@ -42,16 +42,17 @@ export type EmployeeMinAggregateOutputType = {
   id: string | null
   companyId: string | null
   departmentId: string | null
-  fio: string | null
+  firstName: string | null
+  lastName: string | null
   gradeId: number | null
-  gender: string | null
+  gender: $Enums.Gender | null
   birthDate: Date | null
   hireDate: Date | null
   fireDate: Date | null
   kEfficiency: number | null
   workingHoursPerDay: number | null
-  employmentType: string | null
-  status: string | null
+  employmentType: $Enums.EmploymentType | null
+  status: $Enums.EmployeeStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,16 +61,17 @@ export type EmployeeMaxAggregateOutputType = {
   id: string | null
   companyId: string | null
   departmentId: string | null
-  fio: string | null
+  firstName: string | null
+  lastName: string | null
   gradeId: number | null
-  gender: string | null
+  gender: $Enums.Gender | null
   birthDate: Date | null
   hireDate: Date | null
   fireDate: Date | null
   kEfficiency: number | null
   workingHoursPerDay: number | null
-  employmentType: string | null
-  status: string | null
+  employmentType: $Enums.EmploymentType | null
+  status: $Enums.EmployeeStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -78,7 +80,8 @@ export type EmployeeCountAggregateOutputType = {
   id: number
   companyId: number
   departmentId: number
-  fio: number
+  firstName: number
+  lastName: number
   gradeId: number
   gender: number
   birthDate: number
@@ -111,7 +114,8 @@ export type EmployeeMinAggregateInputType = {
   id?: true
   companyId?: true
   departmentId?: true
-  fio?: true
+  firstName?: true
+  lastName?: true
   gradeId?: true
   gender?: true
   birthDate?: true
@@ -129,7 +133,8 @@ export type EmployeeMaxAggregateInputType = {
   id?: true
   companyId?: true
   departmentId?: true
-  fio?: true
+  firstName?: true
+  lastName?: true
   gradeId?: true
   gender?: true
   birthDate?: true
@@ -147,7 +152,8 @@ export type EmployeeCountAggregateInputType = {
   id?: true
   companyId?: true
   departmentId?: true
-  fio?: true
+  firstName?: true
+  lastName?: true
   gradeId?: true
   gender?: true
   birthDate?: true
@@ -253,16 +259,17 @@ export type EmployeeGroupByOutputType = {
   id: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender: $Enums.Gender
   birthDate: Date | null
   hireDate: Date
   fireDate: Date | null
   kEfficiency: number
   workingHoursPerDay: number
-  employmentType: string
-  status: string
+  employmentType: $Enums.EmploymentType
+  status: $Enums.EmployeeStatus
   metadata: runtime.JsonValue
   createdAt: Date
   updatedAt: Date
@@ -295,16 +302,17 @@ export type EmployeeWhereInput = {
   id?: Prisma.StringFilter<"Employee"> | string
   companyId?: Prisma.StringFilter<"Employee"> | string
   departmentId?: Prisma.StringFilter<"Employee"> | string
-  fio?: Prisma.StringFilter<"Employee"> | string
+  firstName?: Prisma.StringFilter<"Employee"> | string
+  lastName?: Prisma.StringFilter<"Employee"> | string
   gradeId?: Prisma.IntFilter<"Employee"> | number
-  gender?: Prisma.StringFilter<"Employee"> | string
+  gender?: Prisma.EnumGenderFilter<"Employee"> | $Enums.Gender
   birthDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   fireDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   kEfficiency?: Prisma.FloatFilter<"Employee"> | number
   workingHoursPerDay?: Prisma.IntFilter<"Employee"> | number
-  employmentType?: Prisma.StringFilter<"Employee"> | string
-  status?: Prisma.StringFilter<"Employee"> | string
+  employmentType?: Prisma.EnumEmploymentTypeFilter<"Employee"> | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   metadata?: Prisma.JsonFilter<"Employee">
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -321,7 +329,8 @@ export type EmployeeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
-  fio?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   gradeId?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -345,22 +354,23 @@ export type EmployeeOrderByWithRelationInput = {
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  companyId_fio?: Prisma.EmployeeCompanyIdFioCompoundUniqueInput
+  companyId_firstName_lastName?: Prisma.EmployeeCompanyIdFirstNameLastNameCompoundUniqueInput
   AND?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   OR?: Prisma.EmployeeWhereInput[]
   NOT?: Prisma.EmployeeWhereInput | Prisma.EmployeeWhereInput[]
   companyId?: Prisma.StringFilter<"Employee"> | string
   departmentId?: Prisma.StringFilter<"Employee"> | string
-  fio?: Prisma.StringFilter<"Employee"> | string
+  firstName?: Prisma.StringFilter<"Employee"> | string
+  lastName?: Prisma.StringFilter<"Employee"> | string
   gradeId?: Prisma.IntFilter<"Employee"> | number
-  gender?: Prisma.StringFilter<"Employee"> | string
+  gender?: Prisma.EnumGenderFilter<"Employee"> | $Enums.Gender
   birthDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   fireDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   kEfficiency?: Prisma.FloatFilter<"Employee"> | number
   workingHoursPerDay?: Prisma.IntFilter<"Employee"> | number
-  employmentType?: Prisma.StringFilter<"Employee"> | string
-  status?: Prisma.StringFilter<"Employee"> | string
+  employmentType?: Prisma.EnumEmploymentTypeFilter<"Employee"> | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   metadata?: Prisma.JsonFilter<"Employee">
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -371,13 +381,14 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
   history?: Prisma.EmployeeHistoryListRelationFilter
-}, "id" | "companyId_fio">
+}, "id" | "companyId_firstName_lastName">
 
 export type EmployeeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
-  fio?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   gradeId?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -404,16 +415,17 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   companyId?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   departmentId?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  fio?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  firstName?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  lastName?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   gradeId?: Prisma.IntWithAggregatesFilter<"Employee"> | number
-  gender?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  gender?: Prisma.EnumGenderWithAggregatesFilter<"Employee"> | $Enums.Gender
   birthDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Employee"> | Date | string | null
   hireDate?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
   fireDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Employee"> | Date | string | null
   kEfficiency?: Prisma.FloatWithAggregatesFilter<"Employee"> | number
   workingHoursPerDay?: Prisma.IntWithAggregatesFilter<"Employee"> | number
-  employmentType?: Prisma.StringWithAggregatesFilter<"Employee"> | string
-  status?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  employmentType?: Prisma.EnumEmploymentTypeWithAggregatesFilter<"Employee"> | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusWithAggregatesFilter<"Employee"> | $Enums.EmployeeStatus
   metadata?: Prisma.JsonWithAggregatesFilter<"Employee">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Employee"> | Date | string
@@ -421,15 +433,16 @@ export type EmployeeScalarWhereWithAggregatesInput = {
 
 export type EmployeeCreateInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -446,16 +459,17 @@ export type EmployeeUncheckedCreateInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -467,15 +481,16 @@ export type EmployeeUncheckedCreateInput = {
 
 export type EmployeeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -492,16 +507,17 @@ export type EmployeeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -515,16 +531,17 @@ export type EmployeeCreateManyInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -532,15 +549,16 @@ export type EmployeeCreateManyInput = {
 
 export type EmployeeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -550,16 +568,17 @@ export type EmployeeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -585,16 +604,18 @@ export type EmployeeOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type EmployeeCompanyIdFioCompoundUniqueInput = {
+export type EmployeeCompanyIdFirstNameLastNameCompoundUniqueInput = {
   companyId: string
-  fio: string
+  firstName: string
+  lastName: string
 }
 
 export type EmployeeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
-  fio?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   gradeId?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
@@ -619,7 +640,8 @@ export type EmployeeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
-  fio?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   gradeId?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
@@ -637,7 +659,8 @@ export type EmployeeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   departmentId?: Prisma.SortOrder
-  fio?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
   gradeId?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
@@ -787,6 +810,18 @@ export type EmployeeUncheckedUpdateManyWithoutDepartmentNestedInput = {
   deleteMany?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
 }
 
+export type EnumGenderFieldUpdateOperationsInput = {
+  set?: $Enums.Gender
+}
+
+export type EnumEmploymentTypeFieldUpdateOperationsInput = {
+  set?: $Enums.EmploymentType
+}
+
+export type EnumEmployeeStatusFieldUpdateOperationsInput = {
+  set?: $Enums.EmployeeStatus
+}
+
 export type EmployeeCreateNestedManyWithoutGradeInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutGradeInput, Prisma.EmployeeUncheckedCreateWithoutGradeInput> | Prisma.EmployeeCreateWithoutGradeInput[] | Prisma.EmployeeUncheckedCreateWithoutGradeInput[]
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutGradeInput | Prisma.EmployeeCreateOrConnectWithoutGradeInput[]
@@ -845,15 +880,16 @@ export type EmployeeUpdateOneRequiredWithoutTaskAssignmentsNestedInput = {
 
 export type EmployeeCreateWithoutLoadSnapshotsInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -869,16 +905,17 @@ export type EmployeeUncheckedCreateWithoutLoadSnapshotsInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -905,15 +942,16 @@ export type EmployeeUpdateToOneWithWhereWithoutLoadSnapshotsInput = {
 
 export type EmployeeUpdateWithoutLoadSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -929,16 +967,17 @@ export type EmployeeUncheckedUpdateWithoutLoadSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -949,15 +988,16 @@ export type EmployeeUncheckedUpdateWithoutLoadSnapshotsInput = {
 
 export type EmployeeCreateWithoutHistoryInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -973,16 +1013,17 @@ export type EmployeeUncheckedCreateWithoutHistoryInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1009,15 +1050,16 @@ export type EmployeeUpdateToOneWithWhereWithoutHistoryInput = {
 
 export type EmployeeUpdateWithoutHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1033,16 +1075,17 @@ export type EmployeeUncheckedUpdateWithoutHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1053,15 +1096,16 @@ export type EmployeeUncheckedUpdateWithoutHistoryInput = {
 
 export type EmployeeCreateWithoutCompanyInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1076,16 +1120,17 @@ export type EmployeeCreateWithoutCompanyInput = {
 export type EmployeeUncheckedCreateWithoutCompanyInput = {
   id?: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1128,16 +1173,17 @@ export type EmployeeScalarWhereInput = {
   id?: Prisma.StringFilter<"Employee"> | string
   companyId?: Prisma.StringFilter<"Employee"> | string
   departmentId?: Prisma.StringFilter<"Employee"> | string
-  fio?: Prisma.StringFilter<"Employee"> | string
+  firstName?: Prisma.StringFilter<"Employee"> | string
+  lastName?: Prisma.StringFilter<"Employee"> | string
   gradeId?: Prisma.IntFilter<"Employee"> | number
-  gender?: Prisma.StringFilter<"Employee"> | string
+  gender?: Prisma.EnumGenderFilter<"Employee"> | $Enums.Gender
   birthDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   hireDate?: Prisma.DateTimeFilter<"Employee"> | Date | string
   fireDate?: Prisma.DateTimeNullableFilter<"Employee"> | Date | string | null
   kEfficiency?: Prisma.FloatFilter<"Employee"> | number
   workingHoursPerDay?: Prisma.IntFilter<"Employee"> | number
-  employmentType?: Prisma.StringFilter<"Employee"> | string
-  status?: Prisma.StringFilter<"Employee"> | string
+  employmentType?: Prisma.EnumEmploymentTypeFilter<"Employee"> | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFilter<"Employee"> | $Enums.EmployeeStatus
   metadata?: Prisma.JsonFilter<"Employee">
   createdAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Employee"> | Date | string
@@ -1145,15 +1191,16 @@ export type EmployeeScalarWhereInput = {
 
 export type EmployeeCreateWithoutManagedDepartmentInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1169,16 +1216,17 @@ export type EmployeeUncheckedCreateWithoutManagedDepartmentInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1194,15 +1242,16 @@ export type EmployeeCreateOrConnectWithoutManagedDepartmentInput = {
 
 export type EmployeeCreateWithoutDepartmentInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1217,16 +1266,17 @@ export type EmployeeCreateWithoutDepartmentInput = {
 export type EmployeeUncheckedCreateWithoutDepartmentInput = {
   id?: string
   companyId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1259,15 +1309,16 @@ export type EmployeeUpdateToOneWithWhereWithoutManagedDepartmentInput = {
 
 export type EmployeeUpdateWithoutManagedDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1283,16 +1334,17 @@ export type EmployeeUncheckedUpdateWithoutManagedDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1319,15 +1371,16 @@ export type EmployeeUpdateManyWithWhereWithoutDepartmentInput = {
 
 export type EmployeeCreateWithoutGradeInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1343,15 +1396,16 @@ export type EmployeeUncheckedCreateWithoutGradeInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1389,15 +1443,16 @@ export type EmployeeUpdateManyWithWhereWithoutGradeInput = {
 
 export type EmployeeCreateWithoutTaskAssignmentsInput = {
   id?: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1413,16 +1468,17 @@ export type EmployeeUncheckedCreateWithoutTaskAssignmentsInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1449,15 +1505,16 @@ export type EmployeeUpdateToOneWithWhereWithoutTaskAssignmentsInput = {
 
 export type EmployeeUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1473,16 +1530,17 @@ export type EmployeeUncheckedUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1494,16 +1552,17 @@ export type EmployeeUncheckedUpdateWithoutTaskAssignmentsInput = {
 export type EmployeeCreateManyCompanyInput = {
   id?: string
   departmentId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1511,15 +1570,16 @@ export type EmployeeCreateManyCompanyInput = {
 
 export type EmployeeUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1534,16 +1594,17 @@ export type EmployeeUpdateWithoutCompanyInput = {
 export type EmployeeUncheckedUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1556,16 +1617,17 @@ export type EmployeeUncheckedUpdateWithoutCompanyInput = {
 export type EmployeeUncheckedUpdateManyWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1574,16 +1636,17 @@ export type EmployeeUncheckedUpdateManyWithoutCompanyInput = {
 export type EmployeeCreateManyDepartmentInput = {
   id?: string
   companyId: string
-  fio: string
+  firstName: string
+  lastName: string
   gradeId: number
-  gender: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1591,15 +1654,16 @@ export type EmployeeCreateManyDepartmentInput = {
 
 export type EmployeeUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1614,16 +1678,17 @@ export type EmployeeUpdateWithoutDepartmentInput = {
 export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1636,16 +1701,17 @@ export type EmployeeUncheckedUpdateWithoutDepartmentInput = {
 export type EmployeeUncheckedUpdateManyWithoutDepartmentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
   gradeId?: Prisma.IntFieldUpdateOperationsInput | number
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1655,15 +1721,16 @@ export type EmployeeCreateManyGradeInput = {
   id?: string
   companyId: string
   departmentId: string
-  fio: string
-  gender: string
+  firstName: string
+  lastName: string
+  gender?: $Enums.Gender
   birthDate?: Date | string | null
   hireDate: Date | string
   fireDate?: Date | string | null
   kEfficiency?: number
   workingHoursPerDay?: number
-  employmentType?: string
-  status?: string
+  employmentType?: $Enums.EmploymentType
+  status?: $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1671,15 +1738,16 @@ export type EmployeeCreateManyGradeInput = {
 
 export type EmployeeUpdateWithoutGradeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1695,15 +1763,16 @@ export type EmployeeUncheckedUpdateWithoutGradeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1717,15 +1786,16 @@ export type EmployeeUncheckedUpdateManyWithoutGradeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   departmentId?: Prisma.StringFieldUpdateOperationsInput | string
-  fio?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   hireDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   kEfficiency?: Prisma.FloatFieldUpdateOperationsInput | number
   workingHoursPerDay?: Prisma.IntFieldUpdateOperationsInput | number
-  employmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  employmentType?: Prisma.EnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType
+  status?: Prisma.EnumEmployeeStatusFieldUpdateOperationsInput | $Enums.EmployeeStatus
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1784,7 +1854,8 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   companyId?: boolean
   departmentId?: boolean
-  fio?: boolean
+  firstName?: boolean
+  lastName?: boolean
   gradeId?: boolean
   gender?: boolean
   birthDate?: boolean
@@ -1811,7 +1882,8 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   companyId?: boolean
   departmentId?: boolean
-  fio?: boolean
+  firstName?: boolean
+  lastName?: boolean
   gradeId?: boolean
   gender?: boolean
   birthDate?: boolean
@@ -1833,7 +1905,8 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   companyId?: boolean
   departmentId?: boolean
-  fio?: boolean
+  firstName?: boolean
+  lastName?: boolean
   gradeId?: boolean
   gender?: boolean
   birthDate?: boolean
@@ -1855,7 +1928,8 @@ export type EmployeeSelectScalar = {
   id?: boolean
   companyId?: boolean
   departmentId?: boolean
-  fio?: boolean
+  firstName?: boolean
+  lastName?: boolean
   gradeId?: boolean
   gender?: boolean
   birthDate?: boolean
@@ -1870,7 +1944,7 @@ export type EmployeeSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "departmentId" | "fio" | "gradeId" | "gender" | "birthDate" | "hireDate" | "fireDate" | "kEfficiency" | "workingHoursPerDay" | "employmentType" | "status" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "departmentId" | "firstName" | "lastName" | "gradeId" | "gender" | "birthDate" | "hireDate" | "fireDate" | "kEfficiency" | "workingHoursPerDay" | "employmentType" | "status" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
@@ -1907,16 +1981,17 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     companyId: string
     departmentId: string
-    fio: string
+    firstName: string
+    lastName: string
     gradeId: number
-    gender: string
+    gender: $Enums.Gender
     birthDate: Date | null
     hireDate: Date
     fireDate: Date | null
     kEfficiency: number
     workingHoursPerDay: number
-    employmentType: string
-    status: string
+    employmentType: $Enums.EmploymentType
+    status: $Enums.EmployeeStatus
     metadata: runtime.JsonValue
     createdAt: Date
     updatedAt: Date
@@ -2353,16 +2428,17 @@ export interface EmployeeFieldRefs {
   readonly id: Prisma.FieldRef<"Employee", 'String'>
   readonly companyId: Prisma.FieldRef<"Employee", 'String'>
   readonly departmentId: Prisma.FieldRef<"Employee", 'String'>
-  readonly fio: Prisma.FieldRef<"Employee", 'String'>
+  readonly firstName: Prisma.FieldRef<"Employee", 'String'>
+  readonly lastName: Prisma.FieldRef<"Employee", 'String'>
   readonly gradeId: Prisma.FieldRef<"Employee", 'Int'>
-  readonly gender: Prisma.FieldRef<"Employee", 'String'>
+  readonly gender: Prisma.FieldRef<"Employee", 'Gender'>
   readonly birthDate: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly hireDate: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly fireDate: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly kEfficiency: Prisma.FieldRef<"Employee", 'Float'>
   readonly workingHoursPerDay: Prisma.FieldRef<"Employee", 'Int'>
-  readonly employmentType: Prisma.FieldRef<"Employee", 'String'>
-  readonly status: Prisma.FieldRef<"Employee", 'String'>
+  readonly employmentType: Prisma.FieldRef<"Employee", 'EmploymentType'>
+  readonly status: Prisma.FieldRef<"Employee", 'EmployeeStatus'>
   readonly metadata: Prisma.FieldRef<"Employee", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Employee", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Employee", 'DateTime'>

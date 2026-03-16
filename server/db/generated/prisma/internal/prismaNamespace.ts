@@ -2282,7 +2282,8 @@ export const EmployeeScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
   departmentId: 'departmentId',
-  fio: 'fio',
+  firstName: 'firstName',
+  lastName: 'lastName',
   gradeId: 'gradeId',
   gender: 'gender',
   birthDate: 'birthDate',
@@ -2520,6 +2521,48 @@ export type ListEnumPermissionScopeFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender'
+ */
+export type EnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender'>
+    
+
+
+/**
+ * Reference to a field of type 'Gender[]'
+ */
+export type ListEnumGenderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Gender[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmploymentType'
+ */
+export type EnumEmploymentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmploymentType'>
+    
+
+
+/**
+ * Reference to a field of type 'EmploymentType[]'
+ */
+export type ListEnumEmploymentTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmploymentType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EmployeeStatus'
+ */
+export type EnumEmployeeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmployeeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'EmployeeStatus[]'
+ */
+export type ListEnumEmployeeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmployeeStatus[]'>
     
 
 /**
