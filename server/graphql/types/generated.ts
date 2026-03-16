@@ -354,11 +354,12 @@ export type CreateEmployeeInput = {
   companyId: Scalars['String']['input'];
   departmentId: Scalars['String']['input'];
   employmentType?: InputMaybe<Scalars['String']['input']>;
-  fio: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
   gender: Scalars['String']['input'];
   gradeId: Scalars['Int']['input'];
   hireDate: Scalars['DateTime']['input'];
   kEfficiency?: InputMaybe<Scalars['Float']['input']>;
+  lastName: Scalars['String']['input'];
   workingHoursPerDay?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -565,13 +566,15 @@ export type Employee = {
   department: Department;
   /** Department assignment */
   departmentId: Scalars['String']['output'];
-  /** Employment type (ТД/ГПХ/Самозанятый) */
+  /** Employment type (LABOR_CONTRACT/SERVICE_CONTRACT/SELF_EMPLOYED) */
   employmentType: Scalars['String']['output'];
-  /** Full name */
+  /** Full name (firstName lastName) - computed */
   fio: Scalars['String']['output'];
   /** Dismissal date (null if active) */
   fireDate?: Maybe<Scalars['DateTime']['output']>;
-  /** Gender (M/F) */
+  /** First name */
+  firstName: Scalars['String']['output'];
+  /** Gender (MALE/FEMALE/OTHER) */
   gender: Scalars['String']['output'];
   grade: Grade;
   /** Seniority level/Grade */
@@ -584,11 +587,13 @@ export type Employee = {
   id: Scalars['String']['output'];
   /** Efficiency coefficient (multiplier, default 1.0) */
   kEfficiency: Scalars['Float']['output'];
+  /** Last name */
+  lastName: Scalars['String']['output'];
   /** Load snapshots */
   loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
   /** Metadata (JSON) */
   metadata?: Maybe<Scalars['JSON']['output']>;
-  /** Current status (active/vacation/sick/dismissed) */
+  /** Current status (ACTIVE/INACTIVE/ON_LEAVE/TERMINATED) */
   status: Scalars['String']['output'];
   /** Task assignments */
   taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
@@ -3529,11 +3534,15 @@ export type UpdateDepartmentInput = {
 
 /** Fields that can be updated */
 export type UpdateEmployeeInput = {
+  birthDate?: InputMaybe<Scalars['DateTime']['input']>;
   departmentId?: InputMaybe<Scalars['String']['input']>;
-  fio?: InputMaybe<Scalars['String']['input']>;
+  employmentType?: InputMaybe<Scalars['String']['input']>;
+  fireDate?: InputMaybe<Scalars['DateTime']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
   gender?: InputMaybe<Scalars['String']['input']>;
   gradeId?: InputMaybe<Scalars['Int']['input']>;
   kEfficiency?: InputMaybe<Scalars['Float']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<Scalars['String']['input']>;
   workingHoursPerDay?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4317,6 +4326,7 @@ export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends R
   employmentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   fio?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   fireDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   gender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   grade?: Resolver<ResolversTypes['Grade'], ParentType, ContextType>;
   gradeId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -4324,6 +4334,7 @@ export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends R
   history?: Resolver<Maybe<Array<Maybe<ResolversTypes['EmployeeHistory']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   kEfficiency?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   loadSnapshots?: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

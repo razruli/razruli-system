@@ -19,17 +19,26 @@ type Employee {
   departmentId: String!
   department: Department! # Field resolver
   """
-  Full name
+  First name
   """
-  fio: String!
+  firstName: String!
 
+  """
+  Last name
+  """
+  lastName: String!
+
+  """
+  Full name (firstName lastName) - computed
+  """
+  fio: String! # Field resolver
   """
   Seniority level/Grade
   """
   gradeId: Int!
   grade: Grade! # Field resolver
   """
-  Gender (M/F)
+  Gender (MALE/FEMALE/OTHER)
   """
   gender: String!
 
@@ -54,12 +63,12 @@ type Employee {
   kEfficiency: Float!
 
   """
-  Employment type (ТД/ГПХ/Самозанятый)
+  Employment type (LABOR_CONTRACT/SERVICE_CONTRACT/SELF_EMPLOYED)
   """
   employmentType: String!
 
   """
-  Current status (active/vacation/sick/dismissed)
+  Current status (ACTIVE/INACTIVE/ON_LEAVE/TERMINATED)
   """
   status: String!
 
@@ -102,7 +111,8 @@ Required fields for creating an employee
 input CreateEmployeeInput {
   companyId: String!
   departmentId: String!
-  fio: String!
+  firstName: String!
+  lastName: String!
   gradeId: Int!
   gender: String!
   hireDate: DateTime!
@@ -116,13 +126,17 @@ input CreateEmployeeInput {
 Fields that can be updated
 """
 input UpdateEmployeeInput {
-  fio: String
+  firstName: String
+  lastName: String
   gradeId: Int
   departmentId: String
   gender: String
   status: String
   kEfficiency: Float
   workingHoursPerDay: Int
+  birthDate: DateTime
+  fireDate: DateTime
+  employmentType: String
 }
 
 """

@@ -10,8 +10,21 @@ import { EmployeeResolvers } from "@/server/graphql/types/generated";
 
 export const employeeFieldResolvers: Pick<
   EmployeeResolvers,
-  "department" | "grade" | "taskAssignments" | "loadSnapshots" | "history"
+  | "fio"
+  | "department"
+  | "grade"
+  | "taskAssignments"
+  | "loadSnapshots"
+  | "history"
 > = {
+  /**
+   * Resolve employee's full name (fio)
+   * Computed from firstName and lastName
+   */
+  fio: (parent) => {
+    return `${parent.firstName} ${parent.lastName}`;
+  },
+
   /**
    * Resolve employee's department
    * Using service's internal DataLoader for batching

@@ -44,8 +44,15 @@ const createEmployeeResolver: MutationResolvers["createEmployee"] = async (
 ) => {
   try {
     // Validate input
-    if (!input.departmentId || !input.fio || !input.gradeId) {
-      throw new Error("Missing required fields: departmentId, fio, gradeId");
+    if (
+      !input.departmentId ||
+      !input.firstName ||
+      !input.lastName ||
+      !input.gradeId
+    ) {
+      throw new Error(
+        "Missing required fields: departmentId, firstName, lastName, gradeId",
+      );
     }
 
     // Use company from auth context if not provided
@@ -58,14 +65,19 @@ const createEmployeeResolver: MutationResolvers["createEmployee"] = async (
     const employee = await context.services.employee.create({
       companyId,
       departmentId: input.departmentId,
-      fio: input.fio,
+      firstName: input.firstName,
+      lastName: input.lastName,
       gradeId: input.gradeId,
       gender: input.gender,
-      birthDate: input.birthDate,
+      birthDate: input.birthDate === null ? undefined : input.birthDate,
       hireDate: input.hireDate,
-      employmentType: input.employmentType || "ТД",
-      workingHoursPerDay: input.workingHoursPerDay || 8,
-      kEfficiency: input.kEfficiency || 1.0,
+      employmentType:
+        input.employmentType === null ? undefined : input.employmentType,
+      workingHoursPerDay:
+        input.workingHoursPerDay === null
+          ? undefined
+          : input.workingHoursPerDay,
+      kEfficiency: input.kEfficiency === null ? undefined : input.kEfficiency,
     });
 
     // Emit event for subscriptions
@@ -104,8 +116,18 @@ const updateEmployeeResolver: MutationResolvers["updateEmployee"] = async (
     // Build update data from provided fields
     const updateData: Record<string, unknown> = {};
 
-    if (input.fio !== undefined && input.fio !== oldEmployee.fio) {
-      updateData.fio = input.fio;
+    if (
+      input.firstName !== undefined &&
+      input.firstName !== oldEmployee.firstName
+    ) {
+      updateData.firstName = input.firstName;
+    }
+
+    if (
+      input.lastName !== undefined &&
+      input.lastName !== oldEmployee.lastName
+    ) {
+      updateData.lastName = input.lastName;
     }
 
     if (input.gradeId !== undefined && input.gradeId !== oldEmployee.gradeId) {
@@ -139,6 +161,27 @@ const updateEmployeeResolver: MutationResolvers["updateEmployee"] = async (
       input.workingHoursPerDay !== oldEmployee.workingHoursPerDay
     ) {
       updateData.workingHoursPerDay = input.workingHoursPerDay;
+    }
+
+    if (
+      input.birthDate !== undefined &&
+      input.birthDate !== oldEmployee.birthDate
+    ) {
+      updateData.birthDate = input.birthDate;
+    }
+
+    if (
+      input.fireDate !== undefined &&
+      input.fireDate !== oldEmployee.fireDate
+    ) {
+      updateData.fireDate = input.fireDate;
+    }
+
+    if (
+      input.employmentType !== undefined &&
+      input.employmentType !== oldEmployee.employmentType
+    ) {
+      updateData.employmentType = input.employmentType;
     }
 
     // If no changes, return old employee
@@ -194,7 +237,7 @@ const dismissEmployeeResolver: MutationResolvers["dismissEmployee"] = async (
     // Dismiss employee (soft delete - sets fireDate and status)
     const dismissedEmployee = await context.services.employee.update(id, {
       fireDate: new Date(),
-      status: "dismissed",
+      status: "TERMINATED",
     });
 
     // Cancel all active task assignments
