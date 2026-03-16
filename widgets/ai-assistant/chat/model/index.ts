@@ -1,1 +1,1 @@
-export type * from "./types";
+export { useChatWidget } from "./useChatWidget";

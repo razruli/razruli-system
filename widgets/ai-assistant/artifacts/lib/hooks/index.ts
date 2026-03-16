@@ -1,1 +1,0 @@
-export { useArtifact } from "./useArtifact";

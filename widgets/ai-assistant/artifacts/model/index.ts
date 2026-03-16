@@ -1,1 +1,1 @@
-export type * from "./types";
+export { useArtifactWidget } from "./useArtifactWidget";

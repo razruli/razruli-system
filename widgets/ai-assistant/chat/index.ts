@@ -1,3 +1,1 @@
-export * from "./ui";
-export * from "./lib";
-export * from "./model";
+export { ChatWidget } from "./ui/ChatWidget";

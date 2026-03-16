@@ -1,3 +1,3 @@
-export * as chat from "./chat";
-export * as artifacts from "./artifacts";
-export * as insights from "./insights";
+export { ChatWidget } from "./chat";
+export { ArtifactWidget } from "./artifacts";
+export { InsightsWidget } from "./insights";
