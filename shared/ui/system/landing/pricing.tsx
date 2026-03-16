@@ -88,7 +88,7 @@ export function Pricing() {
               key={plan.name}
               className={`relative flex flex-col border-border/50 ${
                 plan.highlighted
-                  ? "border-primary/50 bg-gradient-to-b from-primary/5 to-card shadow-lg"
+                  ? "border-primary/50 bg-linear-to-b from-primary/5 to-card shadow-lg"
                   : "bg-card"
               }`}
             >

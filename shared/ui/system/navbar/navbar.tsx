@@ -75,7 +75,7 @@ export function Navbar() {
             Sign In
           </Button>
           <Button asChild>
-            <Link href="/test-company/dashboard">Get Started</Link>
+            <Link href="/auth/signin">Get Started</Link>
           </Button>
         </div>
 
