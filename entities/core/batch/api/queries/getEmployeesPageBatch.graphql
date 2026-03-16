@@ -1,0 +1,40 @@
+# query GetEmployeesPageBatch($first: Int!, $offset: Int, $filter: EmployeeFilter) {
+#   employees(first: $first, offset: $offset, filter: $filter) {
+#     edges {
+#       id
+#       name
+#       email
+#       department {
+#         id
+#         name
+#       }
+#       capacity
+#       currentWorkload
+#       efficiency
+#       status
+#     }
+#     pageInfo {
+#       total
+#       hasMore
+#       offset
+#       limit
+#     }
+#   }
+#   departments(first: 100) {
+#     edges {
+#       id
+#       name
+#     }
+#     pageInfo {
+#       total
+#       hasMore
+#       offset
+#       limit
+#     }
+#   }
+#   stats {
+#     totalEmployees
+#     activeEmployees
+#     onLeaveEmployees
+#   }
+# }

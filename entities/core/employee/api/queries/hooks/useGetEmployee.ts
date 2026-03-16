@@ -5,11 +5,8 @@
 
 "use client";
 
-import {
-  useQuery,
-  type ApolloQueryResult,
-  type OperationVariables,
-} from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+
 import {
   GetEmployeeDocument,
   type GetEmployeeQuery,

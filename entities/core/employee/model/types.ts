@@ -24,7 +24,8 @@ export interface Employee {
   companyId: string;
   departmentId: string;
   department?: Department;
-  fio: string;
+  firstName: string;
+  lastName: string;
   gradeId: number;
   grade?: Grade;
   gender: string;
@@ -66,7 +67,8 @@ export interface EmployeePaginationInput {
 export interface CreateEmployeeInput {
   companyId: string;
   departmentId: string;
-  fio: string;
+  firstName: string;
+  lastName: string;
   gradeId: number;
   gender: string;
   hireDate: Date;
@@ -77,11 +79,15 @@ export interface CreateEmployeeInput {
 }
 
 export interface UpdateEmployeeInput {
-  fio?: string;
+  firstName?: string;
+  lastName?: string;
   gradeId?: number;
   departmentId?: string;
   gender?: string;
   status?: string;
   kEfficiency?: number;
   workingHoursPerDay?: number;
+  birthDate?: Date | null;
+  fireDate?: Date | null;
+  employmentType?: string;
 }
