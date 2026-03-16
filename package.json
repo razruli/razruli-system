@@ -12,6 +12,8 @@
     "fsd": "steiger ./"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@anthropic-ai/sdk": "^0.78.0",
     "@apollo/client": "^4.0.11",
     "@apollo/client-integration-nextjs": "^0.14.4",
     "@apollo/server": "^5.2.0",
@@ -35,6 +37,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.18",
+    "ai": "^6.0.116",
     "better-auth": "^1.4.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
