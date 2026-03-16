@@ -27,17 +27,24 @@ async function main() {
       },
     });
 
-    const grade = await prisma.grade.upsert({
-      where: { id: 1 },
-      update: {},
-      create: {
-        id: 1,
-        name: "Junior",
-        kGrade: 0.6,
-      },
-    });
+    // Create all grades
+    const grades = [
+      { id: 1, name: "Junior", kGrade: 0.6 },
+      { id: 2, name: "Senior", kGrade: 1.2 },
+      { id: 3, name: "Lead", kGrade: 1.5 },
+      { id: 4, name: "Middle", kGrade: 0.9 },
+      { id: 5, name: "Intern", kGrade: 0.4 },
+    ];
 
-    console.log("✅ Base models: User, Company, Grade created");
+    for (const gradeData of grades) {
+      await prisma.grade.upsert({
+        where: { id: gradeData.id },
+        update: {},
+        create: gradeData,
+      });
+    }
+
+    console.log("✅ Base models: User, Company, Grades created");
     console.log("\n✨ Database seeded successfully!");
   } catch (error) {
     console.error("❌ Error seeding database:", error);
