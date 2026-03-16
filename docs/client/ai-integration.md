@@ -33,6 +33,7 @@ AI-powered insights integrated directly into workforce analytics pages. Built wi
 **Endpoint:** `POST /api/ai/analyze`
 
 **Request:**
+
 ```json
 {
   "type": "hiring-gap" | "data-insights" | "capacity-analysis" | "workforce-summary",
@@ -51,7 +52,9 @@ import { useAIAnalysis } from "@/features/common/ai";
 
 const { isLoading, error, response, analyze } = useAIAnalysis({
   type: "hiring-gap",
-  context: { /* data */ }
+  context: {
+    /* data */
+  },
 });
 
 // Trigger analysis
@@ -134,6 +137,7 @@ Embed `AIInsightPanel` components in analytics/dashboard pages.
 ### Model
 
 Currently using **Claude 3.5 Sonnet** (`claude-3-5-sonnet-20241022`)
+
 - Token limit: 200K input, 4K output per request
 - Speed: Fast streaming responses
 - Cost: Optimized for performance
@@ -178,6 +182,7 @@ Display in AIInsightPanel
 ## Error Handling
 
 All errors are caught and surfaced to the UI:
+
 - Unauthorized (401): No valid session
 - Not Found (404): Actor/company not found
 - Server Error (500): AI generation failure

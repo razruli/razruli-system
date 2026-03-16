@@ -1,8 +1,6 @@
-import { anthropic } from "@ai-sdk/anthropic";
+import { groq } from "@ai-sdk/groq";
 import { streamText } from "ai";
-import { getSession } from "better-auth/api";
 
-// import { getSession } from "@/server/auth/auth";
 import { prisma } from "@/server/db/prisma/lib/prisma";
 
 export const runtime = "nodejs";
@@ -15,29 +13,43 @@ interface AnalysisRequest {
     | "capacity-analysis"
     | "workforce-summary";
   context?: Record<string, unknown>;
+  userId?: string; // Pass userId from client
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getSession();
-    if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
     const body = (await request.json()) as AnalysisRequest;
-    const { type, context } = body;
+    const { type, context, userId } = body;
 
-    // Get actor/company context
-    const actor = await prisma.actor.findUnique({
-      where: { userId: session.user.id },
-      include: { company: true },
-    });
-
-    if (!actor) {
-      return new Response("Actor not found", { status: 404 });
+    if (!userId) {
+      return new Response("Unauthorized - no user ID", { status: 401 });
     }
 
-    const company = actor.company;
+    // Get actor/company context (optional for MVP)
+    let company: any = null;
+    try {
+      const actor = await prisma.actor.findUnique({
+        where: { userId },
+        include: { company: true },
+      });
+      if (actor) {
+        company = actor.company;
+      }
+    } catch (err) {
+      console.warn(
+        "[AI Analysis] Actor lookup failed, using generic context",
+        err,
+      );
+    }
+
+    // Use generic context if actor not found
+    if (!company) {
+      company = {
+        name: "Your Company",
+        id: userId, // Use userId as fallback ID
+      };
+    }
+
     let systemPrompt = "";
     let userMessage = "";
 
@@ -67,16 +79,28 @@ export async function POST(request: Request) {
         return new Response("Unknown analysis type", { status: 400 });
     }
 
-    // Stream response using Vercel AI SDK
+    // Stream response using Groq API (free tier available!)
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      console.error("[AI Route] GROQ_API_KEY not set");
+      return new Response(
+        "API key not configured - get free key at https://console.groq.com/keys",
+        { status: 500 },
+      );
+    }
+
+    console.log("[AI Route] Calling Groq with Llama 3.1 8B Instant");
     const result = streamText({
-      model: anthropic("claude-3-5-sonnet-20241022"),
+      model: groq("llama-3.1-8b-instant"),
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
       temperature: 0.7,
     });
 
-    // Return streaming response
-    return result.toDataStream();
+    console.log("[AI Route] streamText result created, converting to response");
+    const response = result.toTextStreamResponse();
+    console.log("[AI Route] Response headers:", response.headers);
+    return response;
   } catch (error) {
     console.error("[AI Analysis Error]", error);
     return new Response("Internal Server Error", { status: 500 });
