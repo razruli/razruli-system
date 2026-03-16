@@ -30,8 +30,6 @@ type Documents = {
     "query GetEmployeeCapacity($id: String!) {\n  employeeCapacity(id: $id)\n}": typeof types.GetEmployeeCapacityDocument,
     "query GetEmployeeLoadIndex($id: String!, $periodStart: DateTime!, $periodEnd: DateTime!) {\n  employeeLoadIndex(id: $id, periodStart: $periodStart, periodEnd: $periodEnd)\n}": typeof types.GetEmployeeLoadIndexDocument,
     "query GetEmployees($filter: EmployeeFilterInput, $pagination: EmployeePaginationInput) {\n  employees(filter: $filter, pagination: $pagination) {\n    nodes {\n      id\n      companyId\n      departmentId\n      department {\n        id\n        name\n      }\n      fio\n      gradeId\n      grade {\n        id\n        name\n        kGrade\n      }\n      gender\n      birthDate\n      hireDate\n      fireDate\n      kEfficiency\n      employmentType\n      status\n      workingHoursPerDay\n      createdAt\n      updatedAt\n    }\n    totalCount\n    pageInfo {\n      hasMore\n      offset\n      limit\n      total\n    }\n  }\n}": typeof types.GetEmployeesDocument,
-    "query Me {\n  me {\n    id\n    name\n    email\n    image\n    status\n    createdAt\n    updatedAt\n  }\n}": typeof types.MeDocument,
-    "query Users($input: UsersInput!) {\n  users(input: $input) {\n    users {\n      id\n      email\n      name\n      status\n      image\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      total\n      offset\n      limit\n    }\n  }\n}": typeof types.UsersDocument,
 };
 const documents: Documents = {
     "mutation AssignDepartmentHead($departmentId: String!, $employeeId: String!) {\n  assignDepartmentHead(departmentId: $departmentId, employeeId: $employeeId) {\n    id\n    name\n    headId\n    head {\n      id\n      fio\n      gradeId\n    }\n    updatedAt\n  }\n}": types.AssignDepartmentHeadDocument,
@@ -50,8 +48,6 @@ const documents: Documents = {
     "query GetEmployeeCapacity($id: String!) {\n  employeeCapacity(id: $id)\n}": types.GetEmployeeCapacityDocument,
     "query GetEmployeeLoadIndex($id: String!, $periodStart: DateTime!, $periodEnd: DateTime!) {\n  employeeLoadIndex(id: $id, periodStart: $periodStart, periodEnd: $periodEnd)\n}": types.GetEmployeeLoadIndexDocument,
     "query GetEmployees($filter: EmployeeFilterInput, $pagination: EmployeePaginationInput) {\n  employees(filter: $filter, pagination: $pagination) {\n    nodes {\n      id\n      companyId\n      departmentId\n      department {\n        id\n        name\n      }\n      fio\n      gradeId\n      grade {\n        id\n        name\n        kGrade\n      }\n      gender\n      birthDate\n      hireDate\n      fireDate\n      kEfficiency\n      employmentType\n      status\n      workingHoursPerDay\n      createdAt\n      updatedAt\n    }\n    totalCount\n    pageInfo {\n      hasMore\n      offset\n      limit\n      total\n    }\n  }\n}": types.GetEmployeesDocument,
-    "query Me {\n  me {\n    id\n    name\n    email\n    image\n    status\n    createdAt\n    updatedAt\n  }\n}": types.MeDocument,
-    "query Users($input: UsersInput!) {\n  users(input: $input) {\n    users {\n      id\n      email\n      name\n      status\n      image\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      total\n      offset\n      limit\n    }\n  }\n}": types.UsersDocument,
 };
 
 /**
@@ -132,14 +128,6 @@ export function graphql(source: "query GetEmployeeLoadIndex($id: String!, $perio
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "query GetEmployees($filter: EmployeeFilterInput, $pagination: EmployeePaginationInput) {\n  employees(filter: $filter, pagination: $pagination) {\n    nodes {\n      id\n      companyId\n      departmentId\n      department {\n        id\n        name\n      }\n      fio\n      gradeId\n      grade {\n        id\n        name\n        kGrade\n      }\n      gender\n      birthDate\n      hireDate\n      fireDate\n      kEfficiency\n      employmentType\n      status\n      workingHoursPerDay\n      createdAt\n      updatedAt\n    }\n    totalCount\n    pageInfo {\n      hasMore\n      offset\n      limit\n      total\n    }\n  }\n}"): (typeof documents)["query GetEmployees($filter: EmployeeFilterInput, $pagination: EmployeePaginationInput) {\n  employees(filter: $filter, pagination: $pagination) {\n    nodes {\n      id\n      companyId\n      departmentId\n      department {\n        id\n        name\n      }\n      fio\n      gradeId\n      grade {\n        id\n        name\n        kGrade\n      }\n      gender\n      birthDate\n      hireDate\n      fireDate\n      kEfficiency\n      employmentType\n      status\n      workingHoursPerDay\n      createdAt\n      updatedAt\n    }\n    totalCount\n    pageInfo {\n      hasMore\n      offset\n      limit\n      total\n    }\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "query Me {\n  me {\n    id\n    name\n    email\n    image\n    status\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["query Me {\n  me {\n    id\n    name\n    email\n    image\n    status\n    createdAt\n    updatedAt\n  }\n}"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "query Users($input: UsersInput!) {\n  users(input: $input) {\n    users {\n      id\n      email\n      name\n      status\n      image\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      total\n      offset\n      limit\n    }\n  }\n}"): (typeof documents)["query Users($input: UsersInput!) {\n  users(input: $input) {\n    users {\n      id\n      email\n      name\n      status\n      image\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      total\n      offset\n      limit\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
