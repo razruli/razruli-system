@@ -79,7 +79,7 @@ const useOnboardingFlowModel = () => {
   const canProceed = (): boolean => {
     if (currentStep === "company") return validateCompany(company);
     if (currentStep === "role") return validateRole(role);
-    if (currentStep === "upload") return uploadedFiles.length === 3;
+    if (currentStep === "upload") return uploadedFiles.length === 4;
     if (currentStep === "mapping") return validateMapping();
     if (currentStep === "confirmation")
       return validateConfirmation({ confirmed });

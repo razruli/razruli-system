@@ -8,6 +8,11 @@ import {
   ConfirmationView,
 } from "@/features/common/onboarding";
 import { useMappingStore } from "@/features/common/onboarding";
+import {
+  useCompanyError,
+  useRoleError,
+  useUploadGlobalError,
+} from "@/features/common/onboarding";
 import { Button } from "@/shared/ui/shadcn/button";
 
 import useOnboardingFlowModel from "../model/useOnboardingFlowModel";
@@ -35,8 +40,22 @@ export function OnboardingFlowWidget() {
 
   const columnMappings = useMappingStore((state) => state.columnMappings);
 
+  // Get error states from stores
+  const companyError = useCompanyError();
+  const roleError = useRoleError();
+  const uploadGlobalError = useUploadGlobalError();
+
+  // Determine if Next button should be disabled
+  const isNextDisabled = () => {
+    if (currentStep === "company") return !!companyError || !company?.name;
+    if (currentStep === "role") return !!roleError || !role?.role;
+    if (currentStep === "upload")
+      return uploadedFiles.length === 0 || !!uploadGlobalError;
+    return false;
+  };
+
   const handleNext = async () => {
-    if (canProceed()) {
+    if (!isNextDisabled() && canProceed()) {
       nextStep();
     }
   };
@@ -50,14 +69,19 @@ export function OnboardingFlowWidget() {
         throw new Error("Missing required data");
       }
 
-      await submitOnboarding({
+      const response = await submitOnboarding({
         company,
         role,
         files: uploadedFiles,
         columnMappings,
       });
 
-      router.push("/dashboard");
+      // Redirect to company dashboard using company slug
+      // Build URL using slug for better readability
+      const companySlug = response.company?.slug;
+      if (companySlug) {
+        router.push(`/${companySlug}/dashboard`);
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to complete onboarding";
@@ -150,7 +174,10 @@ export function OnboardingFlowWidget() {
               {isSubmitting ? "Completing..." : "Complete Setup"}
             </Button>
           ) : (
-            <Button onClick={handleNext} disabled={isSubmitting}>
+            <Button
+              onClick={handleNext}
+              disabled={isSubmitting || isNextDisabled()}
+            >
               Next
             </Button>
           )}
