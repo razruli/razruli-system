@@ -1,0 +1,7 @@
+title,plannedHours,targetGrade,department,complexity,businessImpact,newness,isBurningOut
+Code Review,8,Junior,Разработка,routine,medium,routine,false
+API Development,20,Senior,Разработка,complex,high,new,false
+Database Migration,40,Lead,Разработка,complex,high,new,true
+UI Design,16,Middle,Дизайн,standard,medium,familiar,false
+Customer Demos,8,Middle,Продажи,routine,high,routine,false
+Q1 Planning,12,Middle,Маркетинг,standard,high,routine,false

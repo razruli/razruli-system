@@ -1,0 +1,10 @@
+department,process_name,quantity,employee_name,hoursSpent,status,completedAt,notes
+Marketing,Q1 Marketing Campaign,8,Natalia Smirnova,24,COMPLETED,2026-03-10,Q1 campaign execution completed
+Marketing,Q1 Marketing Campaign,2,Ivan Petrov,6,COMPLETED,2026-03-11,Social media content created
+Development,API Development Sprint,5,Dmitry Sokolov,40,COMPLETED,2026-03-12,Core API endpoints implemented
+Development,Database Migration,3,Dmitry Sokolov,12,COMPLETED,2026-03-13,Database migration in progress
+Development,Performance Optimization,4,Sergey Lebedev,16,COMPLETED,2026-03-14,Query optimization completed
+Sales,Customer Onboarding,3,Anna Volkova,8,COMPLETED,2026-03-10,3 new customers onboarded
+Sales,Monthly Sales Report,2,Pavel Orlov,4,COMPLETED,2026-03-15,Sales metrics analyzed
+Support,Support Ticket Review,6,,3,COMPLETED,2026-03-14,Ticket backlog reviewed and prioritized
+Operations,Annual Budget Review,1,Mikhail Novikov,4,COMPLETED,2026-03-12,Budget allocation reviewed

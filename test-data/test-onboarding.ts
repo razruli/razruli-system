@@ -34,7 +34,8 @@ function parseCSV(content: string): {
 // Map Russian CSV headers to database field names
 function createColumnMapping(csvHeaders: string[]): Record<string, string> {
   const headerMap: Record<string, string> = {
-    ФИО: "fio",
+    Имя: "firstName",
+    Фамилия: "lastName",
     "Дата найма": "hireDate",
     Отдел: "department",
     Грейд: "grade",

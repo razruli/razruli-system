@@ -1,0 +1,6 @@
+department,process_name,quantity,employee_name,hoursSpent,status,completedAt,notes
+Разработка,Code Review,5,Иван Петров,8,COMPLETED,2026-03-10,Sprint review completed
+Разработка,API Development,3,Алексей Иванов,12,COMPLETED,2026-03-12,RESTful API endpoint implemented
+Разработка,Database Migration,2,Иван Петров,4,COMPLETED,2026-03-13,Legacy DB migration started
+Дизайн,UI Design,2,Мария Сидорова,6,COMPLETED,2026-03-11,Dashboard redesign
+Продажи,Customer Demos,4,Елена Смирнова,2,COMPLETED,2026-03-14,3 successful demos with prospects

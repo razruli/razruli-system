@@ -22,6 +22,23 @@
 - **full**: `test-employees-full.csv` - 5 employees with all fields
   - Fields: ФИО, Дата найма, Отдел, Грейд, Тип занятости, Статус, Пол, Дата рождения, Часы работы, Эффективность
 
+hoursSpent: true,### 5. Processes
+
+- **minimal**: `test-processes-minimal.csv` - 6 processes with all fields
+  - Fields: title, plannedHours, targetGrade, department, complexity, businessImpact, newness, isBurningOut
+
+### 6. Finished Tasks (Analytics Data) ✨
+
+**Test Dataset (Russian departments from test files):**
+
+- **minimal**: `test-finished-tasks-minimal.csv` - 3 task records with required fields only
+- **full**: `test-finished-tasks-full.csv` - 5 task records with optional fields
+
+**Production Dataset (English departments from production files):**
+
+- **minimal**: `finished-tasks.csv` - 3 task records with required fields only
+- **full**: `finished-tasks-full.csv` - 9 task records with optional fields including employee assignments
+
 ---
 
 ## Test Scenarios
@@ -94,7 +111,45 @@
 
 ---
 
-### Scenario 5: Companies from CSV 🔄 REQUIRES API UPDATE
+### Scenario 5: Complete Onboarding Flow with Analytics ✨ NEW
+
+**CSV Files (Recommended Order):**
+
+1. `test-departments-full.csv` (business structure)
+2. `test-processes-minimal.csv` (operations framework)
+3. `test-employees-full.csv` (headcount)
+4. `test-finished-tasks-full.csv` (historical analytics)
+
+**Why This Order:**
+
+- Departments first → needed for processes and employees
+- Processes next → needed for finished tasks reference
+- Employees next → can reference finished tasks via names (Иван Петров, Алексей Иванов, Мария Сидорова, Елена Смирнова)
+- Finished tasks last → all dependencies exist
+
+**Expected Result:**
+
+- Dashboard displays meaningful analytics data
+- All metrics and charts show real data, not mocks
+- Company ready for immediate use
+
+### Scenario 6: Production Onboarding Flow with Full Analytics ✨ NEW
+
+**CSV Files (Recommended Order):**
+
+1. `departments.csv` (business structure - English departments)
+2. `processes.csv` (8 complete processes with burn/crit/new factors)
+3. `employees.csv` (8 employees with full details and efficiency multipliers)
+4. `finished-tasks-full.csv` (9 historical task records with employee assignments)
+
+**Expected Result:**
+
+- Complete production-ready setup
+- Rich analytics with multiple employees and departments
+- All capacity calculations and metrics populated
+- Dashboard shows comprehensive business operations data
+
+### Scenario 7: Companies from CSV 🔄 REQUIRES API UPDATE
 
 **CSV File:** `test-companies.csv`
 
@@ -241,6 +296,61 @@ Product Manager
 ФИО,Дата найма,Отдел,Грейд,Тип занятости,Статус,Пол,Дата рождения,Часы работы,Эффективность
 Иван Петров,2024-01-15,Разработка,Junior,ТД,active,М,1995-05-20,8,1.0
 Мария Сидорова,2024-02-20,Дизайн,Junior,ТД,active,Ж,1998-07-15,8,0.95
+```
+
+### Finished Tasks CSV (Minimal)
+
+```
+department,process_name,quantity
+Разработка,Code Review,5
+Разработка,API Development,3
+Дизайн,UI Design,2
+```
+
+### Finished Tasks CSV (Full)
+
+```
+department,process_name,quantity,employee_name,hoursSpent,status,completedAt,notes
+Разработка,Code Review,5,Иван Петров,8,COMPLETED,2026-03-10,Sprint review completed
+Разработка,API Development,3,Алексей Иванов,12,COMPLETED,2026-03-12,RESTful API endpoint implemented
+Разработка,Database Migration,2,Иван Петров,4,COMPLETED,2026-03-13,Legacy DB migration started
+Дизайн,UI Design,2,Мария Сидорова,6,COMPLETED,2026-03-11,Dashboard redesign
+Продажи,Customer Demos,4,Елена Смирнова,2,COMPLETED,2026-03-14,3 successful demos with prospects
+```
+
+**Finished Tasks Field Reference:**
+
+- **department** (required): Must exist in company
+- **process_name** (required): Must match a process title in the company
+- **quantity** (required): Positive integer - number of tasks completed
+- **employee_name** (optional): "FirstName LastName" format - must exist in department
+- **hoursSpent** (optional): Non-negative float - actual hours spent on tasks
+- **status** (optional): COMPLETED (default), PENDING, etc.
+- **completedAt** (optional): YYYY-MM-DD format - defaults to today
+- **notes** (optional): Free-form text field
+
+### Finished Tasks CSV (Production Data - Minimal)
+
+```
+department,process_name,quantity
+Marketing,Q1 Marketing Campaign,8
+Development,API Development Sprint,5
+Sales,Customer Onboarding,3
+```
+
+### Finished Tasks CSV (Production Data - Full)
+
+```
+department,process_name,quantity,employee_name,hoursSpent,status,completedAt,notes
+Marketing,Q1 Marketing Campaign,8,Natalia Smirnova,24,COMPLETED,2026-03-10,Q1 campaign execution completed
+Marketing,Q1 Marketing Campaign,2,Ivan Petrov,6,COMPLETED,2026-03-11,Social media content created
+Development,API Development Sprint,5,Dmitry Sokolov,40,COMPLETED,2026-03-12,Core API endpoints implemented
+Development,Database Migration,3,Dmitry Sokolov,12,COMPLETED,2026-03-13,Database migration in progress
+Development,Performance Optimization,4,Sergey Lebedev,16,COMPLETED,2026-03-14,Query optimization completed
+Sales,Customer Onboarding,3,Anna Volkova,8,COMPLETED,2026-03-10,3 new customers onboarded
+Sales,Monthly Sales Report,2,Pavel Orlov,4,COMPLETED,2026-03-15,Sales metrics analyzed
+Support,Support Ticket Review,6,,3,COMPLETED,2026-03-14,Ticket backlog reviewed and prioritized
+Operations,Annual Budget Review,1,Mikhail Novikov,4,COMPLETED,2026-03-12,Budget allocation reviewed
 ```
 
 ---

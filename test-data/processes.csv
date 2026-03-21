@@ -1,9 +1,9 @@
-title,description,plannedHours,kBurn,kCrit,kNew,targetGrade,department,status,priority
-Q1 Marketing Campaign,Quarterly marketing campaign execution,80,0.1,0.05,0.2,Middle,Marketing,open,high
-Monthly Sales Report,Generate and analyze monthly sales metrics,20,0,0,0,Junior,Sales,open,medium
-Annual Budget Review,Review and adjust annual budget allocation,40,0.2,0.1,0,Senior,Operations,open,high
-Database Migration,Migrate legacy database to new infrastructure,120,0.3,0.2,0.3,Lead,Development,in_progress,critical
-Support Ticket Review,Review and prioritize open support tickets,15,0,0,0,Middle,Support,open,medium
-API Development Sprint,Develop new REST API endpoints,100,0.1,0.1,0.25,Lead,Development,open,high
-Customer Onboarding,Onboard new customers to platform,50,0.15,0,0.1,Middle,Sales,open,medium
-Performance Optimization,Optimize system performance for peak load,80,0.2,0.15,0.1,Senior,Development,open,high
+title,description,plannedHours,complexity,businessImpact,newness,isBurningOut,targetGrade,department,status
+Q1 Marketing Campaign,Quarterly marketing campaign execution,80,standard,high,new,true,Lead,Marketing,open
+Monthly Sales Report,Generate and analyze monthly sales metrics,20,routine,medium,routine,false,Junior,Sales,open
+Annual Budget Review,Review and adjust annual budget allocation,40,complex,high,routine,false,Middle,Operations,open
+Database Migration,Migrate legacy database to new infrastructure,120,expert,critical,new,true,Senior,Development,in_progress
+Support Ticket Review,Review and prioritize open support tickets,15,routine,medium,routine,false,Lead,Support,open
+API Development Sprint,Develop new REST API endpoints,100,complex,high,new,true,Senior,Development,open
+Customer Onboarding,Onboard new customers to platform,50,standard,medium,new,false,Lead,Sales,open
+Performance Optimization,Optimize system performance for peak load,80,expert,high,new,false,Middle,Development,open

@@ -1,9 +1,9 @@
 firstName,lastName,hireDate,department,grade,employmentType,status,gender,birthDate,workingHoursPerDay,kEfficiency
-Ivan,Petrov,2023-01-15,Marketing,Junior,ТД,active,М,1990-05-20,8,1.0
-Anna,Volkova,2023-02-10,Sales,Senior,ТД,active,Ж,1988-03-15,8,1.2
-Dmitry,Sokolov,2023-03-01,Development,Lead,ТД,active,М,1985-07-22,8,1.3
-Elena,Kozlova,2022-11-20,Support,Middle,ГПХ,active,Ж,1992-09-10,6,0.9
-Mikhail,Novikov,2023-04-05,Operations,Senior,ТД,active,М,1987-01-30,8,1.15
-Sergey,Lebedev,2023-05-12,Development,Junior,ТД,active,М,1995-11-08,8,0.95
-Natalia,Smirnova,2023-06-01,Marketing,Middle,ТД,active,Ж,1991-04-12,8,1.05
-Pavel,Orlov,2024-01-10,Sales,Lead,ТД,active,М,1986-08-25,8,1.25
+Ivan,Petrov,2023-01-15,Marketing,Junior,LABOR_CONTRACT,ACTIVE,MALE,1990-05-20,8,1.0
+Anna,Volkova,2023-02-10,Sales,Senior,LABOR_CONTRACT,ACTIVE,FEMALE,1988-03-15,8,1.2
+Dmitry,Sokolov,2023-03-01,Development,Lead,LABOR_CONTRACT,ACTIVE,MALE,1985-07-22,8,1.3
+Elena,Kozlova,2022-11-20,Support,Middle,SERVICE_CONTRACT,ACTIVE,FEMALE,1992-09-10,6,0.9
+Mikhail,Novikov,2023-04-05,Operations,Senior,LABOR_CONTRACT,ACTIVE,MALE,1987-01-30,8,1.15
+Sergey,Lebedev,2023-05-12,Development,Junior,LABOR_CONTRACT,ACTIVE,MALE,1995-11-08,8,0.95
+Natalia,Smirnova,2023-06-01,Marketing,Middle,LABOR_CONTRACT,ACTIVE,FEMALE,1991-04-12,8,1.05
+Pavel,Orlov,2024-01-10,Sales,Lead,LABOR_CONTRACT,ACTIVE,MALE,1986-08-25,8,1.25
