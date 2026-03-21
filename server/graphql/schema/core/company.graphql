@@ -13,6 +13,11 @@ type Company {
   name: String!
 
   """
+  Slug (URL-friendly identifier)
+  """
+  slug: String!
+
+  """
   Timezone (default UTC+3)
   """
   timezone: String!
@@ -63,6 +68,7 @@ Input for creating a company
 """
 input CreateCompanyInput {
   name: String!
+  slug: String
   timezone: String
   workingHoursDay: Int
   workingDaysPerMonth: Int
@@ -83,6 +89,11 @@ extend type Query {
   Get company by ID
   """
   company(id: String!): Company
+
+  """
+  Get company by slug (friendly URL identifier)
+  """
+  companyBySlug(slug: String!): Company
 
   """
   Get authenticated user's company

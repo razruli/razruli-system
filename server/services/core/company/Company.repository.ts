@@ -24,6 +24,24 @@ export class CompanyRepository extends BaseRepository<Company> {
     });
   }
 
+  async findBySlug(slug: string): Promise<Company | null> {
+    console.warn(
+      "[Company.repository.findBySlug] Querying database with slug:",
+      {
+        slug,
+      },
+    );
+    const result = await this.prisma.company.findFirst({
+      where: { slug },
+    });
+    console.warn("[Company.repository.findBySlug] Query result:", {
+      found: !!result,
+      resultId: result?.id,
+      resultSlug: result?.slug,
+    });
+    return result;
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: Prisma.CompanyCreateInput): Promise<Company> {

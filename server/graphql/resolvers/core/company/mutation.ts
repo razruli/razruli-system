@@ -6,8 +6,13 @@
  * Each resolver is defined as a standalone function then wrapped with middleware
  */
 
+import prisma from "@/server/db/prisma/lib/prisma";
 import { composeMiddleware, withMiddleware } from "@/server/graphql/middleware";
 import { MutationResolvers } from "@/server/graphql/types/generated";
+import {
+  generateSlug,
+  generateUniqueSlug,
+} from "@/server/lib/slug/slug-generator";
 
 // ==================== MIDDLEWARE CONFIGURATIONS ====================
 // Reusable middleware for company mutations
@@ -42,9 +47,26 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       throw new Error("Missing required field: name");
     }
 
+    // Generate slug from name if not provided
+    let slug = input.slug || generateSlug(input.name);
+
+    // Ensure slug is unique
+    const existingBySlug = await prisma.company.findFirst({
+      where: { slug },
+    });
+
+    if (existingBySlug) {
+      const existingSlugs = await prisma.company.findMany({
+        select: { slug: true },
+      });
+      const slugSet = new Set(existingSlugs.map((c) => c.slug));
+      slug = generateUniqueSlug(slug, slugSet);
+    }
+
     // Create company with input data matching schema
     const company = await context.services.company.create({
       name: input.name,
+      slug,
       timezone: input.timezone || "UTC+3",
       workingHoursDay: input.workingHoursDay || 8,
       workingDaysPerMonth: input.workingDaysPerMonth || 21,

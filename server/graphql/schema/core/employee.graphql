@@ -29,10 +29,6 @@ type Employee {
   lastName: String!
 
   """
-  Full name (firstName lastName) - computed
-  """
-  fio: String! # Field resolver
-  """
   Seniority level/Grade
   """
   gradeId: Int!
@@ -60,7 +56,7 @@ type Employee {
   """
   Efficiency coefficient (multiplier, default 1.0)
   """
-  kEfficiency: Float!
+  kEfficiency: Float
 
   """
   Employment type (LABOR_CONTRACT/SERVICE_CONTRACT/SELF_EMPLOYED)
@@ -147,7 +143,7 @@ input EmployeeFilterInput {
   departmentId: String
   gradeId: Int
   status: String
-  search: String # Search in fio
+  search: String # Search in firstName/lastName
 }
 
 """

@@ -11,12 +11,6 @@ export class LoggingPlugin implements ApolloServerPlugin<BaseContext> {
     const startTime = Date.now();
     const { request, operationName } = requestContext;
 
-    logger.debug("GraphQL operation started", {
-      operationName,
-      variableNames: request.variables ? Object.keys(request.variables) : [],
-      query: request.query?.substring(0, 100),
-    });
-
     return {
       async willSendResponse({ errors }: any) {
         const duration = Date.now() - startTime;
@@ -29,14 +23,6 @@ export class LoggingPlugin implements ApolloServerPlugin<BaseContext> {
             query: request.query?.substring(0, 100),
           });
         } else {
-          logger.info("GraphQL request completed", {
-            operationName,
-            duration,
-            variableNames: request.variables
-              ? Object.keys(request.variables)
-              : [],
-            query: request.query?.substring(0, 100),
-          });
         }
       },
     } as GraphQLRequestListener<BaseContext>;

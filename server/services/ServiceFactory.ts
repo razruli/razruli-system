@@ -9,6 +9,7 @@ import { CompanyService } from "./core/company";
 import { DepartmentService } from "./core/department";
 import { EmployeeService } from "./core/employee";
 import { GradeService } from "./core/grade";
+import { FinishedTaskService } from "./operations/finished-task";
 import { ProcessService } from "./operations/process";
 import { TaskAssignmentService } from "./operations/taskAssignment";
 import { PermissionService } from "./user/permission.service";
@@ -42,6 +43,7 @@ export class ServiceFactory {
     grade?: GradeService;
     process?: ProcessService;
     taskAssignment?: TaskAssignmentService;
+    finishedTask?: FinishedTaskService;
     loadSnapshot?: LoadSnapshotService;
     gapAnalysis?: GapAnalysisService;
     employeeHistory?: EmployeeHistoryService;
@@ -207,6 +209,24 @@ export class ServiceFactory {
     return this._services.taskAssignment;
   }
 
+  /**
+   * Finished Task services
+   * Location: services/operations/finished-task/FinishedTaskService.ts
+   *
+   * Handles:
+   * - Analytics-focused queries on completed work
+   * - Department productivity metrics
+   * - Employee productivity tracking
+   * - Process popularity and trending
+   * - Company-wide rankings and comparisons
+   */
+  getFinishedTaskService(): FinishedTaskService {
+    if (!this._services.finishedTask) {
+      this._services.finishedTask = new FinishedTaskService(this.context);
+    }
+    return this._services.finishedTask;
+  }
+
   // ==================== ANALYTICS DOMAIN ====================
 
   /**
@@ -310,6 +330,7 @@ export class ServiceFactory {
       // Operations
       process: this.getProcessService(),
       taskAssignment: this.getTaskAssignmentService(),
+      finishedTask: this.getFinishedTaskService(),
       // Analytics
       loadSnapshot: this.getLoadSnapshotService(),
       gapAnalysis: this.getGapAnalysisService(),

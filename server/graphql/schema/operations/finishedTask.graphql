@@ -1,0 +1,184 @@
+# ============================================================================
+# FINISHED TASKS DOMAIN - Task Completion Analytics Schema
+# ============================================================================
+
+"""
+Finished Task type representing completed work
+Minimal analytics model: what was done, when, and optionally by whom and how long
+"""
+type FinishedTask {
+  id: String!
+
+  """
+  Department that completed the work (always set)
+  """
+  departmentId: String!
+  department: Department!
+
+  """
+  Specific employee who completed (optional - null = department aggregate)
+  """
+  employeeId: String
+  employee: Employee
+
+  """
+  What process was completed
+  """
+  processId: String!
+  process: Process!
+
+  """
+  Core metrics
+  """
+  quantity: Int!
+  completedAt: DateTime!
+
+  """
+  Optional extended details (more data = better insights)
+  """
+  hoursSpent: Float
+  status: TaskStatus!
+  notes: String
+
+  """
+  Timestamps
+  """
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+Finished task status enumeration
+"""
+enum TaskStatus {
+  COMPLETED
+  VALIDATED
+  REVIEWED
+}
+
+"""
+Aggregated stats for department productivity
+"""
+type DepartmentCompletionMetrics {
+  departmentId: String!
+  totalTasksCompleted: Int!
+  totalHoursSpent: Float!
+  averageHoursPerTask: Float!
+  processes: [ProcessCompletionStats!]!
+}
+
+"""
+Process completion breakdown
+"""
+type ProcessCompletionStats {
+  processId: String!
+  quantity: Int!
+  count: Int!
+}
+
+"""
+Aggregated stats for employee productivity
+"""
+type EmployeeMetrics {
+  employeeId: String!
+  totalTasksCompleted: Int!
+  totalHoursSpent: Float!
+  averageHoursPerTask: Float!
+  processes: [ProcessCompletionStats!]!
+}
+
+"""
+Company-wide productivity ranking
+"""
+type DepartmentRanking {
+  rank: Int!
+  departmentId: String!
+  totalTasksCompleted: Int!
+  entriesCount: Int!
+}
+
+"""
+Process popularity ranking
+"""
+type ProcessRanking {
+  rank: Int!
+  processId: String!
+  totalTasksCompleted: Int!
+  entriesCount: Int!
+}
+
+# ============================================================================
+# Extended Query Type
+# ============================================================================
+
+extend type Query {
+  """
+  Get all finished tasks for a department (with optional date range)
+  """
+  finishedTasksByDepartment(
+    departmentId: String!
+    startDate: DateTime
+    endDate: DateTime
+  ): [FinishedTask!]!
+
+  """
+  Get all finished tasks by employee (with optional date range)
+  """
+  finishedTasksByEmployee(
+    employeeId: String!
+    startDate: DateTime
+    endDate: DateTime
+  ): [FinishedTask!]!
+
+  """
+  Get all finished tasks for a process (with optional date range)
+  """
+  finishedTasksByProcess(
+    processId: String!
+    startDate: DateTime
+    endDate: DateTime
+  ): [FinishedTask!]!
+
+  """
+  Get department productivity metrics (totals and breakdown by process)
+  """
+  departmentMetrics(
+    departmentId: String!
+    startDate: DateTime
+    endDate: DateTime
+  ): DepartmentCompletionMetrics!
+
+  """
+  Get employee productivity metrics
+  """
+  employeeMetrics(
+    employeeId: String!
+    startDate: DateTime
+    endDate: DateTime
+  ): EmployeeMetrics!
+
+  """
+  Get company-wide department productivity ranking
+  """
+  companyProductivityRanking(
+    startDate: DateTime
+    endDate: DateTime
+  ): [DepartmentRanking!]!
+
+  """
+  Get most popular/frequently completed processes
+  """
+  popularProcesses(
+    startDate: DateTime
+    endDate: DateTime
+    limit: Int
+  ): [ProcessRanking!]!
+
+  """
+  Get recent finished tasks for a department (last N days)
+  """
+  recentTasksByDepartment(
+    departmentId: String!
+    daysBack: Int
+  ): [FinishedTask!]!
+}

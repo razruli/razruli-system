@@ -298,7 +298,7 @@ const updateEmployeeEfficiencyResolver: MutationResolvers["updateEmployeeEfficie
       // Record in employee history
       await context.services.employeeHistory.recordEfficiencyUpdate(
         id,
-        oldEmployee.kEfficiency,
+        oldEmployee.kEfficiency || 1,
         kEfficiency,
         context.user?.id || "system",
       );

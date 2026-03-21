@@ -79,10 +79,28 @@ export class CompanyService extends BaseService {
     };
   }
 
+  async getBySlug(slug: string): Promise<Company | null> {
+    this.log("info", `Getting company by slug`, { slug });
+    const cacheKey = this.cacheKey(`slug:${slug}`);
+    console.warn("[Company.service.getBySlug] Cache key:", { cacheKey, slug });
+
+    const result = await this.getOrFetch(cacheKey, () =>
+      this.repository.findBySlug(slug),
+    );
+
+    console.warn("[Company.service.getBySlug] Result from getOrFetch:", {
+      found: !!result,
+      resultId: result?.id,
+    });
+
+    return result;
+  }
+
   // ==================== WRITE OPERATIONS ====================
 
   async create(data: {
     name: string;
+    slug: string;
     timezone?: string;
     workingHoursDay?: number;
     workingDaysPerMonth?: number;
@@ -99,6 +117,7 @@ export class CompanyService extends BaseService {
 
     const company = await this.repository.create({
       name: data.name,
+      slug: data.slug,
       timezone: data.timezone,
       workingHoursDay: data.workingHoursDay,
       workingDaysPerMonth: data.workingDaysPerMonth,

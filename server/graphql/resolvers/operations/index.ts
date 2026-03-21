@@ -9,6 +9,7 @@
  * Exports all resolvers for use in main resolver composition layer
  */
 
+import { finishedTaskResolvers } from "./finishedTask";
 import { processResolvers } from "./process";
 import { taskAssignmentResolvers } from "./taskAssignment";
 
@@ -21,6 +22,7 @@ export const operationsResolvers = {
   Query: {
     ...processResolvers.Query,
     ...taskAssignmentResolvers.Query,
+    ...finishedTaskResolvers.Query,
   },
 
   // Mutation resolvers from all entities
@@ -48,5 +50,6 @@ export const operationsResolvers = {
 // Export individual entities for selective imports
 export { processResolvers } from "./process";
 export { taskAssignmentResolvers } from "./taskAssignment";
+export { finishedTaskResolvers } from "./finishedTask";
 
 export default operationsResolvers;

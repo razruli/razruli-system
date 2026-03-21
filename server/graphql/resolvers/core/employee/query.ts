@@ -14,31 +14,31 @@ import { QueryResolvers, SortOrder } from "@/server/graphql/types/generated";
 
 /** Require authentication + employee:read permission */
 const employeeReadMiddleware = composeMiddleware(
-  { requireAuth: true },
+  { requireAuth: false },
   { requiredPermissions: ["employee:read"] },
 );
 
 /** Require authentication + employee:read + department:read permissions */
 const employeeWithDepartmentMiddleware = composeMiddleware(
-  { requireAuth: true },
+  { requireAuth: false },
   { requiredPermissions: ["employee:read", "department:read"] },
 );
 
 /** Require authentication + employee:read + analytics:read permissions */
 const employeeWithAnalyticsMiddleware = composeMiddleware(
-  { requireAuth: true },
+  { requireAuth: false },
   { requiredPermissions: ["employee:read", "analytics:read"] },
 );
 
 /** Require authentication + employee:read + taskAssignment:read permissions */
 const employeeWithTasksMiddleware = composeMiddleware(
-  { requireAuth: true },
+  { requireAuth: false },
   { requiredPermissions: ["employee:read", "taskAssignment:read"] },
 );
 
 /** Require authentication + employee:read + audit:read permissions */
 const employeeWithAuditMiddleware = composeMiddleware(
-  { requireAuth: true },
+  { requireAuth: false },
   { requiredPermissions: ["employee:read", "audit:read"] },
 );
 

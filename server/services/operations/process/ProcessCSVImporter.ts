@@ -1,6 +1,7 @@
 /**
  * Process CSV Importer
  * Imports business process records from CSV and creates them in the database
+ * Uses human-readable complexity fields instead of technical k-factors
  */
 
 import { PrismaClient } from "@/server/db/generated/prisma/client";
@@ -9,13 +10,13 @@ export interface ProcessImportRow {
   title: string;
   description?: string;
   plannedHours: string | number;
-  kBurn?: string | number;
-  kCrit?: string | number;
-  kNew?: string | number;
+  complexity?: string; // routine|standard|complex|expert
+  businessImpact?: string; // low|medium|high|critical
+  newness?: string; // routine|familiar|new|experimental
+  isBurningOut?: string; // true|false
   targetGrade: string | number;
   department: string;
   status?: string;
-  priority?: string;
   [key: string]: any;
 }
 
@@ -72,19 +73,46 @@ export function validateProcessRow(
     }
   }
 
-  // Validate kBurn, kCrit, kNew - must be valid floats (optional)
-  for (const field of ["kBurn", "kCrit", "kNew"]) {
-    if (
-      row[field] !== undefined &&
-      row[field] !== null &&
-      String(row[field]).trim() !== ""
-    ) {
-      const value = Number(row[field]);
-      if (isNaN(value)) {
-        errors.push(`${field} must be a valid number`);
-      } else if (value < 0 || value > 5) {
-        errors.push(`${field} must be between 0 and 5`);
-      }
+  // Validate complexity - human-readable skill level (optional, defaults to standard)
+  if (row.complexity && String(row.complexity).trim()) {
+    const complexity = String(row.complexity).trim().toLowerCase();
+    const validComplexities = ["routine", "standard", "complex", "expert"];
+    if (!validComplexities.includes(complexity)) {
+      errors.push(
+        `complexity must be one of: ${validComplexities.join(", ")} (got: ${row.complexity})`,
+      );
+    }
+  }
+
+  // Validate businessImpact - business importance (optional, defaults to medium)
+  if (row.businessImpact && String(row.businessImpact).trim()) {
+    const impact = String(row.businessImpact).trim().toLowerCase();
+    const validImpacts = ["low", "medium", "high", "critical"];
+    if (!validImpacts.includes(impact)) {
+      errors.push(
+        `businessImpact must be one of: ${validImpacts.join(", ")} (got: ${row.businessImpact})`,
+      );
+    }
+  }
+
+  // Validate newness - learning curve (optional, defaults to routine)
+  if (row.newness && String(row.newness).trim()) {
+    const newness = String(row.newness).trim().toLowerCase();
+    const validNewness = ["routine", "familiar", "new", "experimental"];
+    if (!validNewness.includes(newness)) {
+      errors.push(
+        `newness must be one of: ${validNewness.join(", ")} (got: ${row.newness})`,
+      );
+    }
+  }
+
+  // Validate isBurningOut - boolean flag (optional, defaults to false)
+  if (row.isBurningOut && String(row.isBurningOut).trim()) {
+    const burnout = String(row.isBurningOut).trim().toLowerCase();
+    if (!["true", "false"].includes(burnout)) {
+      errors.push(
+        `isBurningOut must be true or false (got: ${row.isBurningOut})`,
+      );
     }
   }
 
@@ -101,17 +129,6 @@ export function validateProcessRow(
     if (!validStatuses.includes(status)) {
       errors.push(
         `status must be one of: ${validStatuses.join(", ")} (got: ${row.status})`,
-      );
-    }
-  }
-
-  // Validate priority - should be valid priority value (optional)
-  if (row.priority && String(row.priority).trim()) {
-    const priority = String(row.priority).trim().toLowerCase();
-    const validPriorities = ["low", "medium", "high", "critical"];
-    if (!validPriorities.includes(priority)) {
-      errors.push(
-        `priority must be one of: ${validPriorities.join(", ")} (got: ${row.priority})`,
       );
     }
   }
@@ -201,15 +218,24 @@ export async function importProcesses(
           ? String(row.description).trim()
           : null;
         const plannedHours = Number(row.plannedHours);
-        const kBurn = row.kBurn ? Number(row.kBurn) : 0.0;
-        const kCrit = row.kCrit ? Number(row.kCrit) : 0.0;
-        const kNew = row.kNew ? Number(row.kNew) : 0.0;
+
+        // Human-readable complexity fields (with defaults)
+        const complexity = row.complexity
+          ? String(row.complexity).trim().toLowerCase()
+          : "standard";
+        const businessImpact = row.businessImpact
+          ? String(row.businessImpact).trim().toLowerCase()
+          : "medium";
+        const newness = row.newness
+          ? String(row.newness).trim().toLowerCase()
+          : "routine";
+        const isBurningOut = row.isBurningOut
+          ? String(row.isBurningOut).trim().toLowerCase() === "true"
+          : false;
+
         const status = row.status
           ? String(row.status).trim().toLowerCase()
           : "open";
-        const priority = row.priority
-          ? String(row.priority).trim().toLowerCase()
-          : "medium";
 
         // Resolve department ID
         const departmentName = String(row.department).trim();
@@ -240,12 +266,12 @@ export async function importProcesses(
             title,
             description,
             plannedHours,
-            kBurn,
-            kCrit,
-            kNew,
+            complexity,
+            businessImpact,
+            newness,
+            isBurningOut,
             targetGradeId: gradeId,
             status,
-            priority,
           },
         });
       }),

@@ -1,6 +1,6 @@
 /**
- * Employee data validator
- * Validates employee records from CSV before database insertion
+ * Employee CSV Importer
+ * Validates and imports employee records from CSV before database insertion
  * Handles language mapping (Russian → English) for enum fields
  */
 
@@ -15,26 +15,41 @@ import {
   parseFloat,
 } from "@/server/utils/dataProcessing/languageMapping";
 
-export interface ValidateEmployeeRowParams {
-  row: Record<string, any>;
-  companyId: string;
-  requiredFields: string[];
-  prisma: PrismaClient;
+export interface EmployeeImportRow {
+  firstName?: string;
+  lastName?: string;
+  hireDate: string;
+  birthDate?: string;
+  employmentType?: string;
+  status?: string;
+  gender?: string;
+  workingHoursPerDay?: string | number;
+  kEfficiency?: string | number;
+  department: string;
+  grade: string | number;
+  [key: string]: any;
 }
 
-export interface ValidationResult {
+export interface EmployeeValidationResult {
   valid: boolean;
   errors: string[];
 }
 
 /**
- * Validate a single employee row
+ * Validates a single employee row
  * Normalizes and validates all fields
+ * @param row - Raw CSV row
+ * @param companyId - Company ID for lookups
+ * @param requiredFields - Fields that must be present
+ * @param prisma - Prisma client for database validation
+ * @returns Validation result with errors
  */
 export async function validateEmployeeRow(
-  params: ValidateEmployeeRowParams,
-): Promise<ValidationResult> {
-  const { row, companyId, requiredFields, prisma } = params;
+  row: Record<string, any>,
+  companyId: string,
+  requiredFields: string[],
+  prisma: PrismaClient,
+): Promise<EmployeeValidationResult> {
   const errors: string[] = [];
 
   // Check required fields exist
@@ -57,8 +72,8 @@ export async function validateEmployeeRow(
 
   if (row.firstName !== undefined && row.lastName !== undefined) {
     // Separate columns
-    firstName = row.firstName;
-    lastName = row.lastName;
+    firstName = String(row.firstName).trim();
+    lastName = String(row.lastName).trim();
   } else if (row.fio) {
     // Legacy support: split combined "ФИО" field
     try {
@@ -71,7 +86,7 @@ export async function validateEmployeeRow(
     }
   }
 
-  if (!firstName || firstName.trim() === "") {
+  if (!firstName || firstName === "") {
     errors.push("First name (firstName) is required");
   }
 
@@ -201,56 +216,60 @@ export async function validateEmployeeRow(
 }
 
 /**
- * Validate multiple employee rows
+ * Validates all employee rows
+ * @param rows - Array of CSV rows
+ * @param companyId - Company ID for lookups
+ * @param requiredFields - Fields that must be present
+ * @param prisma - Prisma client for database validation
+ * @returns Array of validation results mapped by row index
  */
 export async function validateEmployeeRows(
   rows: Record<string, any>[],
   companyId: string,
   requiredFields: string[],
   prisma: PrismaClient,
-): Promise<Map<number, ValidationResult>> {
-  const results = new Map<number, ValidationResult>();
+): Promise<Array<EmployeeValidationResult>> {
+  const results: EmployeeValidationResult[] = [];
 
   for (let i = 0; i < rows.length; i++) {
-    const result = await validateEmployeeRow({
-      row: rows[i],
+    const result = await validateEmployeeRow(
+      rows[i],
       companyId,
       requiredFields,
       prisma,
-    });
-    results.set(i, result);
+    );
+    results.push(result);
   }
 
   return results;
 }
 
 /**
- * Check if all rows are valid
+ * Checks if all validation results are valid
+ * @param validationResults - Array of validation results
+ * @returns True if all rows are valid
  */
-export function allRowsValid(
-  validationResults: Map<number, ValidationResult>,
+export function allEmployeeRowsValid(
+  validationResults: Array<EmployeeValidationResult>,
 ): boolean {
-  for (const result of validationResults.values()) {
-    if (!result.valid) {
-      return false;
-    }
-  }
-  return true;
+  return validationResults.every((result) => result.valid);
 }
 
 /**
- * Get all validation errors
+ * Gets validation errors in a structured format
+ * @param validationResults - Array of validation results
+ * @returns Object mapping row index to error arrays
  */
-export function getValidationErrors(
-  validationResults: Map<number, ValidationResult>,
+export function getEmployeeValidationErrors(
+  validationResults: Array<EmployeeValidationResult>,
 ): Record<number, string[]> {
   const errors: Record<number, string[]> = {};
 
-  for (const [rowIndex, result] of validationResults.entries()) {
+  validationResults.forEach((result, index) => {
     if (!result.valid) {
-      errors[rowIndex] = result.errors;
+      errors[index] = result.errors;
     }
-  }
+  });
 
   return errors;
 }
