@@ -1,6 +1,6 @@
-import { groq } from "@ai-sdk/groq";
 import { streamText } from "ai";
 
+import { getModel, getModelConfig } from "@/server/ai/model-provider";
 import { prisma } from "@/server/db/prisma/lib/prisma";
 
 export const runtime = "nodejs";
@@ -79,27 +79,38 @@ export async function POST(request: Request) {
         return new Response("Unknown analysis type", { status: 400 });
     }
 
-    // Stream response using Groq API (free tier available!)
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      console.error("[AI Route] GROQ_API_KEY not set");
+    // Get model with automatic fallback logic
+    let modelConfig;
+    try {
+      modelConfig = getModelConfig();
+    } catch (err) {
+      console.error("[AI Route] Model provider error:", err);
       return new Response(
-        "API key not configured - get free key at https://console.groq.com/keys",
+        "AI model provider not configured. " +
+          "Set AI_GATEWAY_API_KEY (Vercel AI Gateway) or GROQ_API_KEY (fallback) in .env.local. " +
+          "See https://vercel.com/docs/ai for setup instructions.",
         { status: 500 },
       );
     }
 
-    console.log("[AI Route] Calling Groq with Llama 3.1 8B Instant");
+    let model;
+    try {
+      const modelData = await getModel();
+      model = modelData.model;
+    } catch (err) {
+      console.error("[AI Route] Failed to initialize model:", err);
+      return new Response("Failed to initialize AI model provider", {
+        status: 500,
+      });
+    }
+
     const result = streamText({
-      model: groq("llama-3.1-8b-instant"),
+      model: model,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
       temperature: 0.7,
     });
 
-    console.log("[AI Route] streamText result created, converting to response");
-    const response = result.toTextStreamResponse();
-    console.log("[AI Route] Response headers:", response.headers);
     return response;
   } catch (error) {
     console.error("[AI Analysis Error]", error);
