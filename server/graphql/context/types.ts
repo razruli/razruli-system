@@ -34,6 +34,7 @@ import type { CompanyService } from "@/server/services/core/company/Company.serv
 import type { DepartmentService } from "@/server/services/core/department/Department.service";
 import type { EmployeeService } from "@/server/services/core/employee/Employee.service";
 import type { GradeService } from "@/server/services/core/grade/Grade.service";
+import type { FinishedTaskService } from "@/server/services/operations/finished-task/FinishedTaskService";
 import type { ProcessService } from "@/server/services/operations/process/Process.service";
 import type { TaskAssignmentService } from "@/server/services/operations/taskAssignment/TaskAssignment.service";
 import { PermissionService, RoleService } from "@/server/services/user";
@@ -104,6 +105,7 @@ export interface ServicesRegistry {
   // Operations domain
   process: ProcessService;
   taskAssignment: TaskAssignmentService;
+  finishedTask: FinishedTaskService;
 
   // Analytics domain
   loadSnapshot: LoadSnapshotService;

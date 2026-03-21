@@ -56,7 +56,7 @@ import type { GraphQLContext } from "./types";
  */
 export async function buildGraphQLContext(
   prisma: PrismaClient,
-  user: User,
+  user: User | null,
   userAgent?: string,
 ): Promise<GraphQLContext> {
   const requestId = uuidv4();
