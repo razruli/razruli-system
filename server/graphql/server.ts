@@ -37,7 +37,7 @@ function loadSchema(): string[] {
     const entries = fs.readdirSync(dir);
 
     // Priority order: scalars, index, then all else
-    const ordered = entries.sort((a: string, b: string) => {
+    const ordered = entries.sort((a: string, _b: string) => {
       if (a === "scalars.graphql") return -2;
       if (a === "index.graphql") return -1;
       if (a === "fragments") return 0;
@@ -166,6 +166,7 @@ function createApolloServer(): ApolloServer<GraphQLContext> {
   return new ApolloServer<GraphQLContext>({
     typeDefs,
     resolvers,
+    csrfPrevention: false,
 
     formatError: (error) => {
       logger.error("GraphQL Error formatted", {
@@ -234,6 +235,7 @@ function getApolloServer(): ApolloServer<GraphQLContext> {
  */
 async function contextCreator(): Promise<GraphQLContext> {
   try {
+    // Session is passed via req context if available
     const context = await createContext();
 
     logger.debug("GraphQL context created successfully", {

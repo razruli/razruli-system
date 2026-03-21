@@ -1,25 +1,33 @@
+"use server";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
 
 import { auth } from "./auth";
 
-export async function getUserFromRequest() {
-  // Get the headers from the incoming request
-  const requestHeaders = await headers();
+export interface Session {
+  user: any;
+  session?: any;
+}
 
-  // Use auth.api.getSession to parse and validate the session cookie
-  const session = await auth.api.getSession({ headers: requestHeaders });
+/**
+ * Get session from request headers
+ * Returns session for authenticated users, null for unauthenticated
+ */
+export async function getUserFromRequest(): Promise<Session | null> {
+  try {
+    const nextHeaders = await headers();
 
-  // Check if a session was found
-  if (!session) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    const session = await auth.api.getSession({
+      headers: nextHeaders,
+      query: { disableCookieCache: true },
+    });
+
+    if (!session) {
+      return null;
+    }
+
+    return session;
+  } catch (error) {
+    console.error("Failed to get session:", error);
+    return null;
   }
-
-  // Access the user data from the session object
-  // console.log("User ID:", session.user.id);
-
-  return NextResponse.json({
-    message: "Success",
-    user: session.user,
-  });
 }

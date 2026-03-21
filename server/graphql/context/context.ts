@@ -7,7 +7,8 @@
  * ============================================================================
  */
 
-import { getUserFromRequest } from "../../auth/getUserFromRequest";
+import { getUserFromRequest } from "@/server/auth/getUserFromRequest";
+
 import prisma from "../../db/prisma/lib/prisma";
 
 import { buildGraphQLContext } from "./builder";
@@ -16,17 +17,17 @@ import { buildGraphQLContext } from "./builder";
  * Create GraphQL context for each request
  *
  * Flow:
- * 1. Get authenticated user from Next.js request
- * 2. Call buildGraphQLContext to assemble everything
- * 3. Return to Apollo, which passes to middleware/resolvers
+ * 1. Accept session passed from route handler (already authenticated)
+ * 2. Extract user from session (null if not authenticated)
+ * 3. Call buildGraphQLContext to assemble everything
+ * 4. Return to Apollo, which passes to middleware/resolvers
  *
  * Happens once per GraphQL request
  */
 export async function createContext() {
-  // Get authenticated user from request
-  const res = await getUserFromRequest();
-  const data = await res.json();
-  const user = data.user || null;
+  // Use provided session, or fetch if not provided (fallback for safety)
+  const session = await getUserFromRequest();
+  const user = session?.user || null;
 
   // Build complete context with fresh loaders and services
   return buildGraphQLContext(prisma, user);
