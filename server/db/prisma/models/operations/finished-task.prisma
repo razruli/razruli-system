@@ -1,0 +1,48 @@
+// ============================================================================
+// OPERATIONS DOMAIN - Finished Tasks & Completions
+// ============================================================================
+// Tracks completed work: department-level aggregates and individual employees
+// Supports both quick department imports and detailed employee tracking
+// ============================================================================
+
+/// Completed task entry
+/// employeeId = NULL means department-level aggregate
+/// employeeId = set means individual contributor tracked
+model FinishedTask {
+  id              String    @id @default(cuid())
+  companyId       String
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  // Department always required (for aggregation and analytics)
+  departmentId    String
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  
+  // Optional: specific employee if provided in CSV
+  employeeId      String?
+  employee        Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  
+  // Process being completed
+  processId       String
+  process         Process   @relation(fields: [processId], references: [id], onDelete: Cascade)
+  
+  // Core metrics (required)
+  quantity        Int       /// How many of this process completed
+  completedAt     DateTime  @db.Timestamp(3) /// When the work was done
+  
+  // Optional extended details (more data = better insights)
+  hoursSpent      Float?    @db.DoublePrecision /// Actual hours used (vs. planned)
+  status          String    @default("COMPLETED") @db.VarChar(50) /// COMPLETED, VALIDATED, etc.
+  notes           String?   @db.Text /// Free-form notes about the work
+  
+  // Metadata
+  createdAt       DateTime  @default(now()) @db.Timestamp(3)
+  updatedAt       DateTime  @updatedAt @db.Timestamp(3)
+  
+  @@unique([companyId, departmentId, processId, employeeId, completedAt])
+  @@index([companyId])
+  @@index([departmentId])
+  @@index([employeeId])
+  @@index([processId])
+  @@index([completedAt])
+  @@map("finished_task")
+}

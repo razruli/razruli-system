@@ -81,7 +81,7 @@ export interface ServiceContext {
   userId: string | null;
 
   /** Authenticated user object (auth only) - undefined if unauthenticated */
-  user?: User;
+  user?: User | null;
 
   /** Business actor object - undefined if not authenticated as business user */
   actor?: Actor;

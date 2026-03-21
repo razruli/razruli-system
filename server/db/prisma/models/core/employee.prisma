@@ -50,8 +50,14 @@ model Employee {
   fireDate          DateTime?        @db.Timestamp(3)
 
   // Capacity Coefficients
-  kEfficiency       Float            @default(1.0) @db.DoublePrecision
+  // kEfficiency: optional override for special cases (e.g., senior devs, experts)
+  // When null/not set, defaults to 1.0 during capacity calculation
+  // Other factors (age, gender, tenure) are calculated from employee data
+  kEfficiency       Float?           @db.DoublePrecision
   workingHoursPerDay Int             @default(8)
+
+  // Calculated Capacity (stored at import time, can be recalculated)
+  monthlyCU         Float?           @db.DoublePrecision @default(0.0)
 
   // Employment Classification
   employmentType    EmploymentType   @default(LABOR_CONTRACT)
@@ -61,6 +67,7 @@ model Employee {
   managedDepartment Department?      @relation("DepartmentHead")
   taskAssignments   TaskAssignment[]
   loadSnapshots     LoadSnapshot[]
+  finishedTasks     FinishedTask[]
   history           EmployeeHistory[] @relation("EmployeeToHistory")
 
   // Metadata

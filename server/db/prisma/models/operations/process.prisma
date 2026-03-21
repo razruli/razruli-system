@@ -5,7 +5,9 @@
 // L = (T_hours / 8) * (1 + K_burn + K_crit + K_new) * K_diff
 // ============================================================================
 
-/// Business process with estimated workload and complexity multipliers
+/// Business process with human-readable complexity classification
+/// Complexity converted to k-factors internally for CU calculation
+/// Weight formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
 model Process {
   id                String       @id @default(cuid())
   companyId         String
@@ -18,11 +20,30 @@ model Process {
   title             String       @db.VarChar(255)
   description       String?      @db.Text
 
-  // Resource Consumption (hours and complexity multipliers)
+  // Time Estimate (user provides this in hours)
   plannedHours      Int
-  kBurn             Float        @default(0.0) @db.DoublePrecision
-  kCrit             Float        @default(0.0) @db.DoublePrecision
-  kNew              Float        @default(0.0) @db.DoublePrecision
+
+  // HUMAN-READABLE COMPLEXITY FACTORS (replaces kBurn, kCrit, kNew)
+  // These get converted to k-values internally
+  
+  /// Difficulty/Skill Required: routine|standard|complex|expert
+  /// routine = Junior can do, standard = Mid-level, complex = Senior, expert = Lead+
+  complexity        String       @default("standard") @db.VarChar(50)
+
+  /// Business/Customer Impact: low|medium|high|critical
+  /// low = nice to have, medium = normal work, high = important, critical = system down
+  businessImpact    String       @default("medium") @db.VarChar(50)
+
+  /// Is this new/unfamiliar work? routine|familiar|new|experimental
+  /// routine = done before, familiar = similar tech, new = new framework, experimental = cutting edge
+  newness           String       @default("routine") @db.VarChar(50)
+
+  /// Does team get burned out by this type of work? false|true
+  /// true = mentally exhausting, requires breaks, increases burnout risk
+  isBurningOut      Boolean      @default(false)
+
+  // Calculated Process Weight (stored at import time, can be recalculated)
+  weight            Float?       @db.DoublePrecision
 
   // Target Skill Level for Execution
   targetGradeId     Int
@@ -30,10 +51,10 @@ model Process {
 
   // Status Tracking
   status            String       @default("open") @db.VarChar(50)
-  priority          String       @default("medium") @db.VarChar(50)
 
   // Relations
   taskAssignments   TaskAssignment[]
+  finishedTasks     FinishedTask[]
 
   createdAt         DateTime     @default(now()) @db.Timestamp(3)
   updatedAt         DateTime     @updatedAt @db.Timestamp(3)

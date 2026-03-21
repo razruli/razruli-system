@@ -12,6 +12,7 @@ const config: CodegenConfig = {
     "server/graphql/schema/core/employee.graphql",
     "server/graphql/schema/operations/process.graphql",
     "server/graphql/schema/operations/taskAssignment.graphql",
+    "server/graphql/schema/operations/finishedTask.graphql",
     "server/graphql/schema/analytics/loadSnapshot.graphql",
     "server/graphql/schema/analytics/gapAnalysis.graphql",
     "server/graphql/schema/audit/employeeHistory.graphql",

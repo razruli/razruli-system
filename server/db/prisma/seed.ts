@@ -21,6 +21,7 @@ async function main() {
       create: {
         id: "company-1",
         name: "Gruzin Inc",
+        slug: "gruzin-inc",
         timezone: "UTC+3",
         workingHoursDay: 8,
         workingDaysPerMonth: 21,
