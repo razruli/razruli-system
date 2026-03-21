@@ -1,0 +1,10 @@
+query GetCompanyBySlug($slug: String!) {
+  companyBySlug(slug: $slug) {
+    id
+    name
+    slug
+    timezone
+    workingHoursDay
+    workingDaysPerMonth
+  }
+}

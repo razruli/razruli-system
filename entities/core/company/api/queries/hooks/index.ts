@@ -1,0 +1,1 @@
+export { useSuspenseQueryCompanyBySlug } from "./useSuspenseQueryCompanyBySlug";

@@ -1,0 +1,36 @@
+query GetProcesses($filter: ProcessFilterInput, $pagination: ProcessPaginationInput) {
+  processes(filter: $filter, pagination: $pagination) {
+    nodes {
+      id
+      companyId
+      departmentId
+      name
+      description
+      processType
+      capacityUnits
+      kMultiplier
+      estimatedDurationDays
+      status
+      priority
+      createdAt
+      updatedAt
+      startedAt
+      completedAt
+      company {
+        id
+        name
+      }
+      department {
+        id
+        name
+      }
+    }
+    totalCount
+    pageInfo {
+      hasMore
+      offset
+      limit
+      total
+    }
+  }
+}
