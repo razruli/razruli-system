@@ -14,7 +14,10 @@ const REQUIRED_FILES = [
   { type: "departments", label: "Departments File", order: 1 },
   { type: "employees", label: "Employees File", order: 2 },
   { type: "processes", label: "Processes File", order: 3 },
+  { type: "finishedTasks", label: "Finished Tasks File", order: 4 },
 ];
+
+const OPTIONAL_FILES: any[] = [];
 
 export function UploadForm() {
   const files = useUploadFiles();
@@ -30,6 +33,12 @@ export function UploadForm() {
     if (lower.includes("depart")) return "departments";
     if (lower.includes("employ")) return "employees";
     if (lower.includes("process")) return "processes";
+    if (
+      lower.includes("finished") ||
+      lower.includes("completed") ||
+      lower.includes("task")
+    )
+      return "finishedTasks";
     return null;
   };
 
@@ -49,7 +58,7 @@ export function UploadForm() {
 
     if (!fileType) {
       setGlobalError(
-        "File name must contain 'departments', 'employees', or 'processes'",
+        "File name must contain 'departments', 'employees', 'processes', or 'finished tasks'",
       );
       return;
     }
@@ -109,8 +118,8 @@ export function UploadForm() {
       <div>
         <h2 className="text-2xl font-bold">Upload Data Files</h2>
         <p className="text-muted-foreground mt-1">
-          Upload all 3 required CSV files in any order: departments, employees,
-          and processes
+          Upload all 4 required CSV files in any order: departments, employees,
+          processes, and finished tasks
         </p>
       </div>
 

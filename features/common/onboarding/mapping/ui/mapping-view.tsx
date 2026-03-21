@@ -5,6 +5,24 @@ import { useState } from "react";
 import { FileType, useMappingStore } from "../lib/store/store";
 import { REQUIRED_FIELDS_BY_TYPE, OPTIONAL_FIELDS_BY_TYPE } from "../model";
 
+// Helper function to suggest headers based on field name
+function suggestHeaderForField(fieldName: string, availableHeaders: string[]): string[] {
+  const fieldLower = fieldName.toLowerCase();
+  const suggestions: string[] = [];
+  
+  // Find exact matches first
+  const exact = availableHeaders.find((h) => h.toLowerCase() === fieldLower);
+  if (exact) suggestions.push(exact);
+  
+  // Find partial matches
+  const partial = availableHeaders.filter(
+    (h) => !suggestions.includes(h) && h.toLowerCase().includes(fieldLower)
+  );
+  suggestions.push(...partial);
+  
+  return suggestions;
+}
+
 export function MappingView() {
   const files = useMappingStore((state) => state.files);
   const columnMappings = useMappingStore((state) => state.columnMappings);
@@ -62,7 +80,12 @@ export function MappingView() {
   };
 
   const getMissingFileTypes = () => {
-    const REQUIRED_TYPES = ["department", "employee", "process"];
+    const REQUIRED_TYPES = [
+      "department",
+      "employee",
+      "process",
+      "finishedTasks",
+    ];
     const uploadedTypes = files.map((f) => f.type);
     return REQUIRED_TYPES.filter(
       (type) => !uploadedTypes.includes(type as FileType),
@@ -161,11 +184,26 @@ export function MappingView() {
                   className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
                 >
                   <option value="">-- Select CSV Column --</option>
-                  {activeFile.headers.map((header) => (
-                    <option key={header} value={header}>
-                      {header}
-                    </option>
-                  ))}
+                  {/* Show suggested headers first */}
+                  {suggestHeaderForField(dbField, activeFile.headers).length > 0 && (
+                    <optgroup label="Suggested">
+                      {suggestHeaderForField(dbField, activeFile.headers).map((header) => (
+                        <option key={header} value={header}>
+                          {header}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {/* Show all other headers */}
+                  {activeFile.headers.length > 0 && (
+                    <optgroup label="All Columns">
+                      {activeFile.headers.map((header) => (
+                        <option key={header} value={header}>
+                          {header}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </div>
               {missingFields.includes(dbField) && (
@@ -199,11 +237,26 @@ export function MappingView() {
                     className="w-full px-3 py-2 border rounded-md bg-background text-foreground"
                   >
                     <option value="">-- Skip this field --</option>
-                    {activeFile.headers.map((header) => (
-                      <option key={header} value={header}>
-                        {header}
-                      </option>
-                    ))}
+                    {/* Show suggested headers first */}
+                    {suggestHeaderForField(dbField, activeFile.headers).length > 0 && (
+                      <optgroup label="Suggested">
+                        {suggestHeaderForField(dbField, activeFile.headers).map((header) => (
+                          <option key={header} value={header}>
+                            {header}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                    {/* Show all other headers */}
+                    {activeFile.headers.length > 0 && (
+                      <optgroup label="All Columns">
+                        {activeFile.headers.map((header) => (
+                          <option key={header} value={header}>
+                            {header}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
                   </select>
                 </div>
               </div>

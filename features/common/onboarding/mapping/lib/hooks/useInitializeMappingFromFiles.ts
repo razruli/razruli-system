@@ -17,6 +17,12 @@ export function useInitializeMappingFromFiles(uploadedFiles: File[]) {
     if (lower.includes("depart")) return "department";
     if (lower.includes("employ")) return "employee";
     if (lower.includes("process")) return "process";
+    if (
+      lower.includes("finished") ||
+      lower.includes("completed") ||
+      lower.includes("task")
+    )
+      return "finishedTasks";
     return null;
   };
 
@@ -38,7 +44,7 @@ export function useInitializeMappingFromFiles(uploadedFiles: File[]) {
 
         if (!fileType) {
           throw new Error(
-            `Could not determine file type for ${file.name}. File name must contain 'departments', 'employees', or 'processes'.`,
+            `Could not determine file type for ${file.name}. File name must contain 'departments', 'employees', 'processes', or 'finished tasks'.`,
           );
         }
 

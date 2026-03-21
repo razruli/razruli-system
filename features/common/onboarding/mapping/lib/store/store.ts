@@ -7,7 +7,8 @@ export type FileType =
   | "company"
   | "role"
   | "department"
-  | "process";
+  | "process"
+  | "finishedTasks";
 
 interface MappingFile {
   name: string;
@@ -150,7 +151,12 @@ export const useMappingStore = create<MappingStoreState>((set, get) => ({
 
   allFilesMappingsComplete: () => {
     const state = get();
-    const REQUIRED_TYPES = ["department", "employee", "process"];
+    const REQUIRED_TYPES = [
+      "department",
+      "employee",
+      "process",
+      "finishedTasks",
+    ];
 
     // Check all required file types are present
     const uploadedTypes = state.files.map((f) => f.type);

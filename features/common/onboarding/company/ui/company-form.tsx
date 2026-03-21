@@ -9,13 +9,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/shadcn/select";
+import { Textarea } from "@/shared/ui/shadcn/textarea";
 
 import { useCompanyData, useCompanyActions } from "../lib";
+import { useCompanyError } from "../lib/store/selectors";
 import { INDUSTRIES, TIMEZONES } from "../model";
 
 export function CompanyForm() {
   const data = useCompanyData();
   const { setData } = useCompanyActions();
+  const error = useCompanyError();
+
+  const handleFieldChange = (field: string, value: any) => {
+    setData({ [field]: value } as any);
+  };
 
   return (
     <div className="space-y-6">
@@ -24,6 +31,12 @@ export function CompanyForm() {
         <p className="text-muted-foreground mt-1">Tell us about your company</p>
       </div>
 
+      {error && (
+        <div className="bg-destructive/10 border border-destructive text-destructive rounded-lg p-3 text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-4">
         <div>
           <Label htmlFor="name">Company Name</Label>
@@ -31,7 +44,7 @@ export function CompanyForm() {
             id="name"
             placeholder="Acme Corp"
             value={data?.name || ""}
-            onChange={(e) => setData({ name: e.target.value })}
+            onChange={(e) => handleFieldChange("name", e.target.value)}
             className="mt-2"
           />
         </div>
@@ -40,7 +53,7 @@ export function CompanyForm() {
           <Label htmlFor="industry">Industry</Label>
           <Select
             value={data?.industry || ""}
-            onValueChange={(value) => setData({ industry: value })}
+            onValueChange={(value) => handleFieldChange("industry", value)}
           >
             <SelectTrigger id="industry" className="mt-2">
               <SelectValue placeholder="Select industry" />
@@ -59,7 +72,7 @@ export function CompanyForm() {
           <Label htmlFor="timezone">Timezone</Label>
           <Select
             value={data?.timezone || ""}
-            onValueChange={(value) => setData({ timezone: value })}
+            onValueChange={(value) => handleFieldChange("timezone", value)}
           >
             <SelectTrigger id="timezone" className="mt-2">
               <SelectValue placeholder="Select timezone" />
@@ -82,11 +95,9 @@ export function CompanyForm() {
               type="time"
               value={data?.workingHours?.start || ""}
               onChange={(e) =>
-                setData({
-                  workingHours: {
-                    ...data?.workingHours,
-                    start: e.target.value,
-                  } as any,
+                handleFieldChange("workingHours", {
+                  ...data?.workingHours,
+                  start: e.target.value,
                 })
               }
               className="mt-2"
@@ -99,16 +110,26 @@ export function CompanyForm() {
               type="time"
               value={data?.workingHours?.end || ""}
               onChange={(e) =>
-                setData({
-                  workingHours: {
-                    ...data?.workingHours,
-                    end: e.target.value,
-                  } as any,
+                handleFieldChange("workingHours", {
+                  ...data?.workingHours,
+                  end: e.target.value,
                 })
               }
               className="mt-2"
             />
           </div>
+        </div>
+
+        <div>
+          <Label htmlFor="description">Company Description (Optional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Tell us about your company..."
+            value={data?.description || ""}
+            onChange={(e) => handleFieldChange("description", e.target.value)}
+            className="mt-2"
+            rows={4}
+          />
         </div>
       </div>
     </div>

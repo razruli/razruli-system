@@ -8,6 +8,7 @@ export const CompanyFormSchema = z.object({
     start: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
     end: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
   }),
+  description: z.string().optional(),
 });
 
 export type CompanyFormData = z.infer<typeof CompanyFormSchema>;

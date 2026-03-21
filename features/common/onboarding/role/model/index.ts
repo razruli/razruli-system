@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 export const RoleFormSchema = z.object({
+  phone: z.string().optional(),
+  bio: z.string().optional(),
   role: z.enum(["admin", "manager", "user", "viewer"]),
 });
 
