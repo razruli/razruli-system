@@ -3,7 +3,8 @@ mutation CreateEmployee($input: CreateEmployeeInput!) {
     id
     companyId
     departmentId
-    fio
+    firstName
+    lastName
     gradeId
     status
     createdAt

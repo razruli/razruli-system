@@ -6,7 +6,8 @@ query GetDepartment($id: String!) {
     headId
     head {
       id
-      fio
+      firstName
+      lastName
       gradeId
     }
     createdAt

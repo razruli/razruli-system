@@ -3,7 +3,8 @@ mutation UpdateEmployee($id: String!, $input: UpdateEmployeeInput!) {
     id
     companyId
     departmentId
-    fio
+    firstName
+    lastName
     gradeId
     gender
     status

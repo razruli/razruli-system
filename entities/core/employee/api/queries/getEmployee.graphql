@@ -7,7 +7,8 @@ query GetEmployee($id: String!) {
       id
       name
     }
-    fio
+    firstName
+    lastName
     gradeId
     grade {
       id

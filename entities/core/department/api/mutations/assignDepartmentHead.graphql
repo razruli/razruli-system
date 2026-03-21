@@ -5,7 +5,8 @@ mutation AssignDepartmentHead($departmentId: String!, $employeeId: String!) {
     headId
     head {
       id
-      fio
+      firstName
+      lastName
       gradeId
     }
     updatedAt

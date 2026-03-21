@@ -11,7 +11,8 @@ query GetEmployees(
         id
         name
       }
-      fio
+      firstName
+      lastName
       gradeId
       grade {
         id

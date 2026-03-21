@@ -1,10 +1,16 @@
 /**
- * Employee Query Hooks
+ * Employee Query Documents & Hooks
  *
  * Usage:
- * import { useGetEmployee, useGetEmployees } from '@/entities/core/employee/api/queries';
- *
- * const { data, loading } = useGetEmployee({ id: '...' });
+ * import { GetEmployeesDocument } from '@/entities/core/employee/api/queries';
+ * import { GetEmployeeDocument } from '@/entities/core/employee/api/queries';
  */
 
+export {
+  GetEmployeeDocument,
+  GetEmployeesDocument,
+  GetDepartmentEmployeesDocument,
+  GetEmployeeCapacityDocument,
+  GetEmployeeLoadIndexDocument,
+} from "@/shared/graphql/generated";
 export * from "./hooks";

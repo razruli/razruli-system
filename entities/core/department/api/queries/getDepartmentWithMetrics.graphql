@@ -15,7 +15,8 @@ query GetDepartmentWithMetrics(
       headId
       head {
         id
-        fio
+        firstName
+        lastName
       }
     }
     totalEmployees

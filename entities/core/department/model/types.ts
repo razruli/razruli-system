@@ -21,7 +21,6 @@ export interface Grade {
 
 export interface EmployeeHead {
   id: string;
-  fio: string;
   gradeId: number;
 }
 

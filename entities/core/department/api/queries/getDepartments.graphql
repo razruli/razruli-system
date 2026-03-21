@@ -7,7 +7,8 @@ query GetDepartments($filter: DepartmentFilterInput!) {
       headId
       head {
         id
-        fio
+        firstName
+        lastName
         gradeId
       }
       createdAt

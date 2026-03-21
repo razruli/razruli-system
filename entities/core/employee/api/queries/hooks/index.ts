@@ -3,3 +3,4 @@ export { useGetEmployees } from "./useGetEmployees";
 export { useGetDepartmentEmployees } from "./useGetDepartmentEmployees";
 export { useGetEmployeeCapacity } from "./useGetEmployeeCapacity";
 export { useGetEmployeeLoadIndex } from "./useGetEmployeeLoadIndex";
+export { useSuspenseQueryEmployees } from "./useSuspenseQueryEmployees";

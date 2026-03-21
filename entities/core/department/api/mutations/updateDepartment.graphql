@@ -6,7 +6,8 @@ mutation UpdateDepartment($id: String!, $input: UpdateDepartmentInput!) {
     headId
     head {
       id
-      fio
+      firstName
+      lastName
     }
     updatedAt
   }

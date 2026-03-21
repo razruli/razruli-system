@@ -3,7 +3,8 @@ query GetDepartmentEmployees($departmentId: String!) {
     id
     companyId
     departmentId
-    fio
+    firstName
+    lastName
     gradeId
     grade {
       id
