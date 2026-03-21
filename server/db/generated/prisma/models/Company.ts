@@ -39,6 +39,7 @@ export type CompanySumAggregateOutputType = {
 export type CompanyMinAggregateOutputType = {
   id: string | null
   name: string | null
+  slug: string | null
   timezone: string | null
   workingHoursDay: number | null
   workingDaysPerMonth: number | null
@@ -49,6 +50,7 @@ export type CompanyMinAggregateOutputType = {
 export type CompanyMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  slug: string | null
   timezone: string | null
   workingHoursDay: number | null
   workingDaysPerMonth: number | null
@@ -59,6 +61,7 @@ export type CompanyMaxAggregateOutputType = {
 export type CompanyCountAggregateOutputType = {
   id: number
   name: number
+  slug: number
   timezone: number
   workingHoursDay: number
   workingDaysPerMonth: number
@@ -81,6 +84,7 @@ export type CompanySumAggregateInputType = {
 export type CompanyMinAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
   timezone?: true
   workingHoursDay?: true
   workingDaysPerMonth?: true
@@ -91,6 +95,7 @@ export type CompanyMinAggregateInputType = {
 export type CompanyMaxAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
   timezone?: true
   workingHoursDay?: true
   workingDaysPerMonth?: true
@@ -101,6 +106,7 @@ export type CompanyMaxAggregateInputType = {
 export type CompanyCountAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
   timezone?: true
   workingHoursDay?: true
   workingDaysPerMonth?: true
@@ -198,6 +204,7 @@ export type CompanyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type CompanyGroupByOutputType = {
   id: string
   name: string
+  slug: string
   timezone: string
   workingHoursDay: number
   workingDaysPerMonth: number
@@ -231,6 +238,7 @@ export type CompanyWhereInput = {
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   id?: Prisma.StringFilter<"Company"> | string
   name?: Prisma.StringFilter<"Company"> | string
+  slug?: Prisma.StringFilter<"Company"> | string
   timezone?: Prisma.StringFilter<"Company"> | string
   workingHoursDay?: Prisma.IntFilter<"Company"> | number
   workingDaysPerMonth?: Prisma.IntFilter<"Company"> | number
@@ -241,6 +249,7 @@ export type CompanyWhereInput = {
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  finishedTasks?: Prisma.FinishedTaskListRelationFilter
   actors?: Prisma.ActorListRelationFilter
   roles?: Prisma.RoleListRelationFilter
 }
@@ -248,6 +257,7 @@ export type CompanyWhereInput = {
 export type CompanyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   workingHoursDay?: Prisma.SortOrder
   workingDaysPerMonth?: Prisma.SortOrder
@@ -258,12 +268,14 @@ export type CompanyOrderByWithRelationInput = {
   processes?: Prisma.ProcessOrderByRelationAggregateInput
   taskAssignments?: Prisma.TaskAssignmentOrderByRelationAggregateInput
   loadSnapshots?: Prisma.LoadSnapshotOrderByRelationAggregateInput
+  finishedTasks?: Prisma.FinishedTaskOrderByRelationAggregateInput
   actors?: Prisma.ActorOrderByRelationAggregateInput
   roles?: Prisma.RoleOrderByRelationAggregateInput
 }
 
 export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
   OR?: Prisma.CompanyWhereInput[]
   NOT?: Prisma.CompanyWhereInput | Prisma.CompanyWhereInput[]
@@ -278,13 +290,15 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   processes?: Prisma.ProcessListRelationFilter
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
   loadSnapshots?: Prisma.LoadSnapshotListRelationFilter
+  finishedTasks?: Prisma.FinishedTaskListRelationFilter
   actors?: Prisma.ActorListRelationFilter
   roles?: Prisma.RoleListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type CompanyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   workingHoursDay?: Prisma.SortOrder
   workingDaysPerMonth?: Prisma.SortOrder
@@ -303,6 +317,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   NOT?: Prisma.CompanyScalarWhereWithAggregatesInput | Prisma.CompanyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Company"> | string
   name?: Prisma.StringWithAggregatesFilter<"Company"> | string
+  slug?: Prisma.StringWithAggregatesFilter<"Company"> | string
   timezone?: Prisma.StringWithAggregatesFilter<"Company"> | string
   workingHoursDay?: Prisma.IntWithAggregatesFilter<"Company"> | number
   workingDaysPerMonth?: Prisma.IntWithAggregatesFilter<"Company"> | number
@@ -313,6 +328,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
 export type CompanyCreateInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -323,6 +339,7 @@ export type CompanyCreateInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -330,6 +347,7 @@ export type CompanyCreateInput = {
 export type CompanyUncheckedCreateInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -340,6 +358,7 @@ export type CompanyUncheckedCreateInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -347,6 +366,7 @@ export type CompanyUncheckedCreateInput = {
 export type CompanyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -357,6 +377,7 @@ export type CompanyUpdateInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -364,6 +385,7 @@ export type CompanyUpdateInput = {
 export type CompanyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -374,6 +396,7 @@ export type CompanyUncheckedUpdateInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -381,6 +404,7 @@ export type CompanyUncheckedUpdateInput = {
 export type CompanyCreateManyInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -391,6 +415,7 @@ export type CompanyCreateManyInput = {
 export type CompanyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -401,6 +426,7 @@ export type CompanyUpdateManyMutationInput = {
 export type CompanyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -421,6 +447,7 @@ export type CompanyNullableScalarRelationFilter = {
 export type CompanyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   workingHoursDay?: Prisma.SortOrder
   workingDaysPerMonth?: Prisma.SortOrder
@@ -436,6 +463,7 @@ export type CompanyAvgOrderByAggregateInput = {
 export type CompanyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   workingHoursDay?: Prisma.SortOrder
   workingDaysPerMonth?: Prisma.SortOrder
@@ -446,6 +474,7 @@ export type CompanyMaxOrderByAggregateInput = {
 export type CompanyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   workingHoursDay?: Prisma.SortOrder
   workingDaysPerMonth?: Prisma.SortOrder
@@ -530,6 +559,20 @@ export type CompanyUpdateOneRequiredWithoutEmployeesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutEmployeesInput, Prisma.CompanyUpdateWithoutEmployeesInput>, Prisma.CompanyUncheckedUpdateWithoutEmployeesInput>
 }
 
+export type CompanyCreateNestedOneWithoutFinishedTasksInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutFinishedTasksInput, Prisma.CompanyUncheckedCreateWithoutFinishedTasksInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutFinishedTasksInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutFinishedTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutFinishedTasksInput, Prisma.CompanyUncheckedCreateWithoutFinishedTasksInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutFinishedTasksInput
+  upsert?: Prisma.CompanyUpsertWithoutFinishedTasksInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutFinishedTasksInput, Prisma.CompanyUpdateWithoutFinishedTasksInput>, Prisma.CompanyUncheckedUpdateWithoutFinishedTasksInput>
+}
+
 export type CompanyCreateNestedOneWithoutProcessesInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutProcessesInput, Prisma.CompanyUncheckedCreateWithoutProcessesInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutProcessesInput
@@ -561,6 +604,7 @@ export type CompanyUpdateOneRequiredWithoutTaskAssignmentsNestedInput = {
 export type CompanyCreateWithoutLoadSnapshotsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -570,6 +614,7 @@ export type CompanyCreateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -577,6 +622,7 @@ export type CompanyCreateWithoutLoadSnapshotsInput = {
 export type CompanyUncheckedCreateWithoutLoadSnapshotsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -586,6 +632,7 @@ export type CompanyUncheckedCreateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -609,6 +656,7 @@ export type CompanyUpdateToOneWithWhereWithoutLoadSnapshotsInput = {
 export type CompanyUpdateWithoutLoadSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -618,6 +666,7 @@ export type CompanyUpdateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -625,6 +674,7 @@ export type CompanyUpdateWithoutLoadSnapshotsInput = {
 export type CompanyUncheckedUpdateWithoutLoadSnapshotsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -634,6 +684,7 @@ export type CompanyUncheckedUpdateWithoutLoadSnapshotsInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -641,6 +692,7 @@ export type CompanyUncheckedUpdateWithoutLoadSnapshotsInput = {
 export type CompanyCreateWithoutActorsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -651,12 +703,14 @@ export type CompanyCreateWithoutActorsInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutActorsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -667,6 +721,7 @@ export type CompanyUncheckedCreateWithoutActorsInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
 
@@ -689,6 +744,7 @@ export type CompanyUpdateToOneWithWhereWithoutActorsInput = {
 export type CompanyUpdateWithoutActorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -699,12 +755,14 @@ export type CompanyUpdateWithoutActorsInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutActorsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -715,12 +773,14 @@ export type CompanyUncheckedUpdateWithoutActorsInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutRolesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -731,12 +791,14 @@ export type CompanyCreateWithoutRolesInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
 }
 
 export type CompanyUncheckedCreateWithoutRolesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -747,6 +809,7 @@ export type CompanyUncheckedCreateWithoutRolesInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
 }
 
@@ -769,6 +832,7 @@ export type CompanyUpdateToOneWithWhereWithoutRolesInput = {
 export type CompanyUpdateWithoutRolesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -779,12 +843,14 @@ export type CompanyUpdateWithoutRolesInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyUncheckedUpdateWithoutRolesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -795,12 +861,14 @@ export type CompanyUncheckedUpdateWithoutRolesInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 export type CompanyCreateWithoutDepartmentsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -810,6 +878,7 @@ export type CompanyCreateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -817,6 +886,7 @@ export type CompanyCreateWithoutDepartmentsInput = {
 export type CompanyUncheckedCreateWithoutDepartmentsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -826,6 +896,7 @@ export type CompanyUncheckedCreateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -849,6 +920,7 @@ export type CompanyUpdateToOneWithWhereWithoutDepartmentsInput = {
 export type CompanyUpdateWithoutDepartmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -858,6 +930,7 @@ export type CompanyUpdateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -865,6 +938,7 @@ export type CompanyUpdateWithoutDepartmentsInput = {
 export type CompanyUncheckedUpdateWithoutDepartmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -874,6 +948,7 @@ export type CompanyUncheckedUpdateWithoutDepartmentsInput = {
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -881,6 +956,7 @@ export type CompanyUncheckedUpdateWithoutDepartmentsInput = {
 export type CompanyCreateWithoutEmployeesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -890,6 +966,7 @@ export type CompanyCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -897,6 +974,7 @@ export type CompanyCreateWithoutEmployeesInput = {
 export type CompanyUncheckedCreateWithoutEmployeesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -906,6 +984,7 @@ export type CompanyUncheckedCreateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -929,6 +1008,7 @@ export type CompanyUpdateToOneWithWhereWithoutEmployeesInput = {
 export type CompanyUpdateWithoutEmployeesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -938,6 +1018,7 @@ export type CompanyUpdateWithoutEmployeesInput = {
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -945,11 +1026,101 @@ export type CompanyUpdateWithoutEmployeesInput = {
 export type CompanyUncheckedUpdateWithoutEmployeesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutFinishedTasksInput = {
+  id?: string
+  name: string
+  slug: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutFinishedTasksInput = {
+  id?: string
+  name: string
+  slug: string
+  timezone?: string
+  workingHoursDay?: number
+  workingDaysPerMonth?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutCompanyInput
+  departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
+  processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
+  loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutFinishedTasksInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutFinishedTasksInput, Prisma.CompanyUncheckedCreateWithoutFinishedTasksInput>
+}
+
+export type CompanyUpsertWithoutFinishedTasksInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutFinishedTasksInput, Prisma.CompanyUncheckedUpdateWithoutFinishedTasksInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutFinishedTasksInput, Prisma.CompanyUncheckedCreateWithoutFinishedTasksInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutFinishedTasksInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutFinishedTasksInput, Prisma.CompanyUncheckedUpdateWithoutFinishedTasksInput>
+}
+
+export type CompanyUpdateWithoutFinishedTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUpdateManyWithoutCompanyNestedInput
+  departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
+  processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
+  loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutFinishedTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
+  workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutCompanyNestedInput
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
@@ -961,6 +1132,7 @@ export type CompanyUncheckedUpdateWithoutEmployeesInput = {
 export type CompanyCreateWithoutProcessesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -970,6 +1142,7 @@ export type CompanyCreateWithoutProcessesInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -977,6 +1150,7 @@ export type CompanyCreateWithoutProcessesInput = {
 export type CompanyUncheckedCreateWithoutProcessesInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -986,6 +1160,7 @@ export type CompanyUncheckedCreateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -1009,6 +1184,7 @@ export type CompanyUpdateToOneWithWhereWithoutProcessesInput = {
 export type CompanyUpdateWithoutProcessesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1018,6 +1194,7 @@ export type CompanyUpdateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -1025,6 +1202,7 @@ export type CompanyUpdateWithoutProcessesInput = {
 export type CompanyUncheckedUpdateWithoutProcessesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1034,6 +1212,7 @@ export type CompanyUncheckedUpdateWithoutProcessesInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -1041,6 +1220,7 @@ export type CompanyUncheckedUpdateWithoutProcessesInput = {
 export type CompanyCreateWithoutTaskAssignmentsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -1050,6 +1230,7 @@ export type CompanyCreateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleCreateNestedManyWithoutCompanyInput
 }
@@ -1057,6 +1238,7 @@ export type CompanyCreateWithoutTaskAssignmentsInput = {
 export type CompanyUncheckedCreateWithoutTaskAssignmentsInput = {
   id?: string
   name: string
+  slug: string
   timezone?: string
   workingHoursDay?: number
   workingDaysPerMonth?: number
@@ -1066,6 +1248,7 @@ export type CompanyUncheckedCreateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUncheckedCreateNestedManyWithoutCompanyInput
   processes?: Prisma.ProcessUncheckedCreateNestedManyWithoutCompanyInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedCreateNestedManyWithoutCompanyInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutCompanyInput
   actors?: Prisma.ActorUncheckedCreateNestedManyWithoutCompanyInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutCompanyInput
 }
@@ -1089,6 +1272,7 @@ export type CompanyUpdateToOneWithWhereWithoutTaskAssignmentsInput = {
 export type CompanyUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1098,6 +1282,7 @@ export type CompanyUpdateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUpdateManyWithoutCompanyNestedInput
 }
@@ -1105,6 +1290,7 @@ export type CompanyUpdateWithoutTaskAssignmentsInput = {
 export type CompanyUncheckedUpdateWithoutTaskAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   workingHoursDay?: Prisma.IntFieldUpdateOperationsInput | number
   workingDaysPerMonth?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1114,6 +1300,7 @@ export type CompanyUncheckedUpdateWithoutTaskAssignmentsInput = {
   departments?: Prisma.DepartmentUncheckedUpdateManyWithoutCompanyNestedInput
   processes?: Prisma.ProcessUncheckedUpdateManyWithoutCompanyNestedInput
   loadSnapshots?: Prisma.LoadSnapshotUncheckedUpdateManyWithoutCompanyNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutCompanyNestedInput
   actors?: Prisma.ActorUncheckedUpdateManyWithoutCompanyNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutCompanyNestedInput
 }
@@ -1129,6 +1316,7 @@ export type CompanyCountOutputType = {
   processes: number
   taskAssignments: number
   loadSnapshots: number
+  finishedTasks: number
   actors: number
   roles: number
 }
@@ -1139,6 +1327,7 @@ export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   processes?: boolean | CompanyCountOutputTypeCountProcessesArgs
   taskAssignments?: boolean | CompanyCountOutputTypeCountTaskAssignmentsArgs
   loadSnapshots?: boolean | CompanyCountOutputTypeCountLoadSnapshotsArgs
+  finishedTasks?: boolean | CompanyCountOutputTypeCountFinishedTasksArgs
   actors?: boolean | CompanyCountOutputTypeCountActorsArgs
   roles?: boolean | CompanyCountOutputTypeCountRolesArgs
 }
@@ -1191,6 +1380,13 @@ export type CompanyCountOutputTypeCountLoadSnapshotsArgs<ExtArgs extends runtime
 /**
  * CompanyCountOutputType without action
  */
+export type CompanyCountOutputTypeCountFinishedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FinishedTaskWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
 export type CompanyCountOutputTypeCountActorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ActorWhereInput
 }
@@ -1206,6 +1402,7 @@ export type CompanyCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.E
 export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
   timezone?: boolean
   workingHoursDay?: boolean
   workingDaysPerMonth?: boolean
@@ -1216,6 +1413,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   processes?: boolean | Prisma.Company$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Company$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Company$loadSnapshotsArgs<ExtArgs>
+  finishedTasks?: boolean | Prisma.Company$finishedTasksArgs<ExtArgs>
   actors?: boolean | Prisma.Company$actorsArgs<ExtArgs>
   roles?: boolean | Prisma.Company$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
@@ -1224,6 +1422,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
   timezone?: boolean
   workingHoursDay?: boolean
   workingDaysPerMonth?: boolean
@@ -1234,6 +1433,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
   timezone?: boolean
   workingHoursDay?: boolean
   workingDaysPerMonth?: boolean
@@ -1244,6 +1444,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type CompanySelectScalar = {
   id?: boolean
   name?: boolean
+  slug?: boolean
   timezone?: boolean
   workingHoursDay?: boolean
   workingDaysPerMonth?: boolean
@@ -1251,13 +1452,14 @@ export type CompanySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "timezone" | "workingHoursDay" | "workingDaysPerMonth" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "timezone" | "workingHoursDay" | "workingDaysPerMonth" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employees?: boolean | Prisma.Company$employeesArgs<ExtArgs>
   departments?: boolean | Prisma.Company$departmentsArgs<ExtArgs>
   processes?: boolean | Prisma.Company$processesArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Company$taskAssignmentsArgs<ExtArgs>
   loadSnapshots?: boolean | Prisma.Company$loadSnapshotsArgs<ExtArgs>
+  finishedTasks?: boolean | Prisma.Company$finishedTasksArgs<ExtArgs>
   actors?: boolean | Prisma.Company$actorsArgs<ExtArgs>
   roles?: boolean | Prisma.Company$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyCountOutputTypeDefaultArgs<ExtArgs>
@@ -1273,6 +1475,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     processes: Prisma.$ProcessPayload<ExtArgs>[]
     taskAssignments: Prisma.$TaskAssignmentPayload<ExtArgs>[]
     loadSnapshots: Prisma.$LoadSnapshotPayload<ExtArgs>[]
+    finishedTasks: Prisma.$FinishedTaskPayload<ExtArgs>[]
     /**
      * *
      *    * Business users (Actors) in this company
@@ -1283,6 +1486,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    slug: string
     timezone: string
     workingHoursDay: number
     workingDaysPerMonth: number
@@ -1687,6 +1891,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   processes<T extends Prisma.Company$processesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$processesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProcessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   taskAssignments<T extends Prisma.Company$taskAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$taskAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loadSnapshots<T extends Prisma.Company$loadSnapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$loadSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoadSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  finishedTasks<T extends Prisma.Company$finishedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$finishedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinishedTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   actors<T extends Prisma.Company$actorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$actorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roles<T extends Prisma.Company$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1720,6 +1925,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
 export interface CompanyFieldRefs {
   readonly id: Prisma.FieldRef<"Company", 'String'>
   readonly name: Prisma.FieldRef<"Company", 'String'>
+  readonly slug: Prisma.FieldRef<"Company", 'String'>
   readonly timezone: Prisma.FieldRef<"Company", 'String'>
   readonly workingHoursDay: Prisma.FieldRef<"Company", 'Int'>
   readonly workingDaysPerMonth: Prisma.FieldRef<"Company", 'Int'>
@@ -2230,6 +2436,30 @@ export type Company$loadSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.LoadSnapshotScalarFieldEnum | Prisma.LoadSnapshotScalarFieldEnum[]
+}
+
+/**
+ * Company.finishedTasks
+ */
+export type Company$finishedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FinishedTask
+   */
+  select?: Prisma.FinishedTaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FinishedTask
+   */
+  omit?: Prisma.FinishedTaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FinishedTaskInclude<ExtArgs> | null
+  where?: Prisma.FinishedTaskWhereInput
+  orderBy?: Prisma.FinishedTaskOrderByWithRelationInput | Prisma.FinishedTaskOrderByWithRelationInput[]
+  cursor?: Prisma.FinishedTaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FinishedTaskScalarFieldEnum | Prisma.FinishedTaskScalarFieldEnum[]
 }
 
 /**

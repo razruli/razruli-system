@@ -278,6 +278,8 @@ export type Company = {
   name: Scalars['String']['output'];
   /** All processes */
   processes?: Maybe<Array<Maybe<Process>>>;
+  /** Slug (URL-friendly identifier) */
+  slug: Scalars['String']['output'];
   /** All task assignments */
   taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
   /** Timezone (default UTC+3) */
@@ -336,6 +338,7 @@ export type CreateActorInput = {
 /** Input for creating a company */
 export type CreateCompanyInput = {
   name: Scalars['String']['input'];
+  slug?: InputMaybe<Scalars['String']['input']>;
   timezone?: InputMaybe<Scalars['String']['input']>;
   workingDaysPerMonth?: InputMaybe<Scalars['Int']['input']>;
   workingHoursDay?: InputMaybe<Scalars['Int']['input']>;
@@ -482,6 +485,16 @@ export type Department = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** Aggregated stats for department productivity */
+export type DepartmentCompletionMetrics = {
+  __typename?: 'DepartmentCompletionMetrics';
+  averageHoursPerTask: Scalars['Float']['output'];
+  departmentId: Scalars['String']['output'];
+  processes: Array<ProcessCompletionStats>;
+  totalHoursSpent: Scalars['Float']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /** Department connection with pagination */
 export type DepartmentConnection = {
   __typename?: 'DepartmentConnection';
@@ -551,6 +564,15 @@ export type DepartmentMetrics = {
   totalLoad: Scalars['Float']['output'];
 };
 
+/** Company-wide productivity ranking */
+export type DepartmentRanking = {
+  __typename?: 'DepartmentRanking';
+  departmentId: Scalars['String']['output'];
+  entriesCount: Scalars['Int']['output'];
+  rank: Scalars['Int']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /**
  * Employee type and resolvers
  * Represents a team member with capacity coefficients and employment details
@@ -568,8 +590,6 @@ export type Employee = {
   departmentId: Scalars['String']['output'];
   /** Employment type (LABOR_CONTRACT/SERVICE_CONTRACT/SELF_EMPLOYED) */
   employmentType: Scalars['String']['output'];
-  /** Full name (firstName lastName) - computed */
-  fio: Scalars['String']['output'];
   /** Dismissal date (null if active) */
   fireDate?: Maybe<Scalars['DateTime']['output']>;
   /** First name */
@@ -586,7 +606,7 @@ export type Employee = {
   /** Unique identifier */
   id: Scalars['String']['output'];
   /** Efficiency coefficient (multiplier, default 1.0) */
-  kEfficiency: Scalars['Float']['output'];
+  kEfficiency?: Maybe<Scalars['Float']['output']>;
   /** Last name */
   lastName: Scalars['String']['output'];
   /** Load snapshots */
@@ -741,6 +761,16 @@ export type EmployeeLoadHistory = {
   trendDirection: TrendDirection;
 };
 
+/** Aggregated stats for employee productivity */
+export type EmployeeMetrics = {
+  __typename?: 'EmployeeMetrics';
+  averageHoursPerTask: Scalars['Float']['output'];
+  employeeId: Scalars['String']['output'];
+  processes: Array<ProcessCompletionStats>;
+  totalHoursSpent: Scalars['Float']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /** Pagination and sorting */
 export type EmployeePaginationInput = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -819,6 +849,34 @@ export enum ExportFormat {
   Pdf = 'PDF',
   Xlsx = 'XLSX'
 }
+
+/**
+ * Finished Task type representing completed work
+ * Minimal analytics model: what was done, when, and optionally by whom and how long
+ */
+export type FinishedTask = {
+  __typename?: 'FinishedTask';
+  completedAt: Scalars['DateTime']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  department: Department;
+  /** Department that completed the work (always set) */
+  departmentId: Scalars['String']['output'];
+  employee?: Maybe<Employee>;
+  /** Specific employee who completed (optional - null = department aggregate) */
+  employeeId?: Maybe<Scalars['String']['output']>;
+  /** Optional extended details (more data = better insights) */
+  hoursSpent?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  process: Process;
+  /** What process was completed */
+  processId: Scalars['String']['output'];
+  /** Core metrics */
+  quantity: Scalars['Int']['output'];
+  status: TaskStatus;
+  updatedAt: Scalars['DateTime']['output'];
+};
 
 /** GapAnalysis type representing workforce planning analysis */
 export type GapAnalysis = {
@@ -2028,6 +2086,14 @@ export type Process = {
   updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+/** Process completion breakdown */
+export type ProcessCompletionStats = {
+  __typename?: 'ProcessCompletionStats';
+  count: Scalars['Int']['output'];
+  processId: Scalars['String']['output'];
+  quantity: Scalars['Int']['output'];
+};
+
 /** Process response wrapper with pagination */
 export type ProcessConnection = {
   __typename?: 'ProcessConnection';
@@ -2072,6 +2138,15 @@ export enum ProcessPriority {
   Low = 'LOW',
   Normal = 'NORMAL'
 }
+
+/** Process popularity ranking */
+export type ProcessRanking = {
+  __typename?: 'ProcessRanking';
+  entriesCount: Scalars['Int']['output'];
+  processId: Scalars['String']['output'];
+  rank: Scalars['Int']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
 
 /** Process sort fields */
 export enum ProcessSortField {
@@ -2155,10 +2230,14 @@ export type Query = {
   company?: Maybe<Company>;
   /** Get actors in a company */
   companyActors: ActorConnection;
+  /** Get company by slug (friendly URL identifier) */
+  companyBySlug?: Maybe<Company>;
   /** Get company-wide load analysis */
   companyLoadAnalysis: CompanyLoadAnalysis;
   /** Get processes by company with metrics */
   companyProcessMetrics: Array<ProcessMetrics>;
+  /** Get company-wide department productivity ranking */
+  companyProductivityRanking: Array<DepartmentRanking>;
   /** Get compliance report */
   complianceReport: ComplianceReport;
   /** Get data access audit */
@@ -2175,6 +2254,8 @@ export type Query = {
   departmentGapComparison: Array<DepartmentGapComparison>;
   /** Get department load overview */
   departmentLoadOverview: DepartmentLoadOverview;
+  /** Get department productivity metrics (totals and breakdown by process) */
+  departmentMetrics: DepartmentCompletionMetrics;
   /** List processes by department */
   departmentProcesses: Array<Process>;
   /** Get load snapshots by department */
@@ -2203,6 +2284,8 @@ export type Query = {
   employeeLoadIndex: Scalars['Float']['output'];
   /** Get employee load trend */
   employeeLoadTrend: EmployeeLoadHistory;
+  /** Get employee productivity metrics */
+  employeeMetrics: EmployeeMetrics;
   /** Get employee task statistics */
   employeeTaskStats: EmployeeTaskStats;
   /** Get tasks assigned to an employee */
@@ -2215,6 +2298,12 @@ export type Query = {
   entityAuditTrail: EntityAuditTrail;
   /** Check failed login attempts */
   failedLoginAttempts: Array<AuditLog>;
+  /** Get all finished tasks for a department (with optional date range) */
+  finishedTasksByDepartment: Array<FinishedTask>;
+  /** Get all finished tasks by employee (with optional date range) */
+  finishedTasksByEmployee: Array<FinishedTask>;
+  /** Get all finished tasks for a process (with optional date range) */
+  finishedTasksByProcess: Array<FinishedTask>;
   /** List gap analyses with filtering */
   gapAnalyses: GapAnalysisConnection;
   /** Get gap analysis by ID */
@@ -2256,6 +2345,8 @@ export type Query = {
   permission?: Maybe<Permission>;
   /** List permissions with filtering (admin only) */
   permissions: PermissionConnection;
+  /** Get most popular/frequently completed processes */
+  popularProcesses: Array<ProcessRanking>;
   /** Get process by ID */
   process?: Maybe<Process>;
   /** Get tasks in a process */
@@ -2264,6 +2355,8 @@ export type Query = {
   processWithMetrics?: Maybe<ProcessMetrics>;
   /** List all processes with filtering and pagination */
   processes: ProcessConnection;
+  /** Get recent finished tasks for a department (last N days) */
+  recentTasksByDepartment: Array<FinishedTask>;
   /** Get role by ID (admin only) */
   role?: Maybe<Role>;
   /** List roles with filtering (admin only) */
@@ -2368,6 +2461,15 @@ export type QueryCompanyActorsArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryCompanyBySlugArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryCompanyLoadAnalysisArgs = {
   companyId: Scalars['String']['input'];
   dateRange?: InputMaybe<DateRangeInput>;
@@ -2381,6 +2483,16 @@ export type QueryCompanyLoadAnalysisArgs = {
 export type QueryCompanyProcessMetricsArgs = {
   companyId: Scalars['String']['input'];
   filter?: InputMaybe<ProcessFilterInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryCompanyProductivityRankingArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2458,6 +2570,17 @@ export type QueryDepartmentGapComparisonArgs = {
 export type QueryDepartmentLoadOverviewArgs = {
   departmentId: Scalars['String']['input'];
   snapshotDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentMetricsArgs = {
+  departmentId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2602,6 +2725,17 @@ export type QueryEmployeeLoadTrendArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryEmployeeMetricsArgs = {
+  employeeId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryEmployeeTaskStatsArgs = {
   employeeId: Scalars['String']['input'];
 };
@@ -2653,6 +2787,39 @@ export type QueryEntityAuditTrailArgs = {
  */
 export type QueryFailedLoginAttemptsArgs = {
   dateRange?: InputMaybe<DateRangeInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByDepartmentArgs = {
+  departmentId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByEmployeeArgs = {
+  employeeId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByProcessArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  processId: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2810,6 +2977,17 @@ export type QueryPermissionsArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryPopularProcessesArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -2841,6 +3019,16 @@ export type QueryProcessWithMetricsArgs = {
 export type QueryProcessesArgs = {
   filter?: InputMaybe<ProcessFilterInput>;
   pagination?: InputMaybe<ProcessPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRecentTasksByDepartmentArgs = {
+  daysBack?: InputMaybe<Scalars['Int']['input']>;
+  departmentId: Scalars['String']['input'];
 };
 
 
@@ -3459,7 +3647,9 @@ export enum TaskStatus {
   Completed = 'COMPLETED',
   Created = 'CREATED',
   InProgress = 'IN_PROGRESS',
-  OnHold = 'ON_HOLD'
+  OnHold = 'ON_HOLD',
+  Reviewed = 'REVIEWED',
+  Validated = 'VALIDATED'
 }
 
 /** Event type for task status changes */
@@ -3817,12 +4007,14 @@ export type ResolversTypes = {
   DateRangeInput: DateRangeInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Department: ResolverTypeWrapper<DepartmentModel>;
+  DepartmentCompletionMetrics: ResolverTypeWrapper<DepartmentCompletionMetrics>;
   DepartmentConnection: ResolverTypeWrapper<Omit<DepartmentConnection, 'nodes'> & { nodes: Array<ResolversTypes['Department']> }>;
   DepartmentEmployeeHistory: ResolverTypeWrapper<Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversTypes['Department'], timeline: Array<ResolversTypes['EmployeeTimelineEntry']> }>;
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: ResolverTypeWrapper<Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversTypes['Department'], gapAnalysis?: Maybe<ResolversTypes['GapAnalysis']> }>;
   DepartmentLoadOverview: ResolverTypeWrapper<Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversTypes['Department'], employeeBreakdown: Array<ResolversTypes['EmployeeLoadBreakdown']> }>;
   DepartmentMetrics: ResolverTypeWrapper<Omit<DepartmentMetrics, 'department'> & { department: ResolversTypes['Department'] }>;
+  DepartmentRanking: ResolverTypeWrapper<DepartmentRanking>;
   Employee: ResolverTypeWrapper<EmployeeModel>;
   EmployeeAuditReport: ResolverTypeWrapper<Omit<EmployeeAuditReport, 'capacityChanges' | 'efficiencyChanges' | 'employee' | 'statusChanges' | 'timeline'> & { capacityChanges: Array<ResolversTypes['EmployeeHistory']>, efficiencyChanges: Array<ResolversTypes['EmployeeHistory']>, employee: ResolversTypes['Employee'], statusChanges: Array<ResolversTypes['EmployeeHistory']>, timeline: Array<ResolversTypes['EmployeeTimelineEntry']> }>;
   EmployeeChangeType: EmployeeChangeType;
@@ -3836,6 +4028,7 @@ export type ResolversTypes = {
   EmployeeHistorySortInput: EmployeeHistorySortInput;
   EmployeeLoadBreakdown: ResolverTypeWrapper<Omit<EmployeeLoadBreakdown, 'employee'> & { employee: ResolversTypes['Employee'] }>;
   EmployeeLoadHistory: ResolverTypeWrapper<Omit<EmployeeLoadHistory, 'employee' | 'snapshots'> & { employee: ResolversTypes['Employee'], snapshots: Array<ResolversTypes['LoadSnapshot']> }>;
+  EmployeeMetrics: ResolverTypeWrapper<EmployeeMetrics>;
   EmployeePaginationInput: EmployeePaginationInput;
   EmployeeStatusChangeEvent: ResolverTypeWrapper<Omit<EmployeeStatusChangeEvent, 'history'> & { history: ResolversTypes['EmployeeHistory'] }>;
   EmployeeTaskStats: ResolverTypeWrapper<Omit<EmployeeTaskStats, 'employee'> & { employee: ResolversTypes['Employee'] }>;
@@ -3844,6 +4037,7 @@ export type ResolversTypes = {
   EntityAuditTrail: ResolverTypeWrapper<Omit<EntityAuditTrail, 'changesByUser' | 'timeline'> & { changesByUser: Array<ResolversTypes['ChangeByUser']>, timeline: Array<ResolversTypes['AuditLog']> }>;
   Error: ResolverTypeWrapper<Error>;
   ExportFormat: ExportFormat;
+  FinishedTask: ResolverTypeWrapper<Omit<FinishedTask, 'department' | 'employee' | 'process'> & { department: ResolversTypes['Department'], employee?: Maybe<ResolversTypes['Employee']>, process: ResolversTypes['Process'] }>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GapAnalysis: ResolverTypeWrapper<GapAnalysisResultModel>;
   GapAnalysisConnection: ResolverTypeWrapper<Omit<GapAnalysisConnection, 'nodes'> & { nodes: Array<ResolversTypes['GapAnalysis']> }>;
@@ -3891,11 +4085,13 @@ export type ResolversTypes = {
   PermissionPaginationInput: PermissionPaginationInput;
   PermissionScope: PermissionScope;
   Process: ResolverTypeWrapper<ProcessModel>;
+  ProcessCompletionStats: ResolverTypeWrapper<ProcessCompletionStats>;
   ProcessConnection: ResolverTypeWrapper<Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversTypes['Process']> }>;
   ProcessFilterInput: ProcessFilterInput;
   ProcessMetrics: ResolverTypeWrapper<Omit<ProcessMetrics, 'process'> & { process: ResolversTypes['Process'] }>;
   ProcessPaginationInput: ProcessPaginationInput;
   ProcessPriority: ProcessPriority;
+  ProcessRanking: ResolverTypeWrapper<ProcessRanking>;
   ProcessSortField: ProcessSortField;
   ProcessSortInput: ProcessSortInput;
   ProcessStatus: ProcessStatus;
@@ -3991,12 +4187,14 @@ export type ResolversParentTypes = {
   DateRangeInput: DateRangeInput;
   DateTime: Scalars['DateTime']['output'];
   Department: DepartmentModel;
+  DepartmentCompletionMetrics: DepartmentCompletionMetrics;
   DepartmentConnection: Omit<DepartmentConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Department']> };
   DepartmentEmployeeHistory: Omit<DepartmentEmployeeHistory, 'department' | 'timeline'> & { department: ResolversParentTypes['Department'], timeline: Array<ResolversParentTypes['EmployeeTimelineEntry']> };
   DepartmentFilterInput: DepartmentFilterInput;
   DepartmentGapComparison: Omit<DepartmentGapComparison, 'department' | 'gapAnalysis'> & { department: ResolversParentTypes['Department'], gapAnalysis?: Maybe<ResolversParentTypes['GapAnalysis']> };
   DepartmentLoadOverview: Omit<DepartmentLoadOverview, 'department' | 'employeeBreakdown'> & { department: ResolversParentTypes['Department'], employeeBreakdown: Array<ResolversParentTypes['EmployeeLoadBreakdown']> };
   DepartmentMetrics: Omit<DepartmentMetrics, 'department'> & { department: ResolversParentTypes['Department'] };
+  DepartmentRanking: DepartmentRanking;
   Employee: EmployeeModel;
   EmployeeAuditReport: Omit<EmployeeAuditReport, 'capacityChanges' | 'efficiencyChanges' | 'employee' | 'statusChanges' | 'timeline'> & { capacityChanges: Array<ResolversParentTypes['EmployeeHistory']>, efficiencyChanges: Array<ResolversParentTypes['EmployeeHistory']>, employee: ResolversParentTypes['Employee'], statusChanges: Array<ResolversParentTypes['EmployeeHistory']>, timeline: Array<ResolversParentTypes['EmployeeTimelineEntry']> };
   EmployeeConnection: Omit<EmployeeConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Employee']> };
@@ -4008,12 +4206,14 @@ export type ResolversParentTypes = {
   EmployeeHistorySortInput: EmployeeHistorySortInput;
   EmployeeLoadBreakdown: Omit<EmployeeLoadBreakdown, 'employee'> & { employee: ResolversParentTypes['Employee'] };
   EmployeeLoadHistory: Omit<EmployeeLoadHistory, 'employee' | 'snapshots'> & { employee: ResolversParentTypes['Employee'], snapshots: Array<ResolversParentTypes['LoadSnapshot']> };
+  EmployeeMetrics: EmployeeMetrics;
   EmployeePaginationInput: EmployeePaginationInput;
   EmployeeStatusChangeEvent: Omit<EmployeeStatusChangeEvent, 'history'> & { history: ResolversParentTypes['EmployeeHistory'] };
   EmployeeTaskStats: Omit<EmployeeTaskStats, 'employee'> & { employee: ResolversParentTypes['Employee'] };
   EmployeeTimelineEntry: Omit<EmployeeTimelineEntry, 'event'> & { event: ResolversParentTypes['EmployeeHistory'] };
   EntityAuditTrail: Omit<EntityAuditTrail, 'changesByUser' | 'timeline'> & { changesByUser: Array<ResolversParentTypes['ChangeByUser']>, timeline: Array<ResolversParentTypes['AuditLog']> };
   Error: Error;
+  FinishedTask: Omit<FinishedTask, 'department' | 'employee' | 'process'> & { department: ResolversParentTypes['Department'], employee?: Maybe<ResolversParentTypes['Employee']>, process: ResolversParentTypes['Process'] };
   Float: Scalars['Float']['output'];
   GapAnalysis: GapAnalysisResultModel;
   GapAnalysisConnection: Omit<GapAnalysisConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['GapAnalysis']> };
@@ -4051,10 +4251,12 @@ export type ResolversParentTypes = {
   PermissionFilterInput: PermissionFilterInput;
   PermissionPaginationInput: PermissionPaginationInput;
   Process: ProcessModel;
+  ProcessCompletionStats: ProcessCompletionStats;
   ProcessConnection: Omit<ProcessConnection, 'nodes'> & { nodes: Array<ResolversParentTypes['Process']> };
   ProcessFilterInput: ProcessFilterInput;
   ProcessMetrics: Omit<ProcessMetrics, 'process'> & { process: ResolversParentTypes['Process'] };
   ProcessPaginationInput: ProcessPaginationInput;
+  ProcessRanking: ProcessRanking;
   ProcessSortInput: ProcessSortInput;
   ProcessStatusChangeEvent: Omit<ProcessStatusChangeEvent, 'process'> & { process: ResolversParentTypes['Process'] };
   QuarterlyProjection: QuarterlyProjection;
@@ -4213,6 +4415,7 @@ export type CompanyResolvers<ContextType = GraphQLContext, ParentType extends Re
   loadSnapshots?: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   processes?: Resolver<Maybe<Array<Maybe<ResolversTypes['Process']>>>, ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   taskAssignments?: Resolver<Maybe<Array<Maybe<ResolversTypes['TaskAssignment']>>>, ParentType, ContextType>;
   timezone?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -4267,6 +4470,14 @@ export type DepartmentResolvers<ContextType = GraphQLContext, ParentType extends
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
+export type DepartmentCompletionMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentCompletionMetrics'] = ResolversParentTypes['DepartmentCompletionMetrics']> = {
+  averageHoursPerTask?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  departmentId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  processes?: Resolver<Array<ResolversTypes['ProcessCompletionStats']>, ParentType, ContextType>;
+  totalHoursSpent?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  totalTasksCompleted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type DepartmentConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentConnection'] = ResolversParentTypes['DepartmentConnection']> = {
   nodes?: Resolver<Array<ResolversTypes['Department']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
@@ -4317,6 +4528,13 @@ export type DepartmentMetricsResolvers<ContextType = GraphQLContext, ParentType 
   totalLoad?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
+export type DepartmentRankingResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['DepartmentRanking'] = ResolversParentTypes['DepartmentRanking']> = {
+  departmentId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  entriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  rank?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  totalTasksCompleted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Employee'] = ResolversParentTypes['Employee']> = {
   birthDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   companyId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4324,7 +4542,6 @@ export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends R
   department?: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
   departmentId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   employmentType?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  fio?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   fireDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   gender?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -4333,7 +4550,7 @@ export type EmployeeResolvers<ContextType = GraphQLContext, ParentType extends R
   hireDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   history?: Resolver<Maybe<Array<Maybe<ResolversTypes['EmployeeHistory']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  kEfficiency?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  kEfficiency?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   loadSnapshots?: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
   metadata?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
@@ -4405,6 +4622,14 @@ export type EmployeeLoadHistoryResolvers<ContextType = GraphQLContext, ParentTyp
   trendDirection?: Resolver<ResolversTypes['TrendDirection'], ParentType, ContextType>;
 };
 
+export type EmployeeMetricsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeMetrics'] = ResolversParentTypes['EmployeeMetrics']> = {
+  averageHoursPerTask?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  employeeId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  processes?: Resolver<Array<ResolversTypes['ProcessCompletionStats']>, ParentType, ContextType>;
+  totalHoursSpent?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  totalTasksCompleted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type EmployeeStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['EmployeeStatusChangeEvent'] = ResolversParentTypes['EmployeeStatusChangeEvent']> = {
   employeeName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   history?: Resolver<ResolversTypes['EmployeeHistory'], ParentType, ContextType>;
@@ -4444,6 +4669,23 @@ export type ErrorResolvers<ContextType = GraphQLContext, ParentType extends Reso
   code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   extensions?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+};
+
+export type FinishedTaskResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['FinishedTask'] = ResolversParentTypes['FinishedTask']> = {
+  completedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  department?: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
+  departmentId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  employee?: Resolver<Maybe<ResolversTypes['Employee']>, ParentType, ContextType>;
+  employeeId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  hoursSpent?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  notes?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  process?: Resolver<ResolversTypes['Process'], ParentType, ContextType>;
+  processId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['TaskStatus'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
 export type GapAnalysisResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['GapAnalysis'] = ResolversParentTypes['GapAnalysis']> = {
@@ -4757,6 +4999,12 @@ export type ProcessResolvers<ContextType = GraphQLContext, ParentType extends Re
   updatedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 };
 
+export type ProcessCompletionStatsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessCompletionStats'] = ResolversParentTypes['ProcessCompletionStats']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  processId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+};
+
 export type ProcessConnectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessConnection'] = ResolversParentTypes['ProcessConnection']> = {
   nodes?: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
@@ -4771,6 +5019,13 @@ export type ProcessMetricsResolvers<ContextType = GraphQLContext, ParentType ext
   taskCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   totalCapacityRequired?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   utilizationRate?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+};
+
+export type ProcessRankingResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessRanking'] = ResolversParentTypes['ProcessRanking']> = {
+  entriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  processId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  rank?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  totalTasksCompleted?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type ProcessStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessStatusChangeEvent'] = ResolversParentTypes['ProcessStatusChangeEvent']> = {
@@ -4799,8 +5054,10 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   companies?: Resolver<Maybe<Array<Maybe<ResolversTypes['Company']>>>, ParentType, ContextType>;
   company?: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<QueryCompanyArgs, 'id'>>;
   companyActors?: Resolver<ResolversTypes['ActorConnection'], ParentType, ContextType, RequireFields<QueryCompanyActorsArgs, 'companyId'>>;
+  companyBySlug?: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<QueryCompanyBySlugArgs, 'slug'>>;
   companyLoadAnalysis?: Resolver<ResolversTypes['CompanyLoadAnalysis'], ParentType, ContextType, RequireFields<QueryCompanyLoadAnalysisArgs, 'companyId'>>;
   companyProcessMetrics?: Resolver<Array<ResolversTypes['ProcessMetrics']>, ParentType, ContextType, RequireFields<QueryCompanyProcessMetricsArgs, 'companyId'>>;
+  companyProductivityRanking?: Resolver<Array<ResolversTypes['DepartmentRanking']>, ParentType, ContextType, Partial<QueryCompanyProductivityRankingArgs>>;
   complianceReport?: Resolver<ResolversTypes['ComplianceReport'], ParentType, ContextType, RequireFields<QueryComplianceReportArgs, 'companyId' | 'dateRange'>>;
   dataAccessAudit?: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<QueryDataAccessAuditArgs, 'companyId'>>;
   department?: Resolver<Maybe<ResolversTypes['Department']>, ParentType, ContextType, RequireFields<QueryDepartmentArgs, 'id'>>;
@@ -4809,6 +5066,7 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   departmentEmployees?: Resolver<Array<ResolversTypes['Employee']>, ParentType, ContextType, RequireFields<QueryDepartmentEmployeesArgs, 'departmentId'>>;
   departmentGapComparison?: Resolver<Array<ResolversTypes['DepartmentGapComparison']>, ParentType, ContextType, RequireFields<QueryDepartmentGapComparisonArgs, 'companyId'>>;
   departmentLoadOverview?: Resolver<ResolversTypes['DepartmentLoadOverview'], ParentType, ContextType, RequireFields<QueryDepartmentLoadOverviewArgs, 'departmentId'>>;
+  departmentMetrics?: Resolver<ResolversTypes['DepartmentCompletionMetrics'], ParentType, ContextType, RequireFields<QueryDepartmentMetricsArgs, 'departmentId'>>;
   departmentProcesses?: Resolver<Array<ResolversTypes['Process']>, ParentType, ContextType, RequireFields<QueryDepartmentProcessesArgs, 'departmentId'>>;
   departmentSnapshots?: Resolver<Array<ResolversTypes['LoadSnapshot']>, ParentType, ContextType, RequireFields<QueryDepartmentSnapshotsArgs, 'departmentId'>>;
   departmentWithMetrics?: Resolver<Maybe<ResolversTypes['DepartmentMetrics']>, ParentType, ContextType, RequireFields<QueryDepartmentWithMetricsArgs, 'id'>>;
@@ -4823,12 +5081,16 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   employeeHistoryList?: Resolver<ResolversTypes['EmployeeHistoryConnection'], ParentType, ContextType, RequireFields<QueryEmployeeHistoryListArgs, 'employeeId'>>;
   employeeLoadIndex?: Resolver<ResolversTypes['Float'], ParentType, ContextType, RequireFields<QueryEmployeeLoadIndexArgs, 'id' | 'periodEnd' | 'periodStart'>>;
   employeeLoadTrend?: Resolver<ResolversTypes['EmployeeLoadHistory'], ParentType, ContextType, RequireFields<QueryEmployeeLoadTrendArgs, 'dateRange' | 'employeeId'>>;
+  employeeMetrics?: Resolver<ResolversTypes['EmployeeMetrics'], ParentType, ContextType, RequireFields<QueryEmployeeMetricsArgs, 'employeeId'>>;
   employeeTaskStats?: Resolver<ResolversTypes['EmployeeTaskStats'], ParentType, ContextType, RequireFields<QueryEmployeeTaskStatsArgs, 'employeeId'>>;
   employeeTasks?: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, RequireFields<QueryEmployeeTasksArgs, 'employeeId'>>;
   employeeTimeline?: Resolver<Array<ResolversTypes['EmployeeTimelineEntry']>, ParentType, ContextType, RequireFields<QueryEmployeeTimelineArgs, 'employeeId'>>;
   employees?: Resolver<ResolversTypes['EmployeeConnection'], ParentType, ContextType, Partial<QueryEmployeesArgs>>;
   entityAuditTrail?: Resolver<ResolversTypes['EntityAuditTrail'], ParentType, ContextType, RequireFields<QueryEntityAuditTrailArgs, 'entityId' | 'entityType'>>;
   failedLoginAttempts?: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, Partial<QueryFailedLoginAttemptsArgs>>;
+  finishedTasksByDepartment?: Resolver<Array<ResolversTypes['FinishedTask']>, ParentType, ContextType, RequireFields<QueryFinishedTasksByDepartmentArgs, 'departmentId'>>;
+  finishedTasksByEmployee?: Resolver<Array<ResolversTypes['FinishedTask']>, ParentType, ContextType, RequireFields<QueryFinishedTasksByEmployeeArgs, 'employeeId'>>;
+  finishedTasksByProcess?: Resolver<Array<ResolversTypes['FinishedTask']>, ParentType, ContextType, RequireFields<QueryFinishedTasksByProcessArgs, 'processId'>>;
   gapAnalyses?: Resolver<ResolversTypes['GapAnalysisConnection'], ParentType, ContextType, Partial<QueryGapAnalysesArgs>>;
   gapAnalysis?: Resolver<Maybe<ResolversTypes['GapAnalysis']>, ParentType, ContextType, RequireFields<QueryGapAnalysisArgs, 'id'>>;
   gapAnalysisTrend?: Resolver<Array<ResolversTypes['GapTrend']>, ParentType, ContextType, RequireFields<QueryGapAnalysisTrendArgs, 'companyId' | 'dateRange'>>;
@@ -4850,10 +5112,12 @@ export type QueryResolvers<ContextType = GraphQLContext, ParentType extends Reso
   overdueTasks?: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, Partial<QueryOverdueTasksArgs>>;
   permission?: Resolver<Maybe<ResolversTypes['Permission']>, ParentType, ContextType, RequireFields<QueryPermissionArgs, 'id'>>;
   permissions?: Resolver<ResolversTypes['PermissionConnection'], ParentType, ContextType, Partial<QueryPermissionsArgs>>;
+  popularProcesses?: Resolver<Array<ResolversTypes['ProcessRanking']>, ParentType, ContextType, Partial<QueryPopularProcessesArgs>>;
   process?: Resolver<Maybe<ResolversTypes['Process']>, ParentType, ContextType, RequireFields<QueryProcessArgs, 'id'>>;
   processTasks?: Resolver<Array<ResolversTypes['TaskAssignment']>, ParentType, ContextType, RequireFields<QueryProcessTasksArgs, 'processId'>>;
   processWithMetrics?: Resolver<Maybe<ResolversTypes['ProcessMetrics']>, ParentType, ContextType, RequireFields<QueryProcessWithMetricsArgs, 'id'>>;
   processes?: Resolver<ResolversTypes['ProcessConnection'], ParentType, ContextType, Partial<QueryProcessesArgs>>;
+  recentTasksByDepartment?: Resolver<Array<ResolversTypes['FinishedTask']>, ParentType, ContextType, RequireFields<QueryRecentTasksByDepartmentArgs, 'departmentId'>>;
   role?: Resolver<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryRoleArgs, 'id'>>;
   roles?: Resolver<ResolversTypes['RoleConnection'], ParentType, ContextType, Partial<QueryRolesArgs>>;
   securityIncidentReport?: Resolver<ResolversTypes['SecurityIncidentReport'], ParentType, ContextType, RequireFields<QuerySecurityIncidentReportArgs, 'companyId' | 'dateRange'>>;
@@ -5089,11 +5353,13 @@ export type Resolvers<ContextType = GraphQLContext> = {
   DateRange?: DateRangeResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Department?: DepartmentResolvers<ContextType>;
+  DepartmentCompletionMetrics?: DepartmentCompletionMetricsResolvers<ContextType>;
   DepartmentConnection?: DepartmentConnectionResolvers<ContextType>;
   DepartmentEmployeeHistory?: DepartmentEmployeeHistoryResolvers<ContextType>;
   DepartmentGapComparison?: DepartmentGapComparisonResolvers<ContextType>;
   DepartmentLoadOverview?: DepartmentLoadOverviewResolvers<ContextType>;
   DepartmentMetrics?: DepartmentMetricsResolvers<ContextType>;
+  DepartmentRanking?: DepartmentRankingResolvers<ContextType>;
   Employee?: EmployeeResolvers<ContextType>;
   EmployeeAuditReport?: EmployeeAuditReportResolvers<ContextType>;
   EmployeeConnection?: EmployeeConnectionResolvers<ContextType>;
@@ -5101,11 +5367,13 @@ export type Resolvers<ContextType = GraphQLContext> = {
   EmployeeHistoryConnection?: EmployeeHistoryConnectionResolvers<ContextType>;
   EmployeeLoadBreakdown?: EmployeeLoadBreakdownResolvers<ContextType>;
   EmployeeLoadHistory?: EmployeeLoadHistoryResolvers<ContextType>;
+  EmployeeMetrics?: EmployeeMetricsResolvers<ContextType>;
   EmployeeStatusChangeEvent?: EmployeeStatusChangeEventResolvers<ContextType>;
   EmployeeTaskStats?: EmployeeTaskStatsResolvers<ContextType>;
   EmployeeTimelineEntry?: EmployeeTimelineEntryResolvers<ContextType>;
   EntityAuditTrail?: EntityAuditTrailResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
+  FinishedTask?: FinishedTaskResolvers<ContextType>;
   GapAnalysis?: GapAnalysisResolvers<ContextType>;
   GapAnalysisConnection?: GapAnalysisConnectionResolvers<ContextType>;
   GapAnalysisRecommendation?: GapAnalysisRecommendationResolvers<ContextType>;
@@ -5130,8 +5398,10 @@ export type Resolvers<ContextType = GraphQLContext> = {
   Permission?: PermissionResolvers<ContextType>;
   PermissionConnection?: PermissionConnectionResolvers<ContextType>;
   Process?: ProcessResolvers<ContextType>;
+  ProcessCompletionStats?: ProcessCompletionStatsResolvers<ContextType>;
   ProcessConnection?: ProcessConnectionResolvers<ContextType>;
   ProcessMetrics?: ProcessMetricsResolvers<ContextType>;
+  ProcessRanking?: ProcessRankingResolvers<ContextType>;
   ProcessStatusChangeEvent?: ProcessStatusChangeEventResolvers<ContextType>;
   QuarterlyProjection?: QuarterlyProjectionResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

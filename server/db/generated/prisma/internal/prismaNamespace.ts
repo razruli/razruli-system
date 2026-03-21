@@ -403,6 +403,7 @@ export const ModelName = {
   Department: 'Department',
   Employee: 'Employee',
   Grade: 'Grade',
+  FinishedTask: 'FinishedTask',
   Process: 'Process',
   TaskAssignment: 'TaskAssignment'
 } as const
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "gapAnalysisResult" | "hiringRequest" | "loadSnapshot" | "employeeHistory" | "auditLog" | "actor" | "role" | "permission" | "actorRole" | "rolePermission" | "actorPermission" | "user" | "session" | "account" | "verification" | "company" | "department" | "employee" | "grade" | "process" | "taskAssignment"
+    modelProps: "gapAnalysisResult" | "hiringRequest" | "loadSnapshot" | "employeeHistory" | "auditLog" | "actor" | "role" | "permission" | "actorRole" | "rolePermission" | "actorPermission" | "user" | "session" | "account" | "verification" | "company" | "department" | "employee" | "grade" | "finishedTask" | "process" | "taskAssignment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1830,6 +1831,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FinishedTask: {
+      payload: Prisma.$FinishedTaskPayload<ExtArgs>
+      fields: Prisma.FinishedTaskFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FinishedTaskFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FinishedTaskFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        findFirst: {
+          args: Prisma.FinishedTaskFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FinishedTaskFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        findMany: {
+          args: Prisma.FinishedTaskFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>[]
+        }
+        create: {
+          args: Prisma.FinishedTaskCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        createMany: {
+          args: Prisma.FinishedTaskCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FinishedTaskCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>[]
+        }
+        delete: {
+          args: Prisma.FinishedTaskDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        update: {
+          args: Prisma.FinishedTaskUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        deleteMany: {
+          args: Prisma.FinishedTaskDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FinishedTaskUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FinishedTaskUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>[]
+        }
+        upsert: {
+          args: Prisma.FinishedTaskUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FinishedTaskPayload>
+        }
+        aggregate: {
+          args: Prisma.FinishedTaskAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFinishedTask>
+        }
+        groupBy: {
+          args: Prisma.FinishedTaskGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinishedTaskGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FinishedTaskCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FinishedTaskCountAggregateOutputType> | number
+        }
+      }
+    }
     Process: {
       payload: Prisma.$ProcessPayload<ExtArgs>
       fields: Prisma.ProcessFieldRefs
@@ -2256,6 +2331,7 @@ export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[k
 export const CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  slug: 'slug',
   timezone: 'timezone',
   workingHoursDay: 'workingHoursDay',
   workingDaysPerMonth: 'workingDaysPerMonth',
@@ -2291,6 +2367,7 @@ export const EmployeeScalarFieldEnum = {
   fireDate: 'fireDate',
   kEfficiency: 'kEfficiency',
   workingHoursPerDay: 'workingHoursPerDay',
+  monthlyCU: 'monthlyCU',
   employmentType: 'employmentType',
   status: 'status',
   metadata: 'metadata',
@@ -2311,6 +2388,24 @@ export const GradeScalarFieldEnum = {
 export type GradeScalarFieldEnum = (typeof GradeScalarFieldEnum)[keyof typeof GradeScalarFieldEnum]
 
 
+export const FinishedTaskScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  departmentId: 'departmentId',
+  employeeId: 'employeeId',
+  processId: 'processId',
+  quantity: 'quantity',
+  completedAt: 'completedAt',
+  hoursSpent: 'hoursSpent',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FinishedTaskScalarFieldEnum = (typeof FinishedTaskScalarFieldEnum)[keyof typeof FinishedTaskScalarFieldEnum]
+
+
 export const ProcessScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -2318,12 +2413,13 @@ export const ProcessScalarFieldEnum = {
   title: 'title',
   description: 'description',
   plannedHours: 'plannedHours',
-  kBurn: 'kBurn',
-  kCrit: 'kCrit',
-  kNew: 'kNew',
+  complexity: 'complexity',
+  businessImpact: 'businessImpact',
+  newness: 'newness',
+  isBurningOut: 'isBurningOut',
+  weight: 'weight',
   targetGradeId: 'targetGradeId',
   status: 'status',
-  priority: 'priority',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2679,6 +2775,7 @@ export type GlobalOmitConfig = {
   department?: Prisma.DepartmentOmit
   employee?: Prisma.EmployeeOmit
   grade?: Prisma.GradeOmit
+  finishedTask?: Prisma.FinishedTaskOmit
   process?: Prisma.ProcessOmit
   taskAssignment?: Prisma.TaskAssignmentOmit
 }

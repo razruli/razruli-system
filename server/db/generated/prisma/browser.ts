@@ -116,8 +116,17 @@ export type Employee = Prisma.EmployeeModel
  */
 export type Grade = Prisma.GradeModel
 /**
+ * Model FinishedTask
+ * Completed task entry
+ * employeeId = NULL means department-level aggregate
+ * employeeId = set means individual contributor tracked
+ */
+export type FinishedTask = Prisma.FinishedTaskModel
+/**
  * Model Process
- * Business process with estimated workload and complexity multipliers
+ * Business process with human-readable complexity classification
+ * Complexity converted to k-factors internally for CU calculation
+ * Weight formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
  */
 export type Process = Prisma.ProcessModel
 /**

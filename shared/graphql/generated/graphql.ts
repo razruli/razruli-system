@@ -275,6 +275,8 @@ export type Company = {
   name: Scalars['String']['output'];
   /** All processes */
   processes?: Maybe<Array<Maybe<Process>>>;
+  /** Slug (URL-friendly identifier) */
+  slug: Scalars['String']['output'];
   /** All task assignments */
   taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
   /** Timezone (default UTC+3) */
@@ -333,6 +335,7 @@ export type CreateActorInput = {
 /** Input for creating a company */
 export type CreateCompanyInput = {
   name: Scalars['String']['input'];
+  slug?: InputMaybe<Scalars['String']['input']>;
   timezone?: InputMaybe<Scalars['String']['input']>;
   workingDaysPerMonth?: InputMaybe<Scalars['Int']['input']>;
   workingHoursDay?: InputMaybe<Scalars['Int']['input']>;
@@ -479,6 +482,16 @@ export type Department = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+/** Aggregated stats for department productivity */
+export type DepartmentCompletionMetrics = {
+  __typename?: 'DepartmentCompletionMetrics';
+  averageHoursPerTask: Scalars['Float']['output'];
+  departmentId: Scalars['String']['output'];
+  processes: Array<ProcessCompletionStats>;
+  totalHoursSpent: Scalars['Float']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /** Department connection with pagination */
 export type DepartmentConnection = {
   __typename?: 'DepartmentConnection';
@@ -548,6 +561,15 @@ export type DepartmentMetrics = {
   totalLoad: Scalars['Float']['output'];
 };
 
+/** Company-wide productivity ranking */
+export type DepartmentRanking = {
+  __typename?: 'DepartmentRanking';
+  departmentId: Scalars['String']['output'];
+  entriesCount: Scalars['Int']['output'];
+  rank: Scalars['Int']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /**
  * Employee type and resolvers
  * Represents a team member with capacity coefficients and employment details
@@ -565,8 +587,6 @@ export type Employee = {
   departmentId: Scalars['String']['output'];
   /** Employment type (LABOR_CONTRACT/SERVICE_CONTRACT/SELF_EMPLOYED) */
   employmentType: Scalars['String']['output'];
-  /** Full name (firstName lastName) - computed */
-  fio: Scalars['String']['output'];
   /** Dismissal date (null if active) */
   fireDate?: Maybe<Scalars['DateTime']['output']>;
   /** First name */
@@ -583,7 +603,7 @@ export type Employee = {
   /** Unique identifier */
   id: Scalars['String']['output'];
   /** Efficiency coefficient (multiplier, default 1.0) */
-  kEfficiency: Scalars['Float']['output'];
+  kEfficiency?: Maybe<Scalars['Float']['output']>;
   /** Last name */
   lastName: Scalars['String']['output'];
   /** Load snapshots */
@@ -738,6 +758,16 @@ export type EmployeeLoadHistory = {
   trendDirection: TrendDirection;
 };
 
+/** Aggregated stats for employee productivity */
+export type EmployeeMetrics = {
+  __typename?: 'EmployeeMetrics';
+  averageHoursPerTask: Scalars['Float']['output'];
+  employeeId: Scalars['String']['output'];
+  processes: Array<ProcessCompletionStats>;
+  totalHoursSpent: Scalars['Float']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
+
 /** Pagination and sorting */
 export type EmployeePaginationInput = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -816,6 +846,34 @@ export enum ExportFormat {
   Pdf = 'PDF',
   Xlsx = 'XLSX'
 }
+
+/**
+ * Finished Task type representing completed work
+ * Minimal analytics model: what was done, when, and optionally by whom and how long
+ */
+export type FinishedTask = {
+  __typename?: 'FinishedTask';
+  completedAt: Scalars['DateTime']['output'];
+  /** Timestamps */
+  createdAt: Scalars['DateTime']['output'];
+  department: Department;
+  /** Department that completed the work (always set) */
+  departmentId: Scalars['String']['output'];
+  employee?: Maybe<Employee>;
+  /** Specific employee who completed (optional - null = department aggregate) */
+  employeeId?: Maybe<Scalars['String']['output']>;
+  /** Optional extended details (more data = better insights) */
+  hoursSpent?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  process: Process;
+  /** What process was completed */
+  processId: Scalars['String']['output'];
+  /** Core metrics */
+  quantity: Scalars['Int']['output'];
+  status: TaskStatus;
+  updatedAt: Scalars['DateTime']['output'];
+};
 
 /** GapAnalysis type representing workforce planning analysis */
 export type GapAnalysis = {
@@ -2025,6 +2083,14 @@ export type Process = {
   updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
+/** Process completion breakdown */
+export type ProcessCompletionStats = {
+  __typename?: 'ProcessCompletionStats';
+  count: Scalars['Int']['output'];
+  processId: Scalars['String']['output'];
+  quantity: Scalars['Int']['output'];
+};
+
 /** Process response wrapper with pagination */
 export type ProcessConnection = {
   __typename?: 'ProcessConnection';
@@ -2069,6 +2135,15 @@ export enum ProcessPriority {
   Low = 'LOW',
   Normal = 'NORMAL'
 }
+
+/** Process popularity ranking */
+export type ProcessRanking = {
+  __typename?: 'ProcessRanking';
+  entriesCount: Scalars['Int']['output'];
+  processId: Scalars['String']['output'];
+  rank: Scalars['Int']['output'];
+  totalTasksCompleted: Scalars['Int']['output'];
+};
 
 /** Process sort fields */
 export enum ProcessSortField {
@@ -2152,10 +2227,14 @@ export type Query = {
   company?: Maybe<Company>;
   /** Get actors in a company */
   companyActors: ActorConnection;
+  /** Get company by slug (friendly URL identifier) */
+  companyBySlug?: Maybe<Company>;
   /** Get company-wide load analysis */
   companyLoadAnalysis: CompanyLoadAnalysis;
   /** Get processes by company with metrics */
   companyProcessMetrics: Array<ProcessMetrics>;
+  /** Get company-wide department productivity ranking */
+  companyProductivityRanking: Array<DepartmentRanking>;
   /** Get compliance report */
   complianceReport: ComplianceReport;
   /** Get data access audit */
@@ -2172,6 +2251,8 @@ export type Query = {
   departmentGapComparison: Array<DepartmentGapComparison>;
   /** Get department load overview */
   departmentLoadOverview: DepartmentLoadOverview;
+  /** Get department productivity metrics (totals and breakdown by process) */
+  departmentMetrics: DepartmentCompletionMetrics;
   /** List processes by department */
   departmentProcesses: Array<Process>;
   /** Get load snapshots by department */
@@ -2200,6 +2281,8 @@ export type Query = {
   employeeLoadIndex: Scalars['Float']['output'];
   /** Get employee load trend */
   employeeLoadTrend: EmployeeLoadHistory;
+  /** Get employee productivity metrics */
+  employeeMetrics: EmployeeMetrics;
   /** Get employee task statistics */
   employeeTaskStats: EmployeeTaskStats;
   /** Get tasks assigned to an employee */
@@ -2212,6 +2295,12 @@ export type Query = {
   entityAuditTrail: EntityAuditTrail;
   /** Check failed login attempts */
   failedLoginAttempts: Array<AuditLog>;
+  /** Get all finished tasks for a department (with optional date range) */
+  finishedTasksByDepartment: Array<FinishedTask>;
+  /** Get all finished tasks by employee (with optional date range) */
+  finishedTasksByEmployee: Array<FinishedTask>;
+  /** Get all finished tasks for a process (with optional date range) */
+  finishedTasksByProcess: Array<FinishedTask>;
   /** List gap analyses with filtering */
   gapAnalyses: GapAnalysisConnection;
   /** Get gap analysis by ID */
@@ -2253,6 +2342,8 @@ export type Query = {
   permission?: Maybe<Permission>;
   /** List permissions with filtering (admin only) */
   permissions: PermissionConnection;
+  /** Get most popular/frequently completed processes */
+  popularProcesses: Array<ProcessRanking>;
   /** Get process by ID */
   process?: Maybe<Process>;
   /** Get tasks in a process */
@@ -2261,6 +2352,8 @@ export type Query = {
   processWithMetrics?: Maybe<ProcessMetrics>;
   /** List all processes with filtering and pagination */
   processes: ProcessConnection;
+  /** Get recent finished tasks for a department (last N days) */
+  recentTasksByDepartment: Array<FinishedTask>;
   /** Get role by ID (admin only) */
   role?: Maybe<Role>;
   /** List roles with filtering (admin only) */
@@ -2365,6 +2458,15 @@ export type QueryCompanyActorsArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryCompanyBySlugArgs = {
+  slug: Scalars['String']['input'];
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryCompanyLoadAnalysisArgs = {
   companyId: Scalars['String']['input'];
   dateRange?: InputMaybe<DateRangeInput>;
@@ -2378,6 +2480,16 @@ export type QueryCompanyLoadAnalysisArgs = {
 export type QueryCompanyProcessMetricsArgs = {
   companyId: Scalars['String']['input'];
   filter?: InputMaybe<ProcessFilterInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryCompanyProductivityRankingArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2455,6 +2567,17 @@ export type QueryDepartmentGapComparisonArgs = {
 export type QueryDepartmentLoadOverviewArgs = {
   departmentId: Scalars['String']['input'];
   snapshotDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryDepartmentMetricsArgs = {
+  departmentId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2599,6 +2722,17 @@ export type QueryEmployeeLoadTrendArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryEmployeeMetricsArgs = {
+  employeeId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryEmployeeTaskStatsArgs = {
   employeeId: Scalars['String']['input'];
 };
@@ -2650,6 +2784,39 @@ export type QueryEntityAuditTrailArgs = {
  */
 export type QueryFailedLoginAttemptsArgs = {
   dateRange?: InputMaybe<DateRangeInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByDepartmentArgs = {
+  departmentId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByEmployeeArgs = {
+  employeeId: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryFinishedTasksByProcessArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  processId: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 
@@ -2807,6 +2974,17 @@ export type QueryPermissionsArgs = {
  * Root Query type
  * Extended by each domain module (core, operations, analytics, audit)
  */
+export type QueryPopularProcessesArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
 export type QueryProcessArgs = {
   id: Scalars['String']['input'];
 };
@@ -2838,6 +3016,16 @@ export type QueryProcessWithMetricsArgs = {
 export type QueryProcessesArgs = {
   filter?: InputMaybe<ProcessFilterInput>;
   pagination?: InputMaybe<ProcessPaginationInput>;
+};
+
+
+/**
+ * Root Query type
+ * Extended by each domain module (core, operations, analytics, audit)
+ */
+export type QueryRecentTasksByDepartmentArgs = {
+  daysBack?: InputMaybe<Scalars['Int']['input']>;
+  departmentId: Scalars['String']['input'];
 };
 
 
@@ -3456,7 +3644,9 @@ export enum TaskStatus {
   Completed = 'COMPLETED',
   Created = 'CREATED',
   InProgress = 'IN_PROGRESS',
-  OnHold = 'ON_HOLD'
+  OnHold = 'ON_HOLD',
+  Reviewed = 'REVIEWED',
+  Validated = 'VALIDATED'
 }
 
 /** Event type for task status changes */
@@ -3689,13 +3879,20 @@ export type UsersResult = {
   users: Array<User>;
 };
 
+export type GetCompanyBySlugQueryVariables = Exact<{
+  slug: Scalars['String']['input'];
+}>;
+
+
+export type GetCompanyBySlugQuery = { __typename?: 'Query', companyBySlug?: { __typename?: 'Company', id: string, name: string, slug: string, timezone: string, workingHoursDay: number, workingDaysPerMonth: number } | null };
+
 export type AssignDepartmentHeadMutationVariables = Exact<{
   departmentId: Scalars['String']['input'];
   employeeId: Scalars['String']['input'];
 }>;
 
 
-export type AssignDepartmentHeadMutation = { __typename?: 'Mutation', assignDepartmentHead: { __typename?: 'Department', id: string, name: string, headId?: string | null, updatedAt: Date, head?: { __typename?: 'Employee', id: string, fio: string, gradeId: number } | null } };
+export type AssignDepartmentHeadMutation = { __typename?: 'Mutation', assignDepartmentHead: { __typename?: 'Department', id: string, name: string, headId?: string | null, updatedAt: Date, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string, gradeId: number } | null } };
 
 export type CreateDepartmentMutationVariables = Exact<{
   input: CreateDepartmentInput;
@@ -3717,14 +3914,14 @@ export type UpdateDepartmentMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDepartmentMutation = { __typename?: 'Mutation', updateDepartment: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, updatedAt: Date, head?: { __typename?: 'Employee', id: string, fio: string } | null } };
+export type UpdateDepartmentMutation = { __typename?: 'Mutation', updateDepartment: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, updatedAt: Date, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string } | null } };
 
 export type GetDepartmentQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetDepartmentQuery = { __typename?: 'Query', department?: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, createdAt: Date, updatedAt: Date, head?: { __typename?: 'Employee', id: string, fio: string, gradeId: number } | null } | null };
+export type GetDepartmentQuery = { __typename?: 'Query', department?: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, createdAt: Date, updatedAt: Date, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string, gradeId: number } | null } | null };
 
 export type GetDepartmentWithMetricsQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -3733,21 +3930,21 @@ export type GetDepartmentWithMetricsQueryVariables = Exact<{
 }>;
 
 
-export type GetDepartmentWithMetricsQuery = { __typename?: 'Query', departmentWithMetrics?: { __typename?: 'DepartmentMetrics', totalEmployees: number, activeEmployees: number, overloadedCount: number, totalCapacity: number, totalLoad: number, loadIndex: number, department: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, head?: { __typename?: 'Employee', id: string, fio: string } | null } } | null };
+export type GetDepartmentWithMetricsQuery = { __typename?: 'Query', departmentWithMetrics?: { __typename?: 'DepartmentMetrics', totalEmployees: number, activeEmployees: number, overloadedCount: number, totalCapacity: number, totalLoad: number, loadIndex: number, department: { __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string } | null } } | null };
 
 export type GetDepartmentsQueryVariables = Exact<{
   filter: DepartmentFilterInput;
 }>;
 
 
-export type GetDepartmentsQuery = { __typename?: 'Query', departments: { __typename?: 'DepartmentConnection', totalCount: number, nodes: Array<{ __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, createdAt: Date, updatedAt: Date, head?: { __typename?: 'Employee', id: string, fio: string, gradeId: number } | null }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+export type GetDepartmentsQuery = { __typename?: 'Query', departments: { __typename?: 'DepartmentConnection', totalCount: number, nodes: Array<{ __typename?: 'Department', id: string, companyId: string, name: string, headId?: string | null, createdAt: Date, updatedAt: Date, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string, gradeId: number } | null }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
 
 export type CreateEmployeeMutationVariables = Exact<{
   input: CreateEmployeeInput;
 }>;
 
 
-export type CreateEmployeeMutation = { __typename?: 'Mutation', createEmployee: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, fio: string, gradeId: number, status: string, createdAt: Date, updatedAt: Date } };
+export type CreateEmployeeMutation = { __typename?: 'Mutation', createEmployee: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, status: string, createdAt: Date, updatedAt: Date } };
 
 export type DismissEmployeeMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -3763,7 +3960,7 @@ export type UpdateEmployeeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEmployeeMutation = { __typename?: 'Mutation', updateEmployee: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, fio: string, gradeId: number, gender: string, status: string, kEfficiency: number, workingHoursPerDay: number, updatedAt: Date } };
+export type UpdateEmployeeMutation = { __typename?: 'Mutation', updateEmployee: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, gender: string, status: string, kEfficiency?: number | null, workingHoursPerDay: number, updatedAt: Date } };
 
 export type UpdateEmployeeEfficiencyMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -3771,21 +3968,21 @@ export type UpdateEmployeeEfficiencyMutationVariables = Exact<{
 }>;
 
 
-export type UpdateEmployeeEfficiencyMutation = { __typename?: 'Mutation', updateEmployeeEfficiency: { __typename?: 'Employee', id: string, kEfficiency: number, updatedAt: Date } };
+export type UpdateEmployeeEfficiencyMutation = { __typename?: 'Mutation', updateEmployeeEfficiency: { __typename?: 'Employee', id: string, kEfficiency?: number | null, updatedAt: Date } };
 
 export type GetDepartmentEmployeesQueryVariables = Exact<{
   departmentId: Scalars['String']['input'];
 }>;
 
 
-export type GetDepartmentEmployeesQuery = { __typename?: 'Query', departmentEmployees: Array<{ __typename?: 'Employee', id: string, companyId: string, departmentId: string, fio: string, gradeId: number, gender: string, hireDate: Date, fireDate?: Date | null, kEfficiency: number, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } }> };
+export type GetDepartmentEmployeesQuery = { __typename?: 'Query', departmentEmployees: Array<{ __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, gender: string, hireDate: Date, fireDate?: Date | null, kEfficiency?: number | null, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } }> };
 
 export type GetEmployeeQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetEmployeeQuery = { __typename?: 'Query', employee?: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, fio: string, gradeId: number, gender: string, birthDate?: Date | null, hireDate: Date, fireDate?: Date | null, kEfficiency: number, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, department: { __typename?: 'Department', id: string, name: string }, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } } | null };
+export type GetEmployeeQuery = { __typename?: 'Query', employee?: { __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, gender: string, birthDate?: Date | null, hireDate: Date, fireDate?: Date | null, kEfficiency?: number | null, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, department: { __typename?: 'Department', id: string, name: string }, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } } | null };
 
 export type GetEmployeeCapacityQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -3809,22 +4006,32 @@ export type GetEmployeesQueryVariables = Exact<{
 }>;
 
 
-export type GetEmployeesQuery = { __typename?: 'Query', employees: { __typename?: 'EmployeeConnection', totalCount: number, nodes: Array<{ __typename?: 'Employee', id: string, companyId: string, departmentId: string, fio: string, gradeId: number, gender: string, birthDate?: Date | null, hireDate: Date, fireDate?: Date | null, kEfficiency: number, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, department: { __typename?: 'Department', id: string, name: string }, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+export type GetEmployeesQuery = { __typename?: 'Query', employees: { __typename?: 'EmployeeConnection', totalCount: number, nodes: Array<{ __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, gender: string, birthDate?: Date | null, hireDate: Date, fireDate?: Date | null, kEfficiency?: number | null, employmentType: string, status: string, workingHoursPerDay: number, createdAt: Date, updatedAt: Date, department: { __typename?: 'Department', id: string, name: string }, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+
+export type GetProcessesQueryVariables = Exact<{
+  filter?: InputMaybe<ProcessFilterInput>;
+  pagination?: InputMaybe<ProcessPaginationInput>;
+}>;
 
 
-export const AssignDepartmentHeadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AssignDepartmentHead"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employeeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"assignDepartmentHead"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"departmentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}}},{"kind":"Argument","name":{"kind":"Name","value":"employeeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employeeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<AssignDepartmentHeadMutation, AssignDepartmentHeadMutationVariables>;
+export type GetProcessesQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessConnection', totalCount: number, nodes: Array<{ __typename?: 'Process', id: string, companyId: string, departmentId: string, name: string, description?: string | null, processType: ProcessType, capacityUnits: number, kMultiplier: number, estimatedDurationDays?: number | null, status: ProcessStatus, priority: ProcessPriority, createdAt: Date, updatedAt: Date, startedAt?: Date | null, completedAt?: Date | null, company: { __typename?: 'Company', id: string, name: string }, department: { __typename?: 'Department', id: string, name: string } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+
+
+export const GetCompanyBySlugDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyBySlug"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyBySlug"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"timezone"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursDay"}},{"kind":"Field","name":{"kind":"Name","value":"workingDaysPerMonth"}}]}}]}}]} as unknown as DocumentNode<GetCompanyBySlugQuery, GetCompanyBySlugQueryVariables>;
+export const AssignDepartmentHeadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AssignDepartmentHead"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employeeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"assignDepartmentHead"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"departmentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}}},{"kind":"Argument","name":{"kind":"Name","value":"employeeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employeeId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<AssignDepartmentHeadMutation, AssignDepartmentHeadMutationVariables>;
 export const CreateDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateDepartmentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDepartment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<CreateDepartmentMutation, CreateDepartmentMutationVariables>;
 export const DeleteDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDepartment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteDepartmentMutation, DeleteDepartmentMutationVariables>;
-export const UpdateDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateDepartmentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDepartment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}}]}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateDepartmentMutation, UpdateDepartmentMutationVariables>;
-export const GetDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"department"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentQuery, GetDepartmentQueryVariables>;
-export const GetDepartmentWithMetricsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartmentWithMetrics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departmentWithMetrics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalEmployees"}},{"kind":"Field","name":{"kind":"Name","value":"activeEmployees"}},{"kind":"Field","name":{"kind":"Name","value":"overloadedCount"}},{"kind":"Field","name":{"kind":"Name","value":"totalCapacity"}},{"kind":"Field","name":{"kind":"Name","value":"totalLoad"}},{"kind":"Field","name":{"kind":"Name","value":"loadIndex"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentWithMetricsQuery, GetDepartmentWithMetricsQueryVariables>;
-export const GetDepartmentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DepartmentFilterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetDepartmentsQuery, GetDepartmentsQueryVariables>;
-export const CreateEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEmployeeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEmployee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<CreateEmployeeMutation, CreateEmployeeMutationVariables>;
+export const UpdateDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateDepartmentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDepartment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateDepartmentMutation, UpdateDepartmentMutationVariables>;
+export const GetDepartmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"department"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentQuery, GetDepartmentQueryVariables>;
+export const GetDepartmentWithMetricsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartmentWithMetrics"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departmentWithMetrics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalEmployees"}},{"kind":"Field","name":{"kind":"Name","value":"activeEmployees"}},{"kind":"Field","name":{"kind":"Name","value":"overloadedCount"}},{"kind":"Field","name":{"kind":"Name","value":"totalCapacity"}},{"kind":"Field","name":{"kind":"Name","value":"totalLoad"}},{"kind":"Field","name":{"kind":"Name","value":"loadIndex"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentWithMetricsQuery, GetDepartmentWithMetricsQueryVariables>;
+export const GetDepartmentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartments"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DepartmentFilterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetDepartmentsQuery, GetDepartmentsQueryVariables>;
+export const CreateEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEmployeeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEmployee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<CreateEmployeeMutation, CreateEmployeeMutationVariables>;
 export const DismissEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DismissEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reason"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dismissEmployee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"reason"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reason"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<DismissEmployeeMutation, DismissEmployeeMutationVariables>;
-export const UpdateEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateEmployeeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEmployee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateEmployeeMutation, UpdateEmployeeMutationVariables>;
+export const UpdateEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateEmployeeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEmployee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateEmployeeMutation, UpdateEmployeeMutationVariables>;
 export const UpdateEmployeeEfficiencyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateEmployeeEfficiency"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"kEfficiency"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEmployeeEfficiency"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"kEfficiency"},"value":{"kind":"Variable","name":{"kind":"Name","value":"kEfficiency"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateEmployeeEfficiencyMutation, UpdateEmployeeEfficiencyMutationVariables>;
-export const GetDepartmentEmployeesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartmentEmployees"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departmentEmployees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"departmentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentEmployeesQuery, GetDepartmentEmployeesQueryVariables>;
-export const GetEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"birthDate"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetEmployeeQuery, GetEmployeeQueryVariables>;
+export const GetDepartmentEmployeesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDepartmentEmployees"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"departmentEmployees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"departmentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"departmentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetDepartmentEmployeesQuery, GetDepartmentEmployeesQueryVariables>;
+export const GetEmployeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployee"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employee"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"birthDate"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetEmployeeQuery, GetEmployeeQueryVariables>;
 export const GetEmployeeCapacityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployeeCapacity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employeeCapacity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<GetEmployeeCapacityQuery, GetEmployeeCapacityQueryVariables>;
 export const GetEmployeeLoadIndexDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployeeLoadIndex"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employeeLoadIndex"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}}}]}]}}]} as unknown as DocumentNode<GetEmployeeLoadIndexQuery, GetEmployeeLoadIndexQueryVariables>;
-export const GetEmployeesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployees"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeeFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeePaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"fio"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"birthDate"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetEmployeesQuery, GetEmployeesQueryVariables>;
+export const GetEmployeesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployees"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeeFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeePaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"birthDate"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetEmployeesQuery, GetEmployeesQueryVariables>;
+export const GetProcessesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProcesses"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessPaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"processes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"processType"}},{"kind":"Field","name":{"kind":"Name","value":"capacityUnits"}},{"kind":"Field","name":{"kind":"Name","value":"kMultiplier"}},{"kind":"Field","name":{"kind":"Name","value":"estimatedDurationDays"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"company"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetProcessesQuery, GetProcessesQueryVariables>;

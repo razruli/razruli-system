@@ -14,7 +14,9 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model Process
- * Business process with estimated workload and complexity multipliers
+ * Business process with human-readable complexity classification
+ * Complexity converted to k-factors internally for CU calculation
+ * Weight formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
  */
 export type ProcessModel = runtime.Types.Result.DefaultSelection<Prisma.$ProcessPayload>
 
@@ -28,17 +30,13 @@ export type AggregateProcess = {
 
 export type ProcessAvgAggregateOutputType = {
   plannedHours: number | null
-  kBurn: number | null
-  kCrit: number | null
-  kNew: number | null
+  weight: number | null
   targetGradeId: number | null
 }
 
 export type ProcessSumAggregateOutputType = {
   plannedHours: number | null
-  kBurn: number | null
-  kCrit: number | null
-  kNew: number | null
+  weight: number | null
   targetGradeId: number | null
 }
 
@@ -49,12 +47,13 @@ export type ProcessMinAggregateOutputType = {
   title: string | null
   description: string | null
   plannedHours: number | null
-  kBurn: number | null
-  kCrit: number | null
-  kNew: number | null
+  complexity: string | null
+  businessImpact: string | null
+  newness: string | null
+  isBurningOut: boolean | null
+  weight: number | null
   targetGradeId: number | null
   status: string | null
-  priority: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,12 +65,13 @@ export type ProcessMaxAggregateOutputType = {
   title: string | null
   description: string | null
   plannedHours: number | null
-  kBurn: number | null
-  kCrit: number | null
-  kNew: number | null
+  complexity: string | null
+  businessImpact: string | null
+  newness: string | null
+  isBurningOut: boolean | null
+  weight: number | null
   targetGradeId: number | null
   status: string | null
-  priority: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -83,12 +83,13 @@ export type ProcessCountAggregateOutputType = {
   title: number
   description: number
   plannedHours: number
-  kBurn: number
-  kCrit: number
-  kNew: number
+  complexity: number
+  businessImpact: number
+  newness: number
+  isBurningOut: number
+  weight: number
   targetGradeId: number
   status: number
-  priority: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -97,17 +98,13 @@ export type ProcessCountAggregateOutputType = {
 
 export type ProcessAvgAggregateInputType = {
   plannedHours?: true
-  kBurn?: true
-  kCrit?: true
-  kNew?: true
+  weight?: true
   targetGradeId?: true
 }
 
 export type ProcessSumAggregateInputType = {
   plannedHours?: true
-  kBurn?: true
-  kCrit?: true
-  kNew?: true
+  weight?: true
   targetGradeId?: true
 }
 
@@ -118,12 +115,13 @@ export type ProcessMinAggregateInputType = {
   title?: true
   description?: true
   plannedHours?: true
-  kBurn?: true
-  kCrit?: true
-  kNew?: true
+  complexity?: true
+  businessImpact?: true
+  newness?: true
+  isBurningOut?: true
+  weight?: true
   targetGradeId?: true
   status?: true
-  priority?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -135,12 +133,13 @@ export type ProcessMaxAggregateInputType = {
   title?: true
   description?: true
   plannedHours?: true
-  kBurn?: true
-  kCrit?: true
-  kNew?: true
+  complexity?: true
+  businessImpact?: true
+  newness?: true
+  isBurningOut?: true
+  weight?: true
   targetGradeId?: true
   status?: true
-  priority?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -152,12 +151,13 @@ export type ProcessCountAggregateInputType = {
   title?: true
   description?: true
   plannedHours?: true
-  kBurn?: true
-  kCrit?: true
-  kNew?: true
+  complexity?: true
+  businessImpact?: true
+  newness?: true
+  isBurningOut?: true
+  weight?: true
   targetGradeId?: true
   status?: true
-  priority?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -256,12 +256,13 @@ export type ProcessGroupByOutputType = {
   title: string
   description: string | null
   plannedHours: number
-  kBurn: number
-  kCrit: number
-  kNew: number
+  complexity: string
+  businessImpact: string
+  newness: string
+  isBurningOut: boolean
+  weight: number | null
   targetGradeId: number
   status: string
-  priority: string
   createdAt: Date
   updatedAt: Date
   _count: ProcessCountAggregateOutputType | null
@@ -296,18 +297,20 @@ export type ProcessWhereInput = {
   title?: Prisma.StringFilter<"Process"> | string
   description?: Prisma.StringNullableFilter<"Process"> | string | null
   plannedHours?: Prisma.IntFilter<"Process"> | number
-  kBurn?: Prisma.FloatFilter<"Process"> | number
-  kCrit?: Prisma.FloatFilter<"Process"> | number
-  kNew?: Prisma.FloatFilter<"Process"> | number
+  complexity?: Prisma.StringFilter<"Process"> | string
+  businessImpact?: Prisma.StringFilter<"Process"> | string
+  newness?: Prisma.StringFilter<"Process"> | string
+  isBurningOut?: Prisma.BoolFilter<"Process"> | boolean
+  weight?: Prisma.FloatNullableFilter<"Process"> | number | null
   targetGradeId?: Prisma.IntFilter<"Process"> | number
   status?: Prisma.StringFilter<"Process"> | string
-  priority?: Prisma.StringFilter<"Process"> | string
   createdAt?: Prisma.DateTimeFilter<"Process"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Process"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
   targetGrade?: Prisma.XOR<Prisma.GradeScalarRelationFilter, Prisma.GradeWhereInput>
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
+  finishedTasks?: Prisma.FinishedTaskListRelationFilter
 }
 
 export type ProcessOrderByWithRelationInput = {
@@ -317,18 +320,20 @@ export type ProcessOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  complexity?: Prisma.SortOrder
+  businessImpact?: Prisma.SortOrder
+  newness?: Prisma.SortOrder
+  isBurningOut?: Prisma.SortOrder
+  weight?: Prisma.SortOrderInput | Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
   department?: Prisma.DepartmentOrderByWithRelationInput
   targetGrade?: Prisma.GradeOrderByWithRelationInput
   taskAssignments?: Prisma.TaskAssignmentOrderByRelationAggregateInput
+  finishedTasks?: Prisma.FinishedTaskOrderByRelationAggregateInput
 }
 
 export type ProcessWhereUniqueInput = Prisma.AtLeast<{
@@ -341,18 +346,20 @@ export type ProcessWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Process"> | string
   description?: Prisma.StringNullableFilter<"Process"> | string | null
   plannedHours?: Prisma.IntFilter<"Process"> | number
-  kBurn?: Prisma.FloatFilter<"Process"> | number
-  kCrit?: Prisma.FloatFilter<"Process"> | number
-  kNew?: Prisma.FloatFilter<"Process"> | number
+  complexity?: Prisma.StringFilter<"Process"> | string
+  businessImpact?: Prisma.StringFilter<"Process"> | string
+  newness?: Prisma.StringFilter<"Process"> | string
+  isBurningOut?: Prisma.BoolFilter<"Process"> | boolean
+  weight?: Prisma.FloatNullableFilter<"Process"> | number | null
   targetGradeId?: Prisma.IntFilter<"Process"> | number
   status?: Prisma.StringFilter<"Process"> | string
-  priority?: Prisma.StringFilter<"Process"> | string
   createdAt?: Prisma.DateTimeFilter<"Process"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Process"> | Date | string
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   department?: Prisma.XOR<Prisma.DepartmentScalarRelationFilter, Prisma.DepartmentWhereInput>
   targetGrade?: Prisma.XOR<Prisma.GradeScalarRelationFilter, Prisma.GradeWhereInput>
   taskAssignments?: Prisma.TaskAssignmentListRelationFilter
+  finishedTasks?: Prisma.FinishedTaskListRelationFilter
 }, "id">
 
 export type ProcessOrderByWithAggregationInput = {
@@ -362,12 +369,13 @@ export type ProcessOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  complexity?: Prisma.SortOrder
+  businessImpact?: Prisma.SortOrder
+  newness?: Prisma.SortOrder
+  isBurningOut?: Prisma.SortOrder
+  weight?: Prisma.SortOrderInput | Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProcessCountOrderByAggregateInput
@@ -387,12 +395,13 @@ export type ProcessScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Process"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Process"> | string | null
   plannedHours?: Prisma.IntWithAggregatesFilter<"Process"> | number
-  kBurn?: Prisma.FloatWithAggregatesFilter<"Process"> | number
-  kCrit?: Prisma.FloatWithAggregatesFilter<"Process"> | number
-  kNew?: Prisma.FloatWithAggregatesFilter<"Process"> | number
+  complexity?: Prisma.StringWithAggregatesFilter<"Process"> | string
+  businessImpact?: Prisma.StringWithAggregatesFilter<"Process"> | string
+  newness?: Prisma.StringWithAggregatesFilter<"Process"> | string
+  isBurningOut?: Prisma.BoolWithAggregatesFilter<"Process"> | boolean
+  weight?: Prisma.FloatNullableWithAggregatesFilter<"Process"> | number | null
   targetGradeId?: Prisma.IntWithAggregatesFilter<"Process"> | number
   status?: Prisma.StringWithAggregatesFilter<"Process"> | string
-  priority?: Prisma.StringWithAggregatesFilter<"Process"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Process"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Process"> | Date | string
 }
@@ -402,17 +411,19 @@ export type ProcessCreateInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutProcessesInput
   department: Prisma.DepartmentCreateNestedOneWithoutProcessesInput
   targetGrade: Prisma.GradeCreateNestedOneWithoutProcessesInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUncheckedCreateInput = {
@@ -422,15 +433,17 @@ export type ProcessUncheckedCreateInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUpdateInput = {
@@ -438,17 +451,19 @@ export type ProcessUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutProcessesNestedInput
   department?: Prisma.DepartmentUpdateOneRequiredWithoutProcessesNestedInput
   targetGrade?: Prisma.GradeUpdateOneRequiredWithoutProcessesNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateInput = {
@@ -458,15 +473,17 @@ export type ProcessUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessCreateManyInput = {
@@ -476,12 +493,13 @@ export type ProcessCreateManyInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -491,11 +509,12 @@ export type ProcessUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -507,12 +526,13 @@ export type ProcessUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -527,6 +547,11 @@ export type ProcessOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type ProcessScalarRelationFilter = {
+  is?: Prisma.ProcessWhereInput
+  isNot?: Prisma.ProcessWhereInput
+}
+
 export type ProcessCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
@@ -534,21 +559,20 @@ export type ProcessCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  complexity?: Prisma.SortOrder
+  businessImpact?: Prisma.SortOrder
+  newness?: Prisma.SortOrder
+  isBurningOut?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProcessAvgOrderByAggregateInput = {
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
 }
 
@@ -559,12 +583,13 @@ export type ProcessMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  complexity?: Prisma.SortOrder
+  businessImpact?: Prisma.SortOrder
+  newness?: Prisma.SortOrder
+  isBurningOut?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -576,27 +601,21 @@ export type ProcessMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  complexity?: Prisma.SortOrder
+  businessImpact?: Prisma.SortOrder
+  newness?: Prisma.SortOrder
+  isBurningOut?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ProcessSumOrderByAggregateInput = {
   plannedHours?: Prisma.SortOrder
-  kBurn?: Prisma.SortOrder
-  kCrit?: Prisma.SortOrder
-  kNew?: Prisma.SortOrder
+  weight?: Prisma.SortOrder
   targetGradeId?: Prisma.SortOrder
-}
-
-export type ProcessScalarRelationFilter = {
-  is?: Prisma.ProcessWhereInput
-  isNot?: Prisma.ProcessWhereInput
 }
 
 export type ProcessCreateNestedManyWithoutCompanyInput = {
@@ -725,6 +744,20 @@ export type ProcessUncheckedUpdateManyWithoutTargetGradeNestedInput = {
   deleteMany?: Prisma.ProcessScalarWhereInput | Prisma.ProcessScalarWhereInput[]
 }
 
+export type ProcessCreateNestedOneWithoutFinishedTasksInput = {
+  create?: Prisma.XOR<Prisma.ProcessCreateWithoutFinishedTasksInput, Prisma.ProcessUncheckedCreateWithoutFinishedTasksInput>
+  connectOrCreate?: Prisma.ProcessCreateOrConnectWithoutFinishedTasksInput
+  connect?: Prisma.ProcessWhereUniqueInput
+}
+
+export type ProcessUpdateOneRequiredWithoutFinishedTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.ProcessCreateWithoutFinishedTasksInput, Prisma.ProcessUncheckedCreateWithoutFinishedTasksInput>
+  connectOrCreate?: Prisma.ProcessCreateOrConnectWithoutFinishedTasksInput
+  upsert?: Prisma.ProcessUpsertWithoutFinishedTasksInput
+  connect?: Prisma.ProcessWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProcessUpdateToOneWithWhereWithoutFinishedTasksInput, Prisma.ProcessUpdateWithoutFinishedTasksInput>, Prisma.ProcessUncheckedUpdateWithoutFinishedTasksInput>
+}
+
 export type ProcessCreateNestedOneWithoutTaskAssignmentsInput = {
   create?: Prisma.XOR<Prisma.ProcessCreateWithoutTaskAssignmentsInput, Prisma.ProcessUncheckedCreateWithoutTaskAssignmentsInput>
   connectOrCreate?: Prisma.ProcessCreateOrConnectWithoutTaskAssignmentsInput
@@ -744,16 +777,18 @@ export type ProcessCreateWithoutCompanyInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   department: Prisma.DepartmentCreateNestedOneWithoutProcessesInput
   targetGrade: Prisma.GradeCreateNestedOneWithoutProcessesInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUncheckedCreateWithoutCompanyInput = {
@@ -762,15 +797,17 @@ export type ProcessUncheckedCreateWithoutCompanyInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessCreateOrConnectWithoutCompanyInput = {
@@ -809,12 +846,13 @@ export type ProcessScalarWhereInput = {
   title?: Prisma.StringFilter<"Process"> | string
   description?: Prisma.StringNullableFilter<"Process"> | string | null
   plannedHours?: Prisma.IntFilter<"Process"> | number
-  kBurn?: Prisma.FloatFilter<"Process"> | number
-  kCrit?: Prisma.FloatFilter<"Process"> | number
-  kNew?: Prisma.FloatFilter<"Process"> | number
+  complexity?: Prisma.StringFilter<"Process"> | string
+  businessImpact?: Prisma.StringFilter<"Process"> | string
+  newness?: Prisma.StringFilter<"Process"> | string
+  isBurningOut?: Prisma.BoolFilter<"Process"> | boolean
+  weight?: Prisma.FloatNullableFilter<"Process"> | number | null
   targetGradeId?: Prisma.IntFilter<"Process"> | number
   status?: Prisma.StringFilter<"Process"> | string
-  priority?: Prisma.StringFilter<"Process"> | string
   createdAt?: Prisma.DateTimeFilter<"Process"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Process"> | Date | string
 }
@@ -824,16 +862,18 @@ export type ProcessCreateWithoutDepartmentInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutProcessesInput
   targetGrade: Prisma.GradeCreateNestedOneWithoutProcessesInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUncheckedCreateWithoutDepartmentInput = {
@@ -842,15 +882,17 @@ export type ProcessUncheckedCreateWithoutDepartmentInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessCreateOrConnectWithoutDepartmentInput = {
@@ -884,16 +926,18 @@ export type ProcessCreateWithoutTargetGradeInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutProcessesInput
   department: Prisma.DepartmentCreateNestedOneWithoutProcessesInput
   taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUncheckedCreateWithoutTargetGradeInput = {
@@ -903,14 +947,16 @@ export type ProcessUncheckedCreateWithoutTargetGradeInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutProcessInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessCreateOrConnectWithoutTargetGradeInput = {
@@ -939,21 +985,115 @@ export type ProcessUpdateManyWithWhereWithoutTargetGradeInput = {
   data: Prisma.XOR<Prisma.ProcessUpdateManyMutationInput, Prisma.ProcessUncheckedUpdateManyWithoutTargetGradeInput>
 }
 
-export type ProcessCreateWithoutTaskAssignmentsInput = {
+export type ProcessCreateWithoutFinishedTasksInput = {
   id?: string
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutProcessesInput
   department: Prisma.DepartmentCreateNestedOneWithoutProcessesInput
   targetGrade: Prisma.GradeCreateNestedOneWithoutProcessesInput
+  taskAssignments?: Prisma.TaskAssignmentCreateNestedManyWithoutProcessInput
+}
+
+export type ProcessUncheckedCreateWithoutFinishedTasksInput = {
+  id?: string
+  companyId: string
+  departmentId: string
+  title: string
+  description?: string | null
+  plannedHours: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
+  targetGradeId: number
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  taskAssignments?: Prisma.TaskAssignmentUncheckedCreateNestedManyWithoutProcessInput
+}
+
+export type ProcessCreateOrConnectWithoutFinishedTasksInput = {
+  where: Prisma.ProcessWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProcessCreateWithoutFinishedTasksInput, Prisma.ProcessUncheckedCreateWithoutFinishedTasksInput>
+}
+
+export type ProcessUpsertWithoutFinishedTasksInput = {
+  update: Prisma.XOR<Prisma.ProcessUpdateWithoutFinishedTasksInput, Prisma.ProcessUncheckedUpdateWithoutFinishedTasksInput>
+  create: Prisma.XOR<Prisma.ProcessCreateWithoutFinishedTasksInput, Prisma.ProcessUncheckedCreateWithoutFinishedTasksInput>
+  where?: Prisma.ProcessWhereInput
+}
+
+export type ProcessUpdateToOneWithWhereWithoutFinishedTasksInput = {
+  where?: Prisma.ProcessWhereInput
+  data: Prisma.XOR<Prisma.ProcessUpdateWithoutFinishedTasksInput, Prisma.ProcessUncheckedUpdateWithoutFinishedTasksInput>
+}
+
+export type ProcessUpdateWithoutFinishedTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutProcessesNestedInput
+  department?: Prisma.DepartmentUpdateOneRequiredWithoutProcessesNestedInput
+  targetGrade?: Prisma.GradeUpdateOneRequiredWithoutProcessesNestedInput
+  taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutProcessNestedInput
+}
+
+export type ProcessUncheckedUpdateWithoutFinishedTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  departmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutProcessNestedInput
+}
+
+export type ProcessCreateWithoutTaskAssignmentsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  plannedHours: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutProcessesInput
+  department: Prisma.DepartmentCreateNestedOneWithoutProcessesInput
+  targetGrade: Prisma.GradeCreateNestedOneWithoutProcessesInput
+  finishedTasks?: Prisma.FinishedTaskCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessUncheckedCreateWithoutTaskAssignmentsInput = {
@@ -963,14 +1103,16 @@ export type ProcessUncheckedCreateWithoutTaskAssignmentsInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  finishedTasks?: Prisma.FinishedTaskUncheckedCreateNestedManyWithoutProcessInput
 }
 
 export type ProcessCreateOrConnectWithoutTaskAssignmentsInput = {
@@ -994,16 +1136,18 @@ export type ProcessUpdateWithoutTaskAssignmentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutProcessesNestedInput
   department?: Prisma.DepartmentUpdateOneRequiredWithoutProcessesNestedInput
   targetGrade?: Prisma.GradeUpdateOneRequiredWithoutProcessesNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateWithoutTaskAssignmentsInput = {
@@ -1013,14 +1157,16 @@ export type ProcessUncheckedUpdateWithoutTaskAssignmentsInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessCreateManyCompanyInput = {
@@ -1029,12 +1175,13 @@ export type ProcessCreateManyCompanyInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1044,16 +1191,18 @@ export type ProcessUpdateWithoutCompanyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   department?: Prisma.DepartmentUpdateOneRequiredWithoutProcessesNestedInput
   targetGrade?: Prisma.GradeUpdateOneRequiredWithoutProcessesNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateWithoutCompanyInput = {
@@ -1062,15 +1211,17 @@ export type ProcessUncheckedUpdateWithoutCompanyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateManyWithoutCompanyInput = {
@@ -1079,12 +1230,13 @@ export type ProcessUncheckedUpdateManyWithoutCompanyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1095,12 +1247,13 @@ export type ProcessCreateManyDepartmentInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   targetGradeId: number
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1110,16 +1263,18 @@ export type ProcessUpdateWithoutDepartmentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutProcessesNestedInput
   targetGrade?: Prisma.GradeUpdateOneRequiredWithoutProcessesNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateWithoutDepartmentInput = {
@@ -1128,15 +1283,17 @@ export type ProcessUncheckedUpdateWithoutDepartmentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateManyWithoutDepartmentInput = {
@@ -1145,12 +1302,13 @@ export type ProcessUncheckedUpdateManyWithoutDepartmentInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   targetGradeId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1162,11 +1320,12 @@ export type ProcessCreateManyTargetGradeInput = {
   title: string
   description?: string | null
   plannedHours: number
-  kBurn?: number
-  kCrit?: number
-  kNew?: number
+  complexity?: string
+  businessImpact?: string
+  newness?: string
+  isBurningOut?: boolean
+  weight?: number | null
   status?: string
-  priority?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1176,16 +1335,18 @@ export type ProcessUpdateWithoutTargetGradeInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutProcessesNestedInput
   department?: Prisma.DepartmentUpdateOneRequiredWithoutProcessesNestedInput
   taskAssignments?: Prisma.TaskAssignmentUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateWithoutTargetGradeInput = {
@@ -1195,14 +1356,16 @@ export type ProcessUncheckedUpdateWithoutTargetGradeInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   taskAssignments?: Prisma.TaskAssignmentUncheckedUpdateManyWithoutProcessNestedInput
+  finishedTasks?: Prisma.FinishedTaskUncheckedUpdateManyWithoutProcessNestedInput
 }
 
 export type ProcessUncheckedUpdateManyWithoutTargetGradeInput = {
@@ -1212,11 +1375,12 @@ export type ProcessUncheckedUpdateManyWithoutTargetGradeInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   plannedHours?: Prisma.IntFieldUpdateOperationsInput | number
-  kBurn?: Prisma.FloatFieldUpdateOperationsInput | number
-  kCrit?: Prisma.FloatFieldUpdateOperationsInput | number
-  kNew?: Prisma.FloatFieldUpdateOperationsInput | number
+  complexity?: Prisma.StringFieldUpdateOperationsInput | string
+  businessImpact?: Prisma.StringFieldUpdateOperationsInput | string
+  newness?: Prisma.StringFieldUpdateOperationsInput | string
+  isBurningOut?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  priority?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1228,10 +1392,12 @@ export type ProcessUncheckedUpdateManyWithoutTargetGradeInput = {
 
 export type ProcessCountOutputType = {
   taskAssignments: number
+  finishedTasks: number
 }
 
 export type ProcessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   taskAssignments?: boolean | ProcessCountOutputTypeCountTaskAssignmentsArgs
+  finishedTasks?: boolean | ProcessCountOutputTypeCountFinishedTasksArgs
 }
 
 /**
@@ -1251,6 +1417,13 @@ export type ProcessCountOutputTypeCountTaskAssignmentsArgs<ExtArgs extends runti
   where?: Prisma.TaskAssignmentWhereInput
 }
 
+/**
+ * ProcessCountOutputType without action
+ */
+export type ProcessCountOutputTypeCountFinishedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FinishedTaskWhereInput
+}
+
 
 export type ProcessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1259,18 +1432,20 @@ export type ProcessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   title?: boolean
   description?: boolean
   plannedHours?: boolean
-  kBurn?: boolean
-  kCrit?: boolean
-  kNew?: boolean
+  complexity?: boolean
+  businessImpact?: boolean
+  newness?: boolean
+  isBurningOut?: boolean
+  weight?: boolean
   targetGradeId?: boolean
   status?: boolean
-  priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
   targetGrade?: boolean | Prisma.GradeDefaultArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Process$taskAssignmentsArgs<ExtArgs>
+  finishedTasks?: boolean | Prisma.Process$finishedTasksArgs<ExtArgs>
   _count?: boolean | Prisma.ProcessCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["process"]>
 
@@ -1281,12 +1456,13 @@ export type ProcessSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   title?: boolean
   description?: boolean
   plannedHours?: boolean
-  kBurn?: boolean
-  kCrit?: boolean
-  kNew?: boolean
+  complexity?: boolean
+  businessImpact?: boolean
+  newness?: boolean
+  isBurningOut?: boolean
+  weight?: boolean
   targetGradeId?: boolean
   status?: boolean
-  priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
@@ -1301,12 +1477,13 @@ export type ProcessSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   title?: boolean
   description?: boolean
   plannedHours?: boolean
-  kBurn?: boolean
-  kCrit?: boolean
-  kNew?: boolean
+  complexity?: boolean
+  businessImpact?: boolean
+  newness?: boolean
+  isBurningOut?: boolean
+  weight?: boolean
   targetGradeId?: boolean
   status?: boolean
-  priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
@@ -1321,22 +1498,24 @@ export type ProcessSelectScalar = {
   title?: boolean
   description?: boolean
   plannedHours?: boolean
-  kBurn?: boolean
-  kCrit?: boolean
-  kNew?: boolean
+  complexity?: boolean
+  businessImpact?: boolean
+  newness?: boolean
+  isBurningOut?: boolean
+  weight?: boolean
   targetGradeId?: boolean
   status?: boolean
-  priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProcessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "departmentId" | "title" | "description" | "plannedHours" | "kBurn" | "kCrit" | "kNew" | "targetGradeId" | "status" | "priority" | "createdAt" | "updatedAt", ExtArgs["result"]["process"]>
+export type ProcessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "departmentId" | "title" | "description" | "plannedHours" | "complexity" | "businessImpact" | "newness" | "isBurningOut" | "weight" | "targetGradeId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["process"]>
 export type ProcessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   department?: boolean | Prisma.DepartmentDefaultArgs<ExtArgs>
   targetGrade?: boolean | Prisma.GradeDefaultArgs<ExtArgs>
   taskAssignments?: boolean | Prisma.Process$taskAssignmentsArgs<ExtArgs>
+  finishedTasks?: boolean | Prisma.Process$finishedTasksArgs<ExtArgs>
   _count?: boolean | Prisma.ProcessCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProcessIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1357,6 +1536,7 @@ export type $ProcessPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     department: Prisma.$DepartmentPayload<ExtArgs>
     targetGrade: Prisma.$GradePayload<ExtArgs>
     taskAssignments: Prisma.$TaskAssignmentPayload<ExtArgs>[]
+    finishedTasks: Prisma.$FinishedTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1365,12 +1545,29 @@ export type $ProcessPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     title: string
     description: string | null
     plannedHours: number
-    kBurn: number
-    kCrit: number
-    kNew: number
+    /**
+     * Difficulty/Skill Required: routine|standard|complex|expert
+     * routine = Junior can do, standard = Mid-level, complex = Senior, expert = Lead+
+     */
+    complexity: string
+    /**
+     * Business/Customer Impact: low|medium|high|critical
+     * low = nice to have, medium = normal work, high = important, critical = system down
+     */
+    businessImpact: string
+    /**
+     * Is this new/unfamiliar work? routine|familiar|new|experimental
+     * routine = done before, familiar = similar tech, new = new framework, experimental = cutting edge
+     */
+    newness: string
+    /**
+     * Does team get burned out by this type of work? false|true
+     * true = mentally exhausting, requires breaks, increases burnout risk
+     */
+    isBurningOut: boolean
+    weight: number | null
     targetGradeId: number
     status: string
-    priority: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["process"]>
@@ -1771,6 +1968,7 @@ export interface Prisma__ProcessClient<T, Null = never, ExtArgs extends runtime.
   department<T extends Prisma.DepartmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.DepartmentDefaultArgs<ExtArgs>>): Prisma.Prisma__DepartmentClient<runtime.Types.Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   targetGrade<T extends Prisma.GradeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.GradeDefaultArgs<ExtArgs>>): Prisma.Prisma__GradeClient<runtime.Types.Result.GetResult<Prisma.$GradePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   taskAssignments<T extends Prisma.Process$taskAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Process$taskAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  finishedTasks<T extends Prisma.Process$finishedTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Process$finishedTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FinishedTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1806,12 +2004,13 @@ export interface ProcessFieldRefs {
   readonly title: Prisma.FieldRef<"Process", 'String'>
   readonly description: Prisma.FieldRef<"Process", 'String'>
   readonly plannedHours: Prisma.FieldRef<"Process", 'Int'>
-  readonly kBurn: Prisma.FieldRef<"Process", 'Float'>
-  readonly kCrit: Prisma.FieldRef<"Process", 'Float'>
-  readonly kNew: Prisma.FieldRef<"Process", 'Float'>
+  readonly complexity: Prisma.FieldRef<"Process", 'String'>
+  readonly businessImpact: Prisma.FieldRef<"Process", 'String'>
+  readonly newness: Prisma.FieldRef<"Process", 'String'>
+  readonly isBurningOut: Prisma.FieldRef<"Process", 'Boolean'>
+  readonly weight: Prisma.FieldRef<"Process", 'Float'>
   readonly targetGradeId: Prisma.FieldRef<"Process", 'Int'>
   readonly status: Prisma.FieldRef<"Process", 'String'>
-  readonly priority: Prisma.FieldRef<"Process", 'String'>
   readonly createdAt: Prisma.FieldRef<"Process", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Process", 'DateTime'>
 }
@@ -2231,6 +2430,30 @@ export type Process$taskAssignmentsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.TaskAssignmentScalarFieldEnum | Prisma.TaskAssignmentScalarFieldEnum[]
+}
+
+/**
+ * Process.finishedTasks
+ */
+export type Process$finishedTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FinishedTask
+   */
+  select?: Prisma.FinishedTaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FinishedTask
+   */
+  omit?: Prisma.FinishedTaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FinishedTaskInclude<ExtArgs> | null
+  where?: Prisma.FinishedTaskWhereInput
+  orderBy?: Prisma.FinishedTaskOrderByWithRelationInput | Prisma.FinishedTaskOrderByWithRelationInput[]
+  cursor?: Prisma.FinishedTaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FinishedTaskScalarFieldEnum | Prisma.FinishedTaskScalarFieldEnum[]
 }
 
 /**

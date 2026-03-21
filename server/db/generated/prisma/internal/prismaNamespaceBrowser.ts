@@ -70,6 +70,7 @@ export const ModelName = {
   Department: 'Department',
   Employee: 'Employee',
   Grade: 'Grade',
+  FinishedTask: 'FinishedTask',
   Process: 'Process',
   TaskAssignment: 'TaskAssignment'
 } as const
@@ -329,6 +330,7 @@ export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[k
 export const CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  slug: 'slug',
   timezone: 'timezone',
   workingHoursDay: 'workingHoursDay',
   workingDaysPerMonth: 'workingDaysPerMonth',
@@ -364,6 +366,7 @@ export const EmployeeScalarFieldEnum = {
   fireDate: 'fireDate',
   kEfficiency: 'kEfficiency',
   workingHoursPerDay: 'workingHoursPerDay',
+  monthlyCU: 'monthlyCU',
   employmentType: 'employmentType',
   status: 'status',
   metadata: 'metadata',
@@ -384,6 +387,24 @@ export const GradeScalarFieldEnum = {
 export type GradeScalarFieldEnum = (typeof GradeScalarFieldEnum)[keyof typeof GradeScalarFieldEnum]
 
 
+export const FinishedTaskScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  departmentId: 'departmentId',
+  employeeId: 'employeeId',
+  processId: 'processId',
+  quantity: 'quantity',
+  completedAt: 'completedAt',
+  hoursSpent: 'hoursSpent',
+  status: 'status',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FinishedTaskScalarFieldEnum = (typeof FinishedTaskScalarFieldEnum)[keyof typeof FinishedTaskScalarFieldEnum]
+
+
 export const ProcessScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -391,12 +412,13 @@ export const ProcessScalarFieldEnum = {
   title: 'title',
   description: 'description',
   plannedHours: 'plannedHours',
-  kBurn: 'kBurn',
-  kCrit: 'kCrit',
-  kNew: 'kNew',
+  complexity: 'complexity',
+  businessImpact: 'businessImpact',
+  newness: 'newness',
+  isBurningOut: 'isBurningOut',
+  weight: 'weight',
   targetGradeId: 'targetGradeId',
   status: 'status',
-  priority: 'priority',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
