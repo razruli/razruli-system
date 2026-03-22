@@ -242,6 +242,14 @@ export enum AuditStatus {
   Success = 'SUCCESS'
 }
 
+/** Business Impact enumeration - importance/priority of the process */
+export enum BusinessImpactLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
 /** Changes by specific user */
 export type ChangeByUser = {
   __typename?: 'ChangeByUser';
@@ -299,6 +307,14 @@ export type CompanyLoadAnalysis = {
   snapshotDate: Scalars['DateTime']['output'];
   totalEmployees: Scalars['Int']['output'];
 };
+
+/** Complexity level enumeration - maps to k-factors internally */
+export enum ComplexityLevel {
+  Complex = 'COMPLEX',
+  Expert = 'EXPERT',
+  Routine = 'ROUTINE',
+  Standard = 'STANDARD'
+}
 
 /** Compliance report */
 export type ComplianceReport = {
@@ -398,16 +414,17 @@ export type CreatePermissionInput = {
 
 /** Input for creating a process */
 export type CreateProcessInput = {
-  capacityUnits: Scalars['Int']['input'];
+  businessImpact?: InputMaybe<BusinessImpactLevel>;
   companyId: Scalars['String']['input'];
+  complexity?: InputMaybe<ComplexityLevel>;
   departmentId: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
-  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
-  kMultiplier: Scalars['Float']['input'];
-  name: Scalars['String']['input'];
-  priority?: InputMaybe<ProcessPriority>;
-  processType: ProcessType;
-  status?: InputMaybe<ProcessStatus>;
+  isBurningOut?: InputMaybe<Scalars['Boolean']['input']>;
+  newness?: InputMaybe<NewnessLevel>;
+  plannedHours: Scalars['Int']['input'];
+  status?: InputMaybe<ProcessStatusEnum>;
+  targetGradeId: Scalars['Int']['input'];
+  title: Scalars['String']['input'];
 };
 
 /** Input for creating a role */
@@ -1282,18 +1299,12 @@ export type Mutation = {
   assignActorRole: Scalars['Boolean']['output'];
   /** Assign department head */
   assignDepartmentHead: Department;
-  /** Assign capacity to process */
-  assignProcessCapacity: Process;
   /** Assign permission to role (admin only) */
   assignRolePermission: Scalars['Boolean']['output'];
   /** Block a task with reason */
   blockTaskAssignment: TaskAssignment;
   /** Bulk log audit entries */
   bulkLogAuditEntries: Array<AuditLog>;
-  /** Cancel a process */
-  cancelProcess: Process;
-  /** Complete a process */
-  completeProcess: Process;
   /** Complete a task assignment */
   completeTaskAssignment: TaskAssignment;
   /** Create a new actor (admin only) */
@@ -1358,8 +1369,6 @@ export type Mutation = {
   removeRolePermission: Scalars['Boolean']['output'];
   /** Revoke a permission from an actor */
   revokeActorPermission: Scalars['Boolean']['output'];
-  /** Start a process */
-  startProcess: Process;
   /** Start a task assignment */
   startTaskAssignment: TaskAssignment;
   /** Suspend an actor */
@@ -1450,17 +1459,6 @@ export type MutationAssignDepartmentHeadArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
-export type MutationAssignProcessCapacityArgs = {
-  capacityUnits: Scalars['Int']['input'];
-  kMultiplier: Scalars['Float']['input'];
-  processId: Scalars['String']['input'];
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
 export type MutationAssignRolePermissionArgs = {
   permissionId: Scalars['String']['input'];
   roleId: Scalars['String']['input'];
@@ -1483,25 +1481,6 @@ export type MutationBlockTaskAssignmentArgs = {
  */
 export type MutationBulkLogAuditEntriesArgs = {
   entries: Array<LogAuditEntryInput>;
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
-export type MutationCancelProcessArgs = {
-  id: Scalars['String']['input'];
-  reason?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
-export type MutationCompleteProcessArgs = {
-  id: Scalars['String']['input'];
 };
 
 
@@ -1811,15 +1790,6 @@ export type MutationRevokeActorPermissionArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
-export type MutationStartProcessArgs = {
-  id: Scalars['String']['input'];
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
 export type MutationStartTaskAssignmentArgs = {
   id: Scalars['String']['input'];
 };
@@ -1986,6 +1956,14 @@ export type MutationUpdateTaskProgressArgs = {
   id: Scalars['String']['input'];
 };
 
+/** Newness/Learning Curve enumeration */
+export enum NewnessLevel {
+  Experimental = 'EXPERIMENTAL',
+  Familiar = 'FAMILIAR',
+  New = 'NEW',
+  Routine = 'ROUTINE'
+}
+
 export type Node = {
   id: Scalars['ID']['output'];
 };
@@ -2054,33 +2032,37 @@ export enum PermissionScope {
 /** Process type representing business processes */
 export type Process = {
   __typename?: 'Process';
-  /** Capacity configuration */
-  capacityUnits: Scalars['Int']['output'];
+  businessImpact: BusinessImpactLevel;
   /** Relations */
   company: Company;
   /** Process details */
   companyId: Scalars['String']['output'];
-  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Complexity metrics (converted to k-factors internally for weight calculation) */
+  complexity: ComplexityLevel;
   /** Timestamps */
   createdAt: Scalars['DateTime']['output'];
-  /** Audit trail */
-  createdBy: Scalars['String']['output'];
   department: Department;
   departmentId: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  estimatedDurationDays?: Maybe<Scalars['Int']['output']>;
+  finishedTasks?: Maybe<Array<Maybe<FinishedTask>>>;
   id: Scalars['String']['output'];
-  kMultiplier: Scalars['Float']['output'];
-  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
-  name: Scalars['String']['output'];
-  priority: ProcessPriority;
-  processType: ProcessType;
-  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  isBurningOut: Scalars['Boolean']['output'];
+  newness: NewnessLevel;
+  /** Time and complexity estimation */
+  plannedHours: Scalars['Int']['output'];
   /** Status tracking */
-  status: ProcessStatus;
+  status: ProcessStatusEnum;
+  targetGrade: Grade;
+  targetGradeId: Scalars['Int']['output'];
   taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
+  title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
-  updatedBy?: Maybe<Scalars['String']['output']>;
+  /**
+   * Calculated weight and target grade
+   * Weight is stored at creation/import time, can be recalculated
+   * Formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
+   */
+  weight?: Maybe<Scalars['Float']['output']>;
 };
 
 /** Process completion breakdown */
@@ -2103,10 +2085,8 @@ export type ProcessConnection = {
 export type ProcessFilterInput = {
   companyId?: InputMaybe<Scalars['String']['input']>;
   departmentId?: InputMaybe<Scalars['String']['input']>;
-  priority?: InputMaybe<ProcessPriority>;
-  processType?: InputMaybe<ProcessType>;
   search?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<ProcessStatus>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Process metrics for analytics */
@@ -2128,14 +2108,6 @@ export type ProcessPaginationInput = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/** Process priority enumeration */
-export enum ProcessPriority {
-  Critical = 'CRITICAL',
-  High = 'HIGH',
-  Low = 'LOW',
-  Normal = 'NORMAL'
-}
-
 /** Process popularity ranking */
 export type ProcessRanking = {
   __typename?: 'ProcessRanking';
@@ -2147,9 +2119,10 @@ export type ProcessRanking = {
 
 /** Process sort fields */
 export enum ProcessSortField {
-  CapacityUnits = 'CAPACITY_UNITS',
   CreatedAt = 'CREATED_AT',
-  Name = 'NAME',
+  PlannedHours = 'PLANNED_HOURS',
+  Status = 'STATUS',
+  Title = 'TITLE',
   UpdatedAt = 'UPDATED_AT'
 }
 
@@ -2159,39 +2132,22 @@ export type ProcessSortInput = {
   order: SortOrder;
 };
 
-/** Process status enumeration */
-export enum ProcessStatus {
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Draft = 'DRAFT',
-  InProgress = 'IN_PROGRESS',
-  OnHold = 'ON_HOLD',
-  Planned = 'PLANNED'
-}
-
-/** Event type for process status changes */
+/** Process status change event */
 export type ProcessStatusChangeEvent = {
   __typename?: 'ProcessStatusChangeEvent';
-  changedAt: Scalars['DateTime']['output'];
-  changedBy: Scalars['String']['output'];
-  newStatus: ProcessStatus;
-  previousStatus: ProcessStatus;
-  process: Process;
-  reason?: Maybe<Scalars['String']['output']>;
+  newStatus: Scalars['String']['output'];
+  oldStatus: Scalars['String']['output'];
+  processId: Scalars['String']['output'];
+  timestamp: Scalars['DateTime']['output'];
 };
 
-/** Process type enumeration */
-export enum ProcessType {
-  Audit = 'AUDIT',
-  Compliance = 'COMPLIANCE',
-  Maintenance = 'MAINTENANCE',
-  Offboarding = 'OFFBOARDING',
-  Onboarding = 'ONBOARDING',
-  Other = 'OTHER',
-  PerformanceReview = 'PERFORMANCE_REVIEW',
-  ProjectDelivery = 'PROJECT_DELIVERY',
-  Recruitment = 'RECRUITMENT',
-  Training = 'TRAINING'
+/** Process Status enumeration */
+export enum ProcessStatusEnum {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  InProgress = 'IN_PROGRESS',
+  OnHold = 'ON_HOLD',
+  Open = 'OPEN'
 }
 
 /** Quarterly hiring projection */
@@ -2587,7 +2543,7 @@ export type QueryDepartmentMetricsArgs = {
  */
 export type QueryDepartmentProcessesArgs = {
   departmentId: Scalars['String']['input'];
-  status?: InputMaybe<ProcessStatus>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3775,13 +3731,15 @@ export type UpdatePermissionInput = {
 
 /** Input for updating a process */
 export type UpdateProcessInput = {
-  capacityUnits?: InputMaybe<Scalars['Int']['input']>;
+  businessImpact?: InputMaybe<BusinessImpactLevel>;
+  complexity?: InputMaybe<ComplexityLevel>;
   description?: InputMaybe<Scalars['String']['input']>;
-  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
-  kMultiplier?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  priority?: InputMaybe<ProcessPriority>;
-  status?: InputMaybe<ProcessStatus>;
+  isBurningOut?: InputMaybe<Scalars['Boolean']['input']>;
+  newness?: InputMaybe<NewnessLevel>;
+  plannedHours?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<ProcessStatusEnum>;
+  targetGradeId?: InputMaybe<Scalars['Int']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating a role */
@@ -4014,7 +3972,24 @@ export type GetProcessesQueryVariables = Exact<{
 }>;
 
 
-export type GetProcessesQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessConnection', totalCount: number, nodes: Array<{ __typename?: 'Process', id: string, companyId: string, departmentId: string, name: string, description?: string | null, processType: ProcessType, capacityUnits: number, kMultiplier: number, estimatedDurationDays?: number | null, status: ProcessStatus, priority: ProcessPriority, createdAt: Date, updatedAt: Date, startedAt?: Date | null, completedAt?: Date | null, company: { __typename?: 'Company', id: string, name: string }, department: { __typename?: 'Department', id: string, name: string } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+export type GetProcessesQuery = { __typename?: 'Query', processes: { __typename?: 'ProcessConnection', totalCount: number, nodes: Array<{ __typename?: 'Process', id: string, companyId: string, departmentId: string, title: string, description?: string | null, plannedHours: number, complexity: ComplexityLevel, businessImpact: BusinessImpactLevel, newness: NewnessLevel, isBurningOut: boolean, weight?: number | null, status: ProcessStatusEnum, createdAt: Date, updatedAt: Date, company: { __typename?: 'Company', id: string, name: string }, department: { __typename?: 'Department', id: string, name: string } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } } };
+
+export type GetDashboardOverviewQueryVariables = Exact<{
+  companyId: Scalars['String']['input'];
+  employeeFilter?: InputMaybe<EmployeeFilterInput>;
+  employeePagination?: InputMaybe<EmployeePaginationInput>;
+  departmentFilter: DepartmentFilterInput;
+}>;
+
+
+export type GetDashboardOverviewQuery = { __typename?: 'Query', employees: { __typename?: 'EmployeeConnection', totalCount: number, nodes: Array<{ __typename?: 'Employee', id: string, companyId: string, departmentId: string, firstName: string, lastName: string, gradeId: number, status: string, kEfficiency?: number | null, workingHoursPerDay: number, department: { __typename?: 'Department', id: string, name: string }, grade: { __typename?: 'Grade', id: number, name: string, kGrade: number } }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } }, departments: { __typename?: 'DepartmentConnection', totalCount: number, nodes: Array<{ __typename?: 'Department', id: string, name: string, companyId: string, headId?: string | null, createdAt: Date, updatedAt: Date, head?: { __typename?: 'Employee', id: string, firstName: string, lastName: string } | null }>, pageInfo: { __typename?: 'PageInfo', hasMore: boolean, offset: number, limit: number, total: number } }, company?: { __typename?: 'Company', id: string, name: string, slug: string } | null };
+
+export type GetDashboardStatsQueryVariables = Exact<{
+  companyId: Scalars['String']['input'];
+}>;
+
+
+export type GetDashboardStatsQuery = { __typename?: 'Query', employees: { __typename?: 'EmployeeConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', total: number } }, departments: { __typename?: 'DepartmentConnection', totalCount: number }, company?: { __typename?: 'Company', id: string, name: string, slug: string } | null };
 
 
 export const GetCompanyBySlugDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyBySlug"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"slug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyBySlug"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"slug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"slug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"timezone"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursDay"}},{"kind":"Field","name":{"kind":"Name","value":"workingDaysPerMonth"}}]}}]}}]} as unknown as DocumentNode<GetCompanyBySlugQuery, GetCompanyBySlugQueryVariables>;
@@ -4034,4 +4009,6 @@ export const GetEmployeeDocument = {"kind":"Document","definitions":[{"kind":"Op
 export const GetEmployeeCapacityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployeeCapacity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employeeCapacity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<GetEmployeeCapacityQuery, GetEmployeeCapacityQueryVariables>;
 export const GetEmployeeLoadIndexDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployeeLoadIndex"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employeeLoadIndex"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodStart"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodStart"}}},{"kind":"Argument","name":{"kind":"Name","value":"periodEnd"},"value":{"kind":"Variable","name":{"kind":"Name","value":"periodEnd"}}}]}]}}]} as unknown as DocumentNode<GetEmployeeLoadIndexQuery, GetEmployeeLoadIndexQueryVariables>;
 export const GetEmployeesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEmployees"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeeFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeePaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"birthDate"}},{"kind":"Field","name":{"kind":"Name","value":"hireDate"}},{"kind":"Field","name":{"kind":"Name","value":"fireDate"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"employmentType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetEmployeesQuery, GetEmployeesQueryVariables>;
-export const GetProcessesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProcesses"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessPaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"processes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"processType"}},{"kind":"Field","name":{"kind":"Name","value":"capacityUnits"}},{"kind":"Field","name":{"kind":"Name","value":"kMultiplier"}},{"kind":"Field","name":{"kind":"Name","value":"estimatedDurationDays"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"company"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetProcessesQuery, GetProcessesQueryVariables>;
+export const GetProcessesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProcesses"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProcessPaginationInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"processes"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"plannedHours"}},{"kind":"Field","name":{"kind":"Name","value":"complexity"}},{"kind":"Field","name":{"kind":"Name","value":"businessImpact"}},{"kind":"Field","name":{"kind":"Name","value":"newness"}},{"kind":"Field","name":{"kind":"Name","value":"isBurningOut"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"company"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]}}]} as unknown as DocumentNode<GetProcessesQuery, GetProcessesQueryVariables>;
+export const GetDashboardOverviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDashboardOverview"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employeeFilter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeeFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"employeePagination"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"EmployeePaginationInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"departmentFilter"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DepartmentFilterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employeeFilter"}}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"Variable","name":{"kind":"Name","value":"employeePagination"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"departmentId"}},{"kind":"Field","name":{"kind":"Name","value":"department"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"gradeId"}},{"kind":"Field","name":{"kind":"Name","value":"grade"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"kGrade"}}]}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kEfficiency"}},{"kind":"Field","name":{"kind":"Name","value":"workingHoursPerDay"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"departments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"departmentFilter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companyId"}},{"kind":"Field","name":{"kind":"Name","value":"headId"}},{"kind":"Field","name":{"kind":"Name","value":"head"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasMore"}},{"kind":"Field","name":{"kind":"Name","value":"offset"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"company"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]} as unknown as DocumentNode<GetDashboardOverviewQuery, GetDashboardOverviewQueryVariables>;
+export const GetDashboardStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDashboardStats"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"employees"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"companyId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}}}]}},{"kind":"Argument","name":{"kind":"Name","value":"pagination"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"1"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"departments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"companyId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"company"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"companyId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]} as unknown as DocumentNode<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>;
