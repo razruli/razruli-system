@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       temperature: 0.7,
     });
 
-    return response;
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("[AI Analysis Error]", error);
     return new Response("Internal Server Error", { status: 500 });
