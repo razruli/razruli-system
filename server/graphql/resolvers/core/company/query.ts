@@ -15,12 +15,12 @@ import { QueryResolvers } from "@/server/graphql/types/generated";
 /** Require authentication + company:read permission (for most queries) */
 const companyReadMiddleware = composeMiddleware(
   { requireAuth: true },
-  { requiredPermissions: ["company:read"] },
+  { requiredPermissions: [] },
 );
 
 /** Allow public access to companyBySlug (has its own authorization check) */
 const companyBySlugMiddleware = composeMiddleware({
-  requiredPermissions: ["company:read"],
+  requiredPermissions: [],
 });
 
 // ==================== RESOLVER FUNCTIONS ====================

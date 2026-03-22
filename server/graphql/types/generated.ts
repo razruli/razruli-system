@@ -245,6 +245,14 @@ export enum AuditStatus {
   Success = 'SUCCESS'
 }
 
+/** Business Impact enumeration - importance/priority of the process */
+export enum BusinessImpactLevel {
+  Critical = 'CRITICAL',
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM'
+}
+
 /** Changes by specific user */
 export type ChangeByUser = {
   __typename?: 'ChangeByUser';
@@ -302,6 +310,14 @@ export type CompanyLoadAnalysis = {
   snapshotDate: Scalars['DateTime']['output'];
   totalEmployees: Scalars['Int']['output'];
 };
+
+/** Complexity level enumeration - maps to k-factors internally */
+export enum ComplexityLevel {
+  Complex = 'COMPLEX',
+  Expert = 'EXPERT',
+  Routine = 'ROUTINE',
+  Standard = 'STANDARD'
+}
 
 /** Compliance report */
 export type ComplianceReport = {
@@ -401,16 +417,17 @@ export type CreatePermissionInput = {
 
 /** Input for creating a process */
 export type CreateProcessInput = {
-  capacityUnits: Scalars['Int']['input'];
+  businessImpact?: InputMaybe<BusinessImpactLevel>;
   companyId: Scalars['String']['input'];
+  complexity?: InputMaybe<ComplexityLevel>;
   departmentId: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
-  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
-  kMultiplier: Scalars['Float']['input'];
-  name: Scalars['String']['input'];
-  priority?: InputMaybe<ProcessPriority>;
-  processType: ProcessType;
-  status?: InputMaybe<ProcessStatus>;
+  isBurningOut?: InputMaybe<Scalars['Boolean']['input']>;
+  newness?: InputMaybe<NewnessLevel>;
+  plannedHours: Scalars['Int']['input'];
+  status?: InputMaybe<ProcessStatusEnum>;
+  targetGradeId: Scalars['Int']['input'];
+  title: Scalars['String']['input'];
 };
 
 /** Input for creating a role */
@@ -1285,18 +1302,12 @@ export type Mutation = {
   assignActorRole: Scalars['Boolean']['output'];
   /** Assign department head */
   assignDepartmentHead: Department;
-  /** Assign capacity to process */
-  assignProcessCapacity: Process;
   /** Assign permission to role (admin only) */
   assignRolePermission: Scalars['Boolean']['output'];
   /** Block a task with reason */
   blockTaskAssignment: TaskAssignment;
   /** Bulk log audit entries */
   bulkLogAuditEntries: Array<AuditLog>;
-  /** Cancel a process */
-  cancelProcess: Process;
-  /** Complete a process */
-  completeProcess: Process;
   /** Complete a task assignment */
   completeTaskAssignment: TaskAssignment;
   /** Create a new actor (admin only) */
@@ -1361,8 +1372,6 @@ export type Mutation = {
   removeRolePermission: Scalars['Boolean']['output'];
   /** Revoke a permission from an actor */
   revokeActorPermission: Scalars['Boolean']['output'];
-  /** Start a process */
-  startProcess: Process;
   /** Start a task assignment */
   startTaskAssignment: TaskAssignment;
   /** Suspend an actor */
@@ -1453,17 +1462,6 @@ export type MutationAssignDepartmentHeadArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
-export type MutationAssignProcessCapacityArgs = {
-  capacityUnits: Scalars['Int']['input'];
-  kMultiplier: Scalars['Float']['input'];
-  processId: Scalars['String']['input'];
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
 export type MutationAssignRolePermissionArgs = {
   permissionId: Scalars['String']['input'];
   roleId: Scalars['String']['input'];
@@ -1486,25 +1484,6 @@ export type MutationBlockTaskAssignmentArgs = {
  */
 export type MutationBulkLogAuditEntriesArgs = {
   entries: Array<LogAuditEntryInput>;
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
-export type MutationCancelProcessArgs = {
-  id: Scalars['String']['input'];
-  reason?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
-export type MutationCompleteProcessArgs = {
-  id: Scalars['String']['input'];
 };
 
 
@@ -1814,15 +1793,6 @@ export type MutationRevokeActorPermissionArgs = {
  * Root Mutation type
  * Extended by each domain module
  */
-export type MutationStartProcessArgs = {
-  id: Scalars['String']['input'];
-};
-
-
-/**
- * Root Mutation type
- * Extended by each domain module
- */
 export type MutationStartTaskAssignmentArgs = {
   id: Scalars['String']['input'];
 };
@@ -1989,6 +1959,14 @@ export type MutationUpdateTaskProgressArgs = {
   id: Scalars['String']['input'];
 };
 
+/** Newness/Learning Curve enumeration */
+export enum NewnessLevel {
+  Experimental = 'EXPERIMENTAL',
+  Familiar = 'FAMILIAR',
+  New = 'NEW',
+  Routine = 'ROUTINE'
+}
+
 export type Node = {
   id: Scalars['ID']['output'];
 };
@@ -2057,33 +2035,37 @@ export enum PermissionScope {
 /** Process type representing business processes */
 export type Process = {
   __typename?: 'Process';
-  /** Capacity configuration */
-  capacityUnits: Scalars['Int']['output'];
+  businessImpact: BusinessImpactLevel;
   /** Relations */
   company: Company;
   /** Process details */
   companyId: Scalars['String']['output'];
-  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** Complexity metrics (converted to k-factors internally for weight calculation) */
+  complexity: ComplexityLevel;
   /** Timestamps */
   createdAt: Scalars['DateTime']['output'];
-  /** Audit trail */
-  createdBy: Scalars['String']['output'];
   department: Department;
   departmentId: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  estimatedDurationDays?: Maybe<Scalars['Int']['output']>;
+  finishedTasks?: Maybe<Array<Maybe<FinishedTask>>>;
   id: Scalars['String']['output'];
-  kMultiplier: Scalars['Float']['output'];
-  loadSnapshots?: Maybe<Array<Maybe<LoadSnapshot>>>;
-  name: Scalars['String']['output'];
-  priority: ProcessPriority;
-  processType: ProcessType;
-  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  isBurningOut: Scalars['Boolean']['output'];
+  newness: NewnessLevel;
+  /** Time and complexity estimation */
+  plannedHours: Scalars['Int']['output'];
   /** Status tracking */
-  status: ProcessStatus;
+  status: ProcessStatusEnum;
+  targetGrade: Grade;
+  targetGradeId: Scalars['Int']['output'];
   taskAssignments?: Maybe<Array<Maybe<TaskAssignment>>>;
+  title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
-  updatedBy?: Maybe<Scalars['String']['output']>;
+  /**
+   * Calculated weight and target grade
+   * Weight is stored at creation/import time, can be recalculated
+   * Formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
+   */
+  weight?: Maybe<Scalars['Float']['output']>;
 };
 
 /** Process completion breakdown */
@@ -2106,10 +2088,8 @@ export type ProcessConnection = {
 export type ProcessFilterInput = {
   companyId?: InputMaybe<Scalars['String']['input']>;
   departmentId?: InputMaybe<Scalars['String']['input']>;
-  priority?: InputMaybe<ProcessPriority>;
-  processType?: InputMaybe<ProcessType>;
   search?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<ProcessStatus>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Process metrics for analytics */
@@ -2131,14 +2111,6 @@ export type ProcessPaginationInput = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
-/** Process priority enumeration */
-export enum ProcessPriority {
-  Critical = 'CRITICAL',
-  High = 'HIGH',
-  Low = 'LOW',
-  Normal = 'NORMAL'
-}
-
 /** Process popularity ranking */
 export type ProcessRanking = {
   __typename?: 'ProcessRanking';
@@ -2150,9 +2122,10 @@ export type ProcessRanking = {
 
 /** Process sort fields */
 export enum ProcessSortField {
-  CapacityUnits = 'CAPACITY_UNITS',
   CreatedAt = 'CREATED_AT',
-  Name = 'NAME',
+  PlannedHours = 'PLANNED_HOURS',
+  Status = 'STATUS',
+  Title = 'TITLE',
   UpdatedAt = 'UPDATED_AT'
 }
 
@@ -2162,39 +2135,22 @@ export type ProcessSortInput = {
   order: SortOrder;
 };
 
-/** Process status enumeration */
-export enum ProcessStatus {
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Draft = 'DRAFT',
-  InProgress = 'IN_PROGRESS',
-  OnHold = 'ON_HOLD',
-  Planned = 'PLANNED'
-}
-
-/** Event type for process status changes */
+/** Process status change event */
 export type ProcessStatusChangeEvent = {
   __typename?: 'ProcessStatusChangeEvent';
-  changedAt: Scalars['DateTime']['output'];
-  changedBy: Scalars['String']['output'];
-  newStatus: ProcessStatus;
-  previousStatus: ProcessStatus;
-  process: Process;
-  reason?: Maybe<Scalars['String']['output']>;
+  newStatus: Scalars['String']['output'];
+  oldStatus: Scalars['String']['output'];
+  processId: Scalars['String']['output'];
+  timestamp: Scalars['DateTime']['output'];
 };
 
-/** Process type enumeration */
-export enum ProcessType {
-  Audit = 'AUDIT',
-  Compliance = 'COMPLIANCE',
-  Maintenance = 'MAINTENANCE',
-  Offboarding = 'OFFBOARDING',
-  Onboarding = 'ONBOARDING',
-  Other = 'OTHER',
-  PerformanceReview = 'PERFORMANCE_REVIEW',
-  ProjectDelivery = 'PROJECT_DELIVERY',
-  Recruitment = 'RECRUITMENT',
-  Training = 'TRAINING'
+/** Process Status enumeration */
+export enum ProcessStatusEnum {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  InProgress = 'IN_PROGRESS',
+  OnHold = 'ON_HOLD',
+  Open = 'OPEN'
 }
 
 /** Quarterly hiring projection */
@@ -2590,7 +2546,7 @@ export type QueryDepartmentMetricsArgs = {
  */
 export type QueryDepartmentProcessesArgs = {
   departmentId: Scalars['String']['input'];
-  status?: InputMaybe<ProcessStatus>;
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3778,13 +3734,15 @@ export type UpdatePermissionInput = {
 
 /** Input for updating a process */
 export type UpdateProcessInput = {
-  capacityUnits?: InputMaybe<Scalars['Int']['input']>;
+  businessImpact?: InputMaybe<BusinessImpactLevel>;
+  complexity?: InputMaybe<ComplexityLevel>;
   description?: InputMaybe<Scalars['String']['input']>;
-  estimatedDurationDays?: InputMaybe<Scalars['Int']['input']>;
-  kMultiplier?: InputMaybe<Scalars['Float']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  priority?: InputMaybe<ProcessPriority>;
-  status?: InputMaybe<ProcessStatus>;
+  isBurningOut?: InputMaybe<Scalars['Boolean']['input']>;
+  newness?: InputMaybe<NewnessLevel>;
+  plannedHours?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<ProcessStatusEnum>;
+  targetGradeId?: InputMaybe<Scalars['Int']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Input for updating a role */
@@ -3987,10 +3945,12 @@ export type ResolversTypes = {
   AuditStatus: AuditStatus;
   BigInt: ResolverTypeWrapper<Scalars['BigInt']['output']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  BusinessImpactLevel: BusinessImpactLevel;
   ChangeByUser: ResolverTypeWrapper<Omit<ChangeByUser, 'user'> & { user: ResolversTypes['User'] }>;
   ChangeTypeSummary: ResolverTypeWrapper<ChangeTypeSummary>;
   Company: ResolverTypeWrapper<CompanyModel>;
   CompanyLoadAnalysis: ResolverTypeWrapper<Omit<CompanyLoadAnalysis, 'company' | 'departmentMetrics'> & { company: ResolversTypes['Company'], departmentMetrics: Array<ResolversTypes['DepartmentLoadOverview']> }>;
+  ComplexityLevel: ComplexityLevel;
   ComplianceReport: ResolverTypeWrapper<Omit<ComplianceReport, 'company' | 'highRiskActivities' | 'userAccessSummary'> & { company: ResolversTypes['Company'], highRiskActivities: Array<ResolversTypes['AuditLog']>, userAccessSummary: Array<ResolversTypes['UserAccessSummary']> }>;
   CreateActorInput: CreateActorInput;
   CreateCompanyInput: CreateCompanyInput;
@@ -4076,6 +4036,7 @@ export type ResolversTypes = {
   LoadTrendPoint: ResolverTypeWrapper<LoadTrendPoint>;
   LogAuditEntryInput: LogAuditEntryInput;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  NewnessLevel: NewnessLevel;
   Node: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Node']>;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginationInput: PaginationInput;
@@ -4090,13 +4051,11 @@ export type ResolversTypes = {
   ProcessFilterInput: ProcessFilterInput;
   ProcessMetrics: ResolverTypeWrapper<Omit<ProcessMetrics, 'process'> & { process: ResolversTypes['Process'] }>;
   ProcessPaginationInput: ProcessPaginationInput;
-  ProcessPriority: ProcessPriority;
   ProcessRanking: ResolverTypeWrapper<ProcessRanking>;
   ProcessSortField: ProcessSortField;
   ProcessSortInput: ProcessSortInput;
-  ProcessStatus: ProcessStatus;
-  ProcessStatusChangeEvent: ResolverTypeWrapper<Omit<ProcessStatusChangeEvent, 'process'> & { process: ResolversTypes['Process'] }>;
-  ProcessType: ProcessType;
+  ProcessStatusChangeEvent: ResolverTypeWrapper<ProcessStatusChangeEvent>;
+  ProcessStatusEnum: ProcessStatusEnum;
   QuarterlyProjection: ResolverTypeWrapper<QuarterlyProjection>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   RecommendationPriority: RecommendationPriority;
@@ -4258,7 +4217,7 @@ export type ResolversParentTypes = {
   ProcessPaginationInput: ProcessPaginationInput;
   ProcessRanking: ProcessRanking;
   ProcessSortInput: ProcessSortInput;
-  ProcessStatusChangeEvent: Omit<ProcessStatusChangeEvent, 'process'> & { process: ResolversParentTypes['Process'] };
+  ProcessStatusChangeEvent: ProcessStatusChangeEvent;
   QuarterlyProjection: QuarterlyProjection;
   Query: Record<PropertyKey, never>;
   RecordEmployeeHistoryInput: RecordEmployeeHistoryInput;
@@ -4887,12 +4846,9 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   archiveAuditLogs?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<MutationArchiveAuditLogsArgs, 'dateRange'>>;
   assignActorRole?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAssignActorRoleArgs, 'actorId' | 'roleId'>>;
   assignDepartmentHead?: Resolver<ResolversTypes['Department'], ParentType, ContextType, RequireFields<MutationAssignDepartmentHeadArgs, 'departmentId' | 'employeeId'>>;
-  assignProcessCapacity?: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationAssignProcessCapacityArgs, 'capacityUnits' | 'kMultiplier' | 'processId'>>;
   assignRolePermission?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAssignRolePermissionArgs, 'permissionId' | 'roleId'>>;
   blockTaskAssignment?: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationBlockTaskAssignmentArgs, 'id' | 'reason'>>;
   bulkLogAuditEntries?: Resolver<Array<ResolversTypes['AuditLog']>, ParentType, ContextType, RequireFields<MutationBulkLogAuditEntriesArgs, 'entries'>>;
-  cancelProcess?: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCancelProcessArgs, 'id'>>;
-  completeProcess?: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationCompleteProcessArgs, 'id'>>;
   completeTaskAssignment?: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationCompleteTaskAssignmentArgs, 'id'>>;
   createActor?: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationCreateActorArgs, 'input'>>;
   createCompany?: Resolver<Maybe<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MutationCreateCompanyArgs, 'input'>>;
@@ -4925,7 +4881,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   removeActorRole?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveActorRoleArgs, 'actorId' | 'roleId'>>;
   removeRolePermission?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveRolePermissionArgs, 'permissionId' | 'roleId'>>;
   revokeActorPermission?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRevokeActorPermissionArgs, 'actorId' | 'permissionId'>>;
-  startProcess?: Resolver<ResolversTypes['Process'], ParentType, ContextType, RequireFields<MutationStartProcessArgs, 'id'>>;
   startTaskAssignment?: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationStartTaskAssignmentArgs, 'id'>>;
   suspendActor?: Resolver<ResolversTypes['Actor'], ParentType, ContextType, RequireFields<MutationSuspendActorArgs, 'id'>>;
   unblockTaskAssignment?: Resolver<ResolversTypes['TaskAssignment'], ParentType, ContextType, RequireFields<MutationUnblockTaskAssignmentArgs, 'id'>>;
@@ -4976,27 +4931,26 @@ export type PermissionConnectionResolvers<ContextType = GraphQLContext, ParentTy
 };
 
 export type ProcessResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Process'] = ResolversParentTypes['Process']> = {
-  capacityUnits?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  businessImpact?: Resolver<ResolversTypes['BusinessImpactLevel'], ParentType, ContextType>;
   company?: Resolver<ResolversTypes['Company'], ParentType, ContextType>;
   companyId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  completedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  complexity?: Resolver<ResolversTypes['ComplexityLevel'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  createdBy?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   department?: Resolver<ResolversTypes['Department'], ParentType, ContextType>;
   departmentId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  estimatedDurationDays?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  finishedTasks?: Resolver<Maybe<Array<Maybe<ResolversTypes['FinishedTask']>>>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  kMultiplier?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-  loadSnapshots?: Resolver<Maybe<Array<Maybe<ResolversTypes['LoadSnapshot']>>>, ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  priority?: Resolver<ResolversTypes['ProcessPriority'], ParentType, ContextType>;
-  processType?: Resolver<ResolversTypes['ProcessType'], ParentType, ContextType>;
-  startedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['ProcessStatus'], ParentType, ContextType>;
+  isBurningOut?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  newness?: Resolver<ResolversTypes['NewnessLevel'], ParentType, ContextType>;
+  plannedHours?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['ProcessStatusEnum'], ParentType, ContextType>;
+  targetGrade?: Resolver<ResolversTypes['Grade'], ParentType, ContextType>;
+  targetGradeId?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   taskAssignments?: Resolver<Maybe<Array<Maybe<ResolversTypes['TaskAssignment']>>>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  updatedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  weight?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
 };
 
 export type ProcessCompletionStatsResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessCompletionStats'] = ResolversParentTypes['ProcessCompletionStats']> = {
@@ -5029,12 +4983,10 @@ export type ProcessRankingResolvers<ContextType = GraphQLContext, ParentType ext
 };
 
 export type ProcessStatusChangeEventResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['ProcessStatusChangeEvent'] = ResolversParentTypes['ProcessStatusChangeEvent']> = {
-  changedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  changedBy?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  newStatus?: Resolver<ResolversTypes['ProcessStatus'], ParentType, ContextType>;
-  previousStatus?: Resolver<ResolversTypes['ProcessStatus'], ParentType, ContextType>;
-  process?: Resolver<ResolversTypes['Process'], ParentType, ContextType>;
-  reason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  newStatus?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  oldStatus?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  processId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 };
 
 export type QuarterlyProjectionResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['QuarterlyProjection'] = ResolversParentTypes['QuarterlyProjection']> = {

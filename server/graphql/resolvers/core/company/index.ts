@@ -20,6 +20,7 @@ export const companyResolvers = {
     company: companyQueries.company,
     myCompany: companyQueries.myCompany,
     companies: companyQueries.companies,
+    companyBySlug: companyQueries.companyBySlug,
   },
 
   Mutation: {
