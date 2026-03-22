@@ -1,0 +1,68 @@
+query GetDashboardOverview(
+  $companyId: String!
+  $employeeFilter: EmployeeFilterInput
+  $employeePagination: EmployeePaginationInput
+  $departmentFilter: DepartmentFilterInput!
+) {
+  # Get employees summary (first page for quick stats)
+  employees(filter: $employeeFilter, pagination: $employeePagination) {
+    nodes {
+      id
+      companyId
+      departmentId
+      department {
+        id
+        name
+      }
+      firstName
+      lastName
+      gradeId
+      grade {
+        id
+        name
+        kGrade
+      }
+      status
+      kEfficiency
+      workingHoursPerDay
+    }
+    totalCount
+    pageInfo {
+      hasMore
+      offset
+      limit
+      total
+    }
+  }
+
+  # Get departments with metrics
+  departments(filter: $departmentFilter) {
+    nodes {
+      id
+      name
+      companyId
+      headId
+      head {
+        id
+        firstName
+        lastName
+      }
+      createdAt
+      updatedAt
+    }
+    totalCount
+    pageInfo {
+      hasMore
+      offset
+      limit
+      total
+    }
+  }
+
+  # Get company stats
+  company(id: $companyId) {
+    id
+    name
+    slug
+  }
+}

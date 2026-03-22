@@ -1,0 +1,21 @@
+query GetDashboardStats($companyId: String!) {
+  # Employee stats
+  employees(filter: { companyId: $companyId }, pagination: { limit: 1 }) {
+    totalCount
+    pageInfo {
+      total
+    }
+  }
+
+  # Department stats
+  departments(filter: { companyId: $companyId }) {
+    totalCount
+  }
+
+  # Company info
+  company(id: $companyId) {
+    id
+    name
+    slug
+  }
+}

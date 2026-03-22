@@ -1,21 +1,23 @@
-query GetProcesses($filter: ProcessFilterInput, $pagination: ProcessPaginationInput) {
+query GetProcesses(
+  $filter: ProcessFilterInput
+  $pagination: ProcessPaginationInput
+) {
   processes(filter: $filter, pagination: $pagination) {
     nodes {
       id
       companyId
       departmentId
-      name
+      title
       description
-      processType
-      capacityUnits
-      kMultiplier
-      estimatedDurationDays
+      plannedHours
+      complexity
+      businessImpact
+      newness
+      isBurningOut
+      weight
       status
-      priority
       createdAt
       updatedAt
-      startedAt
-      completedAt
       company {
         id
         name
