@@ -2,13 +2,13 @@
  * ============================================================================
  * Context Builder - Orchestrator
  * ============================================================================
- * Brings together: DataLoaders + Services + User + Cache = GraphQLContext
+ * Brings together: DataLoaders + Services + User + Actor + Cache = GraphQLContext
  * Called ONCE per GraphQL request
  *
  * Flow:
  * 1. Create fresh DataLoaders (per-request batching)
  * 2. Create fresh Cache (request-scoped)
- * 3. Create ServiceContext (with prisma, dataloaders, cache, user)
+ * 3. Create ServiceContext (with prisma, dataloaders, cache, user, actor)
  * 4. Create all Services via ServiceFactory (lazy-loaded)
  * 5. Assemble into GraphQLContext
  * ============================================================================
@@ -16,7 +16,11 @@
 
 import { v4 as uuidv4 } from "uuid";
 
-import type { PrismaClient, User } from "@/server/db/generated/prisma/client";
+import type {
+  PrismaClient,
+  User,
+  Actor,
+} from "@/server/db/generated/prisma/client";
 import { ServiceFactory } from "@/server/services/ServiceFactory";
 import type { ServiceContext } from "@/server/types/context";
 
@@ -27,11 +31,13 @@ import type { GraphQLContext } from "./types";
 /**
  * Build complete GraphQL context for this request
  *
- * This is called ONCE per GraphQL request and provides:
- * - Fresh DataLoaders (prevents N+1 queries)
- * - Fresh Services (for this request only)
- * - Request tracing (requestId)
- * - User authentication (from JWT/session)
+ * Responsibilities:
+ * 1. Fetch actor from DB if user is authenticated
+ * 2. Create fresh DataLoaders (prevents N+1 queries)
+ * 3. Create fresh Services (for this request only)
+ * 4. Assemble request tracing and metadata
+ * - User authentication (from session)
+ * - Actor business entity (with roles, permissions, company context)
  * - Cache management (request-scoped + optional persistent)
  *
  * @param prisma - Prisma client (singleton, shared)
@@ -39,20 +45,6 @@ import type { GraphQLContext } from "./types";
  * @param userAgent - HTTP user agent (for audit logging)
  *
  * @returns Complete GraphQL context ready for resolvers
- *
- * @example
- * ```typescript
- * // In Apollo Server context function
- * const context = await buildGraphQLContext(
- *   prisma,
- *   user,  // from auth middleware
- *   req.headers['user-agent']
- * );
- *
- * // In resolver:
- * const employee = await context.loaders.employee.load(id);
- * const updated = await context.services.employee.update(id, data);
- * ```
  */
 export async function buildGraphQLContext(
   prisma: PrismaClient,
@@ -62,20 +54,48 @@ export async function buildGraphQLContext(
   const requestId = uuidv4();
   const requestStartTime = Date.now();
 
-  // ==================== STEP 1: DataLoaders ====================
+  // ==================== STEP 1: Fetch Actor ====================
+  // Fetch actor from DB if user is authenticated
+  // Actor is the business entity with roles, permissions, company context
+  let actor: Actor | null | undefined = null;
+  if (user) {
+    actor = await prisma.actor.findUnique({
+      where: { userId: user.id },
+      include: {
+        company: true,
+        department: true,
+        roles: {
+          include: {
+            role: {
+              include: {
+                permissions: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // ==================== STEP 2: DataLoaders ====================
   // Fresh per request = automatic batching within this request
   const loaders = createDataLoaders(prisma);
 
-  // ==================== STEP 2: Cache ====================
+  // ==================== STEP 3: Cache ====================
   // Request-scoped cache for this GraphQL request
   const cache = new CacheService(`gql:${requestId}`);
 
-  // ==================== STEP 3: ServiceContext ====================
+  // ==================== STEP 4: ServiceContext ====================
   // Context that services depend on
   const serviceContext: ServiceContext = {
     // User
     userId: user?.id || null,
     user,
+
+    // Actor
+    actor: actor || undefined,
+
+    // Authentication status
     isAuthenticated: !!user,
 
     // Database
@@ -95,19 +115,20 @@ export async function buildGraphQLContext(
     errors: [],
   };
 
-  // ==================== STEP 4: Services ====================
+  // ==================== STEP 5: Services ====================
   // Create all domain services via factory (lazy-loaded)
   const serviceFactory = new ServiceFactory(serviceContext);
   const services = serviceFactory.getServices();
 
-  // ==================== STEP 5: GraphQLContext ====================
+  // ==================== STEP 6: GraphQLContext ====================
   // Complete context ready for resolvers and middleware
   const context: GraphQLContext = {
     // Database
     prisma,
 
-    // User
+    // User and Actor
     user: user || null,
+    actor: actor || null,
 
     // DataLoaders
     loaders,

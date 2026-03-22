@@ -241,6 +241,7 @@ async function contextCreator(): Promise<GraphQLContext> {
     logger.debug("GraphQL context created successfully", {
       requestId: context.requestId,
       authenticated: !!context.user,
+      actor: context.actor,
     });
 
     return context;

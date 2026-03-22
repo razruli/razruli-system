@@ -21,7 +21,7 @@ export async function getUserFromRequest(): Promise<Session | null> {
       query: { disableCookieCache: true },
     });
 
-    if (!session) {
+    if (!session || !session.user) {
       return null;
     }
 

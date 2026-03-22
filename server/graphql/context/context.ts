@@ -3,7 +3,7 @@
  * GraphQL Context - Entry Point
  * ============================================================================
  * Called once per GraphQL request by Apollo Server
- * Responsibility: Get user, build context
+ * Responsibility: Get user and actor, build context
  * ============================================================================
  */
 
@@ -17,19 +17,22 @@ import { buildGraphQLContext } from "./builder";
  * Create GraphQL context for each request
  *
  * Flow:
- * 1. Accept session passed from route handler (already authenticated)
+ * 1. Get session from better-auth (authentication only)
  * 2. Extract user from session (null if not authenticated)
- * 3. Call buildGraphQLContext to assemble everything
+ * 3. Call buildGraphQLContext which handles:
+ *    - Fetching actor from DB (if user exists)
+ *    - Creating fresh loaders and services
+ *    - Assembling complete context
  * 4. Return to Apollo, which passes to middleware/resolvers
  *
  * Happens once per GraphQL request
  */
 export async function createContext() {
-  // Use provided session, or fetch if not provided (fallback for safety)
+  // Get authenticated session from better-auth
   const session = await getUserFromRequest();
   const user = session?.user || null;
 
-  // Build complete context with fresh loaders and services
+  // Build complete context (includes actor fetching)
   return buildGraphQLContext(prisma, user);
 }
 
