@@ -2,7 +2,7 @@
 // Process Service
 // ============================================================================
 
-import type { Process } from "@/server/db/generated/prisma/client";
+import type { Process, Prisma } from "@/server/db/generated/prisma/client";
 import { BaseService } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
 
@@ -78,27 +78,43 @@ export class ProcessService extends BaseService {
 
     const offset = pagination?.offset || 0;
     const limit = pagination?.limit || 20;
+    const sortBy = pagination?.sortBy || "createdAt";
+    const sortOrder = pagination?.sortOrder || "ASC";
 
-    let data = await this.repository.findAll();
-
-    // Apply filters
+    // Build Prisma filter object
+    const where: Prisma.ProcessWhereInput = {};
     if (filters?.companyId) {
-      data = data.filter((p) => p.companyId === filters.companyId);
+      where.companyId = filters.companyId;
     }
     if (filters?.status) {
-      data = data.filter((p) => p.status === filters.status);
+      where.status = filters.status;
     }
     if (filters?.search) {
-      const searchLower = filters.search.toLowerCase();
-      data = data.filter((p) => p.title.toLowerCase().includes(searchLower));
+      where.title = {
+        contains: filters.search,
+        mode: "insensitive",
+      };
     }
 
-    const total = data.length;
-    const paginatedData = data.slice(offset, offset + limit);
+    // Build sort object dynamically
+    const orderBy: Record<string, any> = {};
+    orderBy[sortBy] = sortOrder.toLowerCase();
+
+    // Query database with filters, sorting, and pagination
+    const [data, total] = await Promise.all([
+      this.context.prisma.process.findMany({
+        where,
+        orderBy,
+        skip: offset,
+        take: limit,
+      }),
+      this.context.prisma.process.count({ where }),
+    ]);
+
     const hasMore = offset + limit < total;
 
     return {
-      data: paginatedData,
+      data,
       total,
       hasMore,
     };
@@ -112,7 +128,11 @@ export class ProcessService extends BaseService {
     title: string;
     description?: string;
     plannedHours: number;
-    priority?: string;
+    complexity?: string;
+    businessImpact?: string;
+    newness?: string;
+    isBurningOut?: boolean;
+    targetGradeId: number;
     status?: string;
   }): Promise<Process> {
     this.log("info", `Creating process`, { title: data.title });
@@ -122,6 +142,7 @@ export class ProcessService extends BaseService {
     this.validate(data.companyId, "Company ID required");
     this.validate(data.departmentId, "Department ID required");
     this.validate(data.plannedHours, "Planned hours required");
+    this.validate(data.targetGradeId, "Target grade ID required");
 
     const process = await this.repository.create({
       title: data.title,
@@ -129,9 +150,13 @@ export class ProcessService extends BaseService {
       company: { connect: { id: data.companyId } },
       department: { connect: { id: data.departmentId } },
       plannedHours: data.plannedHours,
-      priority: data.priority || "medium",
+      complexity: data.complexity || "standard",
+      businessImpact: data.businessImpact || "medium",
+      newness: data.newness || "routine",
+      isBurningOut: data.isBurningOut ?? false,
       status: data.status || "open",
-      targetGrade: { connect: { id: 1 } }, // Default to grade 1
+      targetGrade: { connect: { id: data.targetGradeId } },
+      weight: null, // TODO: Calculate weight from complexity factors
     });
 
     this.log("info", `Process created`, {
@@ -149,8 +174,12 @@ export class ProcessService extends BaseService {
       title: string;
       description: string;
       status: string;
-      priority: string;
       plannedHours: number;
+      complexity: string;
+      businessImpact: string;
+      newness: string;
+      isBurningOut: boolean;
+      targetGradeId: number;
     }>,
   ): Promise<Process> {
     this.log("info", `Updating process`, { id });

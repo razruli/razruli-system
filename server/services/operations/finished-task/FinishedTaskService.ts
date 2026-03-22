@@ -4,6 +4,7 @@
  * Extends BaseService for caching and context management
  */
 
+import type { FinishedTask } from "@/server/db/generated/prisma/client";
 import { BaseService } from "@/server/services/base";
 import type { ServiceContext } from "@/server/types/context";
 
@@ -186,5 +187,18 @@ export class FinishedTaskService extends BaseService {
       options?.startDate,
       options?.endDate,
     );
+  }
+
+  /**
+   * Find finished tasks by process ID
+   * Used by field resolver to load finishedTasks relationship
+   */
+  async findByProcess(processId: string): Promise<FinishedTask[]> {
+    // Note: This needs the companyId from context or parent
+    // For now, return tasks for the given process across all companies
+    return this.context.prisma.finishedTask.findMany({
+      where: { processId },
+      orderBy: { completedAt: "desc" },
+    });
   }
 }
