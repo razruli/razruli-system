@@ -57,11 +57,22 @@ const processesResolver: QueryResolvers["processes"] = async (
       : undefined;
 
     // Convert pagination input to service format
+    // Map GraphQL enum values to Prisma field names
+    const sortFieldMap: Record<string, string> = {
+      CREATED_AT: "createdAt",
+      UPDATED_AT: "updatedAt",
+      TITLE: "title",
+      PLANNED_HOURS: "plannedHours",
+      STATUS: "status",
+    };
+
     const servicePagination = pagination
       ? {
           offset: pagination.skip || 0,
           limit: pagination.take || 20,
-          sortBy: pagination.orderBy?.field || "createdAt",
+          sortBy:
+            sortFieldMap[pagination.orderBy?.field || "CREATED_AT"] ||
+            "createdAt",
           sortOrder: pagination.orderBy?.order || ("ASC" as SortOrder),
         }
       : {

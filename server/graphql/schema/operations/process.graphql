@@ -13,82 +13,89 @@ type Process {
   """
   companyId: String!
   departmentId: String!
-  name: String!
+  title: String!
   description: String
-  processType: ProcessType!
 
   """
-  Capacity configuration
+  Time and complexity estimation
   """
-  capacityUnits: Int!
-  kMultiplier: Float!
-  estimatedDurationDays: Int
+  plannedHours: Int!
+
+  """
+  Complexity metrics (converted to k-factors internally for weight calculation)
+  """
+  complexity: ComplexityLevel!
+  businessImpact: BusinessImpactLevel!
+  newness: NewnessLevel!
+  isBurningOut: Boolean!
+
+  """
+  Calculated weight and target grade
+  Weight is stored at creation/import time, can be recalculated
+  Formula: (plannedHours/8) × (1 + kBurn + kCrit + kNew)
+  """
+  weight: Float
+  targetGradeId: Int!
 
   """
   Status tracking
   """
-  status: ProcessStatus!
-  priority: ProcessPriority!
+  status: ProcessStatusEnum!
 
   """
   Relations
   """
   company: Company!
   department: Department!
+  targetGrade: Grade!
   taskAssignments: [TaskAssignment]
-  loadSnapshots: [LoadSnapshot]
 
   """
   Timestamps
   """
   createdAt: DateTime!
   updatedAt: DateTime!
-  startedAt: DateTime
-  completedAt: DateTime
-
-  """
-  Audit trail
-  """
-  createdBy: String!
-  updatedBy: String
 }
 
 """
-Process type enumeration
+Complexity level enumeration - maps to k-factors internally
 """
-enum ProcessType {
-  RECRUITMENT
-  ONBOARDING
-  OFFBOARDING
-  TRAINING
-  PERFORMANCE_REVIEW
-  PROJECT_DELIVERY
-  MAINTENANCE
-  AUDIT
-  COMPLIANCE
-  OTHER
+enum ComplexityLevel {
+  ROUTINE
+  STANDARD
+  COMPLEX
+  EXPERT
 }
 
 """
-Process status enumeration
+Business Impact enumeration - importance/priority of the process
 """
-enum ProcessStatus {
-  DRAFT
-  PLANNED
+enum BusinessImpactLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Newness/Learning Curve enumeration
+"""
+enum NewnessLevel {
+  ROUTINE
+  FAMILIAR
+  NEW
+  EXPERIMENTAL
+}
+
+"""
+Process Status enumeration
+"""
+enum ProcessStatusEnum {
+  OPEN
   IN_PROGRESS
-  ON_HOLD
   COMPLETED
   CANCELLED
-}
-
-"""
-Process priority enumeration
-"""
-enum ProcessPriority {
-  CRITICAL
-  HIGH
-  NORMAL
-  LOW
+  ON_HOLD
 }
 
 """
@@ -97,27 +104,30 @@ Input for creating a process
 input CreateProcessInput {
   companyId: String!
   departmentId: String!
-  name: String!
+  title: String!
   description: String
-  processType: ProcessType!
-  capacityUnits: Int!
-  kMultiplier: Float!
-  estimatedDurationDays: Int
-  priority: ProcessPriority
-  status: ProcessStatus
+  plannedHours: Int!
+  complexity: ComplexityLevel
+  businessImpact: BusinessImpactLevel
+  newness: NewnessLevel
+  isBurningOut: Boolean
+  targetGradeId: Int!
+  status: ProcessStatusEnum
 }
 
 """
 Input for updating a process
 """
 input UpdateProcessInput {
-  name: String
+  title: String
   description: String
-  status: ProcessStatus
-  priority: ProcessPriority
-  capacityUnits: Int
-  kMultiplier: Float
-  estimatedDurationDays: Int
+  plannedHours: Int
+  complexity: ComplexityLevel
+  businessImpact: BusinessImpactLevel
+  newness: NewnessLevel
+  isBurningOut: Boolean
+  status: ProcessStatusEnum
+  targetGradeId: Int
 }
 
 """
@@ -126,9 +136,7 @@ Process filter input
 input ProcessFilterInput {
   companyId: String
   departmentId: String
-  processType: ProcessType
-  status: ProcessStatus
-  priority: ProcessPriority
+  status: String
   search: String
 }
 
@@ -155,8 +163,9 @@ Process sort fields
 enum ProcessSortField {
   CREATED_AT
   UPDATED_AT
-  CAPACITY_UNITS
-  NAME
+  TITLE
+  PLANNED_HOURS
+  STATUS
 }
 
 """
@@ -202,7 +211,7 @@ extend type Query {
   """
   List processes by department
   """
-  departmentProcesses(departmentId: String!, status: ProcessStatus): [Process!]!
+  departmentProcesses(departmentId: String!, status: String): [Process!]!
 
   """
   Get process with metrics for analytics
@@ -216,6 +225,16 @@ extend type Query {
     companyId: String!
     filter: ProcessFilterInput
   ): [ProcessMetrics!]!
+}
+
+"""
+Process status change event
+"""
+type ProcessStatusChangeEvent {
+  processId: String!
+  oldStatus: String!
+  newStatus: String!
+  timestamp: DateTime!
 }
 
 # ============================================================================
@@ -237,30 +256,6 @@ extend type Mutation {
   Delete a process
   """
   deleteProcess(id: String!): Boolean!
-
-  """
-  Start a process
-  """
-  startProcess(id: String!): Process!
-
-  """
-  Complete a process
-  """
-  completeProcess(id: String!): Process!
-
-  """
-  Cancel a process
-  """
-  cancelProcess(id: String!, reason: String): Process!
-
-  """
-  Assign capacity to process
-  """
-  assignProcessCapacity(
-    processId: String!
-    capacityUnits: Int!
-    kMultiplier: Float!
-  ): Process!
 }
 
 # ============================================================================
@@ -282,16 +277,4 @@ extend type Subscription {
   Subscribe to process status changes
   """
   processStatusChanged(processId: String!): ProcessStatusChangeEvent!
-}
-
-"""
-Event type for process status changes
-"""
-type ProcessStatusChangeEvent {
-  process: Process!
-  previousStatus: ProcessStatus!
-  newStatus: ProcessStatus!
-  changedAt: DateTime!
-  changedBy: String!
-  reason: String
 }

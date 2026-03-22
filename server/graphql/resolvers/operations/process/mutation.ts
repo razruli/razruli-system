@@ -44,19 +44,30 @@ const createProcessResolver: MutationResolvers["createProcess"] = async (
 ) => {
   try {
     // Validate required fields
-    if (!input.name || !input.companyId || !input.departmentId) {
-      throw new Error("Missing required fields: name, companyId, departmentId");
+    if (!input.title || !input.companyId || !input.departmentId) {
+      throw new Error(
+        "Missing required fields: title, companyId, departmentId",
+      );
     }
 
     // Create process with input data
+    // Note: Enum values from GraphQL are uppercase (STANDARD), normalize to lowercase for Prisma
     const process = await context.services.process.create({
       companyId: input.companyId,
       departmentId: input.departmentId,
-      title: input.name,
+      title: input.title,
       description: input.description ?? undefined,
-      plannedHours: Math.ceil(input.capacityUnits * 8), // Convert CU to hours
-      priority: input.priority ?? "medium",
-      status: input.status ?? "open",
+      plannedHours: input.plannedHours,
+      complexity: input.complexity
+        ? input.complexity.toLowerCase()
+        : "standard",
+      businessImpact: input.businessImpact
+        ? input.businessImpact.toLowerCase()
+        : "medium",
+      newness: input.newness ? input.newness.toLowerCase() : "routine",
+      isBurningOut: input.isBurningOut ?? false,
+      targetGradeId: input.targetGradeId,
+      status: input.status ? input.status.toLowerCase() : "open",
     });
 
     // TODO: Implement event emitter
@@ -84,12 +95,16 @@ const updateProcessResolver: MutationResolvers["updateProcess"] = async (
       title: string;
       description: string;
       status: string;
-      priority: string;
       plannedHours: number;
+      complexity: string;
+      businessImpact: string;
+      newness: string;
+      isBurningOut: boolean;
+      targetGradeId: number;
     }> = {};
 
-    if (input.name !== undefined && input.name !== oldProcess.title) {
-      updateData.title = input.name ?? undefined;
+    if (input.title !== undefined && input.title !== oldProcess.title) {
+      updateData.title = input.title || oldProcess.title;
     }
 
     if (
@@ -99,23 +114,53 @@ const updateProcessResolver: MutationResolvers["updateProcess"] = async (
       updateData.description = input.description ?? undefined;
     }
 
-    if (input.status !== undefined && input.status !== oldProcess.status) {
-      updateData.status = input.status ?? undefined;
+    if (input.status !== undefined) {
+      const normalizedStatus = input.status?.toLowerCase();
+      if (normalizedStatus !== oldProcess.status) {
+        updateData.status = normalizedStatus;
+      }
     }
 
     if (
-      input.priority !== undefined &&
-      input.priority !== oldProcess.priority
+      input.plannedHours !== undefined &&
+      input.plannedHours !== oldProcess.plannedHours
     ) {
-      updateData.priority = input.priority ?? undefined;
+      updateData.plannedHours = input.plannedHours || 0;
+    }
+
+    if (input.complexity !== undefined) {
+      const normalizedComplexity = input.complexity?.toLowerCase();
+      if (normalizedComplexity !== oldProcess.complexity) {
+        updateData.complexity = normalizedComplexity;
+      }
+    }
+
+    if (input.businessImpact !== undefined) {
+      const normalizedImpact = input.businessImpact?.toLowerCase();
+      if (normalizedImpact !== oldProcess.businessImpact) {
+        updateData.businessImpact = normalizedImpact;
+      }
+    }
+
+    if (input.newness !== undefined) {
+      const normalizedNewness = input.newness?.toLowerCase();
+      if (normalizedNewness !== oldProcess.newness) {
+        updateData.newness = normalizedNewness;
+      }
     }
 
     if (
-      input.capacityUnits !== undefined &&
-      input.capacityUnits !== null &&
-      input.capacityUnits * 8 !== oldProcess.plannedHours
+      input.isBurningOut !== undefined &&
+      input.isBurningOut !== oldProcess.isBurningOut
     ) {
-      updateData.plannedHours = input.capacityUnits * 8;
+      updateData.isBurningOut = input.isBurningOut || false;
+    }
+
+    if (
+      input.targetGradeId !== undefined &&
+      input.targetGradeId !== oldProcess.targetGradeId
+    ) {
+      updateData.targetGradeId = input.targetGradeId || 3;
     }
 
     if (Object.keys(updateData).length === 0) {

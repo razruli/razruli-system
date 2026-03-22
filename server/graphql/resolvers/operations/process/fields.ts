@@ -5,15 +5,57 @@
  * Resolves nested fields using DataLoaders to prevent N+1 queries
  */
 
-import {
+import type {
   ProcessResolvers,
   ProcessMetricsResolvers,
+  ComplexityLevel,
+  BusinessImpactLevel,
+  NewnessLevel,
+  ProcessStatusEnum,
 } from "@/server/graphql/types/generated";
+
+// Explicitly define enum field resolvers with correct typing
+const enumFieldResolvers = {
+  /**
+   * Resolve and normalize complexity enum
+   * Database stores lowercase ("standard"), GraphQL expects uppercase ("STANDARD")
+   */
+  complexity: (parent: any): ComplexityLevel => {
+    return parent.complexity.toUpperCase() as ComplexityLevel;
+  },
+
+  /**
+   * Resolve and normalize businessImpact enum
+   * Database stores lowercase ("medium"), GraphQL expects uppercase ("MEDIUM")
+   */
+  businessImpact: (parent: any): BusinessImpactLevel => {
+    return parent.businessImpact.toUpperCase() as BusinessImpactLevel;
+  },
+
+  /**
+   * Resolve and normalize newness enum
+   * Database stores lowercase ("routine"), GraphQL expects uppercase ("ROUTINE")
+   */
+  newness: (parent: any): NewnessLevel => {
+    return parent.newness.toUpperCase() as NewnessLevel;
+  },
+
+  /**
+   * Resolve and normalize status enum
+   * Database stores lowercase ("open"), GraphQL expects uppercase ("OPEN")
+   */
+  status: (parent: any): ProcessStatusEnum => {
+    return parent.status.toUpperCase() as ProcessStatusEnum;
+  },
+};
 
 export const processFieldResolvers: Pick<
   ProcessResolvers,
-  "company" | "department" | "taskAssignments" | "loadSnapshots"
-> = {
+  "company" | "department" | "targetGrade" | "taskAssignments"
+> &
+  typeof enumFieldResolvers = {
+  ...enumFieldResolvers,
+
   /**
    * Resolve process's company
    */
@@ -47,6 +89,24 @@ export const processFieldResolvers: Pick<
   },
 
   /**
+   * Resolve process's target grade
+   */
+  targetGrade: async (parent, _args, context) => {
+    try {
+      // Convert Int targetGradeId to string for Grade service
+      const grade = await context.services.grade.getById(
+        String(parent.targetGradeId),
+      );
+      if (!grade) {
+        throw new Error(`Grade not found: ${parent.targetGradeId}`);
+      }
+      return grade;
+    } catch (error) {
+      throw new Error(`Failed to load target grade: ${error}`);
+    }
+  },
+
+  /**
    * Resolve task assignments for this process
    */
   taskAssignments: async (parent, _args, context) => {
@@ -54,17 +114,6 @@ export const processFieldResolvers: Pick<
       return await context.services.taskAssignment.findByProcess(parent.id);
     } catch (error) {
       throw new Error(`Failed to load task assignments: ${error}`);
-    }
-  },
-
-  /**
-   * Resolve load snapshots for this process
-   */
-  loadSnapshots: async (parent, _args, context) => {
-    try {
-      return await context.services.loadSnapshot.findByProcess(parent.id);
-    } catch (error) {
-      throw new Error(`Failed to load load snapshots: ${error}`);
     }
   },
 };
