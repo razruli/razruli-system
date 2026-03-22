@@ -14,6 +14,7 @@ async function setupTestData() {
       update: {},
       create: {
         id: "company-1",
+        slug: "gruzin",
         name: "Gruzin Inc",
         timezone: "UTC+3",
         workingHoursDay: 8,
